@@ -1,0 +1,17 @@
+<div class="container mt-5">
+  <h1>Animal Rescue Assistant</h1>
+
+  <%= form_with url: intakes_path, method: :post, local: true, class: "card p-4 shadow-sm" do |f| %>
+    <div class="mb-3">
+      <%= label_tag :species, "Animal type" %>
+      <%= text_field_tag :species, nil, class: "form-control", placeholder: "e.g. hedgehog" %>
+    </div>
+
+    <div class="mb-3">
+      <%= label_tag :description, "Describe the situation" %>
+      <%= text_area_tag :description, nil, rows: 4, class: "form-control", placeholder: "Describe what you saw..." %>
+    </div>
+
+    <%= submit_tag "Send to AI", class: "btn btn-primary w-100" %>
+  <% end %>
+</div>

@@ -1,0 +1,30 @@
+<div class="container mt-5">
+  <h1>Rescue AI Response</h1>
+
+  <% if @result.present? %>
+    <div class="card p-4 shadow-sm">
+      <h5>Species:</h5>
+      <p><%= @result.dig("analysis", "species") %></p>
+
+      <h5>Condition:</h5>
+      <p><%= @result.dig("analysis", "condition") %></p>
+
+      <h5>Injury:</h5>
+      <p><%= @result.dig("analysis", "injury") %></p>
+
+      <h5>Handling:</h5>
+      <p><%= @result.dig("analysis", "handling") %></p>
+
+      <h5>Danger:</h5>
+      <p><%= @result.dig("analysis", "danger") %></p>
+
+      <div class="alert alert-success mt-4">
+        <%= @result["user_message"] %>
+      </div>
+    </div>
+  <% else %>
+    <div class="alert alert-warning">No AI response available.</div>
+  <% end %>
+
+  <%= link_to "Report another animal", root_path, class: "btn btn-outline-primary mt-4" %>
+</div>
