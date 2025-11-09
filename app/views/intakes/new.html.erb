@@ -1,15 +1,40 @@
 <div class="container mt-5">
   <h1>Animal Rescue Assistant</h1>
 
-  <%= form_with url: intakes_path, method: :post, local: true, class: "card p-4 shadow-sm" do |f| %>
+  <%= simple_form_for :intake,
+                      url: intakes_path,
+                      method: :post,
+                      local: true,
+                      data: { turbo: false },
+                      class: "card p-4 shadow-sm" do |f| %>
     <div class="mb-3">
-      <%= label_tag :species, "Animal type" %>
-      <%= text_field_tag :species, nil, class: "form-control", placeholder: "e.g. hedgehog" %>
+      <div class="form-check form-switch" >
+        <%= f.input :mock,
+                    as: :boolean,
+                    label: "Mock Data (toggle to use fake data, no ai call will be made)",
+                    input_html: { class: "form-check-input", role: "switch", checked:true } %>
+    </div>
+    <div class="mb-3">
+      <%= f.input :species,
+                  label: "Species*",
+                  placeholder: "e.g. Labrador, Mancoon, Pigeon...",
+                  required: true,
+                  input_html: { class: "form-control"} %>
     </div>
 
     <div class="mb-3">
-      <%= label_tag :description, "Describe the situation" %>
-      <%= text_area_tag :description, nil, rows: 4, class: "form-control", placeholder: "Describe what you saw..." %>
+      <%= f.input :description,
+                  label: "Description",
+                  as: :text,
+                  required: true,
+                  input_html: { placeholder: "What happend?", class: "form_control"} %>
+    </div>
+
+    <div class="mb-3">
+      <%= f.input :photo,
+                  as: :file,
+                  label: "Submit a Photo (optional)",
+                  input_html: { accept: "image/*", class: "form-control, form-control-lg" } %>
     </div>
 
     <%= submit_tag "Send to AI", class: "btn btn-primary w-100" %>
