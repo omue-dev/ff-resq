@@ -1,0 +1,42 @@
+<% animate = local_assigns.fetch(:animate, false) %>
+
+<% if message.role == "assistant" %>
+  <div class="chat-bubble ai-message bg-dark text-white animated-bubble position-relative mb-3"
+       id="ai-wrapper-<%= message.id %>"
+       data-message="<%= message.content %>">
+    <span id="ai-message-<%= message.id %>">
+      <% if animate %>
+        <span class="visually-hidden">AI response incoming</span>
+      <% else %>
+        <%= message.content %>
+      <% end %>
+    </span>
+  </div>
+
+  <% if animate %>
+    <script>
+      (function() {
+        const wrapper = document.getElementById("ai-wrapper-<%= message.id %>");
+        if (!wrapper || wrapper.dataset.animated === "true") return;
+
+        wrapper.dataset.animated = "true";
+        const aiMessage = document.getElementById("ai-message-<%= message.id %>");
+        if (!aiMessage) return;
+
+        const text = wrapper.dataset.message || "";
+        aiMessage.textContent = "";
+
+        let i = 0;
+        const interval = setInterval(() => {
+          aiMessage.textContent += text.charAt(i);
+          i += 1;
+          if (i >= text.length) clearInterval(interval);
+        }, 15);
+      })();
+    </script>
+  <% end %>
+<% else %>
+  <div class="chat-bubble user-message animated-bubble mb-3">
+    <%= message.content %>
+  </div>
+<% end %>
