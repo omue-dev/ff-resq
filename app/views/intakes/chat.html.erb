@@ -1,35 +1,60 @@
 <div class="chat-container mt-5">
   <h1 class="text-center mb-4">Rescue AI Chat</h1>
 
+  <!-- --- Error alert if AI failed --- -->
+  <% if @status == "error" %>
+    <div class="alert alert-danger text-center fw-bold">
+      ⚠️ AI error:
+      <%= @error_message.presence || "An unexpected problem occurred. Please try again later." %>
+    </div>
+  <% end %>
+
+  <!-- --- Chat window area --- -->
   <div class="chat-window shadow-sm bg-secondary p-4 border border-4 border-dark">
-    <% if @result.present? %>
-      <!-- AI response area -->
-      <div class="chat-bubble ai-message bg-dark text-white animated-bubble position-relative" id="ai-wrapper"
-           data-message="<%= @result.dig('user_message') %>">
+    <% if @intake.present? %>
+      <%= turbo_stream_from @intake %>
 
-       <!-- Thinking loader in the same bubble -->
-      <div class="thinking-loader" id="thinking" aria-live="polite" aria-label="AI is thinking">
-        <svg class="typing-dots" width="56" height="20" viewBox="0 0 56 20" role="img" aria-hidden="true">
-          <circle cx="8"  cy="10" r="4"></circle>
-          <circle cx="28" cy="10" r="4"></circle>
-          <circle cx="48" cy="10" r="4"></circle>
-        </svg>
+      <% show_waiting = @status == "pending" && (@chat_messages || []).none? { |msg| msg.role == "assistant" } %>
+      <% last_assistant_id = (@chat_messages || []).select { |msg| msg.role == "assistant" }.last&.id %>
+
+      <div id="chat_messages">
+        <% (@chat_messages || []).each do |message| %>
+          <%= render partial: "intakes/message",
+                     locals: { message: message, animate: message.id == last_assistant_id } %>
+        <% end %>
+
+        <% if show_waiting %>
+          <div class="chat-bubble ai-message bg-dark text-white animated-bubble position-relative mb-3"
+               id="ai-placeholder">
+            <div class="thinking-loader" aria-live="polite" aria-label="AI is thinking">
+              <svg class="typing-dots" width="56" height="20" viewBox="0 0 56 20" role="img" aria-hidden="true">
+                <circle cx="8"  cy="10" r="4"></circle>
+                <circle cx="28" cy="10" r="4"></circle>
+                <circle cx="48" cy="10" r="4"></circle>
+              </svg>
+            </div>
+            <span class="visually-hidden">Waiting for AI response</span>
+          </div>
+        <% end %>
       </div>
 
-        <!-- Text will be typed here -->
-        <span id="ai-message"></span>
-      </div>
+    <% elsif @result.present? %>
+      <div id="chat_messages">
+        <%= render partial: "intakes/message",
+                  locals: { message: OpenStruct.new(id: "mock", role: "user", content: "Mock user message"), animate: false } %>
 
-      <!-- User message -->
-      <div class="chat-bubble user-message mt-3 animated-bubble">
-        <%= params.dig(:intake, :description) %>
+        <%= render partial: "intakes/message",
+                  locals: { message: OpenStruct.new(id: "mock-ai", role: "assistant", content: @result.dig("user_message")), animate: true } %>
       </div>
     <% else %>
-      <div class="alert alert-warning text-center">No AI response available.</div>
+      <!-- Fallback if no AI response -->
+      <div class="alert alert-warning text-center fw-bold">
+        ⚠️ No AI response available.
+      </div>
     <% end %>
   </div>
 
-  <!-- Chat input -->
+  <!-- --- Chat input area --- -->
   <div class="chat-input-area mt-3">
     <%= form_with url: intakes_path, method: :post, local: true, data: { turbo: false }, class: "d-flex" do |f| %>
       <%= f.text_field :description, placeholder: "Type your message...", class: "form-control me-2 chat-input" %>
@@ -41,35 +66,3 @@
     <%= link_to "Show vets nearby", root_path, class: "btn btn-outline-dark btn-lg" %>
   </div>
 </div>
-
-
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const aiWrapper  = document.getElementById("ai-wrapper");   // the bubble wrapper (if you use one)
-    const aiMessage  = document.getElementById("ai-message");   // span/div where text is typed
-    const thinking   = document.getElementById("thinking");
-
-    const sourceEl = aiWrapper || aiMessage; // depending on your structure
-    const text = sourceEl?.dataset?.message;
-
-    if (!aiMessage || !text) return;
-
-    aiMessage.textContent = "";
-
-    // brief thinking, then fade out and type
-    setTimeout(() => {
-      if (thinking) {
-        thinking.style.transition = "opacity .35s ease";
-        thinking.style.opacity = "0";
-        setTimeout(() => thinking.style.display = "none", 350);
-      }
-
-      let i = 0;
-      const interval = setInterval(() => {
-        aiMessage.textContent += text.charAt(i);
-        i++;
-        if (i >= text.length) clearInterval(interval);
-      }, 15);
-    }, 2000);
-  });
-</script>

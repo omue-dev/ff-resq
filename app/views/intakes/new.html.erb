@@ -1,42 +1,58 @@
 <div class="container mt-5">
   <h1>Animal Rescue Assistant</h1>
 
+  <!-- Main intake form -->
+  <!-- Submits to IntakesController#create -->
   <%= simple_form_for :intake,
                       url: intakes_path,
                       method: :post,
-                      local: true,
+                      local: true,               # no AJAX/Turbo
                       data: { turbo: false },
                       class: "card p-4 shadow-sm" do |f| %>
+
+    <!-- --- Mock switch --- -->
+    <!-- When checked: skips AI call, uses fake test data -->
     <div class="mb-3">
-      <div class="form-check form-switch" >
+      <div class="form-check form-switch">
         <%= f.input :mock,
                     as: :boolean,
-                    label: "Mock Data (toggle to use fake data, no ai call will be made)",
-                    input_html: { class: "form-check-input", role: "switch", checked:true } %>
+                    label: "Mock Data (toggle to use fake data, no AI call will be made)",
+                    input_html: { class: "form-check-input", role: "switch", checked: true } %>
+      </div>
     </div>
+
+    <!-- --- Species field --- -->
+    <!-- Saved to intake.species, validated in model -->
     <div class="mb-3">
       <%= f.input :species,
                   label: "Species*",
                   placeholder: "e.g. Labrador, Mancoon, Pigeon...",
                   required: true,
-                  input_html: { class: "form-control"} %>
+                  input_html: { class: "form-control" } %>
     </div>
 
+    <!-- --- Description field --- -->
+    <!-- Saved to intake.description, used in AI prompt -->
     <div class="mb-3">
       <%= f.input :description,
                   label: "Description",
                   as: :text,
                   required: true,
-                  input_html: { placeholder: "What happend?", class: "form_control"} %>
+                  input_html: { placeholder: "What happened?", class: "form-control" } %>
     </div>
 
+    <!-- --- Photo upload --- -->
+    <!-- Optional image URL, used by GeminiClient if present -->
     <div class="mb-3">
       <%= f.input :photo,
                   as: :file,
                   label: "Submit a Photo (optional)",
-                  input_html: { accept: "image/*", class: "form-control, form-control-lg" } %>
+                  input_html: { accept: "image/*", class: "form-control form-control-lg" } %>
     </div>
 
+    <!-- --- Submit button --- -->
+    <!-- Triggers create action (either mock or real AI mode) -->
     <%= submit_tag "Send to AI", class: "btn btn-primary w-100" %>
+
   <% end %>
 </div>

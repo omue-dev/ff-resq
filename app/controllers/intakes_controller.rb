@@ -1,46 +1,72 @@
 class IntakesController < ApplicationController
-  require "net/http"
   require "json"
 
-  WEBHOOK_URL = "http://localhost:5678/webhook-test/animal-intake".freeze
-
+  # --- Handles form submission ---
   def create
-    # get the form data
-    species = params[:species].to_s.strip
-    description = params[:description].to_s.strip
-    mock = ActiveModel::Type::Boolean.new.cast(params[:intake][:mock])
-    # use mockdata for design
+    # Extract form data safely and normalize it
+    data = intake_params
+    species     = data[:species].to_s.strip
+    description = data[:description].to_s.strip
+    foto_url    = data[:foto_url].to_s.strip
+    mock        = ActiveModel::Type::Boolean.new.cast(data[:mock])
+
+    # --- Mock mode: use static data for UI testing, no AI call ---
     if mock
       result = {
         analysis: {
           species: "hedgehog",
           condition: "very bad condition",
-          injury: "large wound on the bag",
-          handling: "place it carefully in a bottle with a cloth",
-          danger: "be careful, hedgehogs can bite"
+          injury: "large wound on the back",
+          handling: "place it carefully in a box with a soft cloth",
+          danger: "be careful, hedgehogs can bite",
+          foto_url: "https://res.cloudinary.com/dtrtke9f2/image/upload/v1762606938/ltdwh0aldgwemqx8anvg.jpg"
         },
-        user_message: "It looks like the hedgehog is in very bad condition, with a large wound on its back. Please handle it carefully — place it in a box or bottle lined with a soft cloth to keep it warm and safe. Avoid touching it directly, as hedgehogs can bite when stressed. Contact a local wildlife rescue center as soon as possible for proper treatment."
+        user_message: "It looks like the hedgehog is in very bad condition, with a large wound on its back. Please handle it carefully — place it in a box lined with a soft cloth to keep it warm and safe. Avoid touching it directly, as hedgehogs can bite when stressed. Contact a local wildlife rescue center as soon as possible for proper treatment."
       }
+
+      # Pass fake result directly to chat view (skips database + AI)
+      redirect_to intake_chat_path(result: result.to_json)
+
     else
-      # prepare request to n8n webhook
-      uri = URI(WEBHOOK_URL)
-      request = Net::HTTP::Post.new(uri, { "Content-Type" => "application/json" })
-      request.body = { species: species, description: description }.to_json
+      # --- Real mode: store data in DB and let model handle AI ---
+      intake = Intake.create!(
+        species: species,
+        description: description,
+        status: "pending",
+        foto_url: foto_url.presence
+      )
 
-      # send to webhook and wait for response
-      response = Net::HTTP.start(uri.hostname, uri.port) do |http|
-        http.request(request)
-      end
+      # Save user's initial message
+      intake.chat_messages.create!(
+        role: "user",
+        content: description
+      )
 
-      # parse response
-      result = JSON.parse(response.body) rescue {}
+      # Model triggers after_create → generate_ai_summary (Gemini call)
+      redirect_to intake_chat_path(id: intake.id)
     end
-
-    # send parsed response to chat-messages
-    redirect_to intake_chat_path(result: result.to_json)
   end
 
+  # --- Shows chat with AI response ---
   def chat
-    @result = JSON.parse(params[:result]) rescue {}
+    if params[:result].present?
+      # Mock mode
+      @result = JSON.parse(params[:result]) rescue {}
+    else
+      # Real AI mode
+      @intake = Intake.find(params[:id])
+      @result = @intake.parsed_payload
+      @chat_messages = @intake.chat_messages.order(:created_at) # Load all messages
+
+      # Pass error + status info to the view
+      @status = @intake.status
+      @error_message = @intake.parsed_payload.dig("error") rescue nil
+    end
+  end
+
+  private
+
+  def intake_params
+    params.require(:intake).permit(:species, :description, :foto_url, :mock)
   end
 end
