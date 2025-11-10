@@ -16,7 +16,6 @@
         </svg>
       </div>
 
-
         <!-- Text will be typed here -->
         <span id="ai-message"></span>
       </div>
@@ -45,33 +44,32 @@
 
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-  const aiWrapper  = document.getElementById("ai-wrapper");   // the bubble wrapper (if you use one)
-  const aiMessage  = document.getElementById("ai-message");   // span/div where text is typed
-  const thinking   = document.getElementById("thinking");
+  document.addEventListener("DOMContentLoaded", function() {
+    const aiWrapper  = document.getElementById("ai-wrapper");   // the bubble wrapper (if you use one)
+    const aiMessage  = document.getElementById("ai-message");   // span/div where text is typed
+    const thinking   = document.getElementById("thinking");
 
-  const sourceEl = aiWrapper || aiMessage; // depending on your structure
-  const text = sourceEl?.dataset?.message;
+    const sourceEl = aiWrapper || aiMessage; // depending on your structure
+    const text = sourceEl?.dataset?.message;
 
-  if (!aiMessage || !text) return;
+    if (!aiMessage || !text) return;
 
-  aiMessage.textContent = "";
+    aiMessage.textContent = "";
 
-  // brief thinking, then fade out and type
-  setTimeout(() => {
-    if (thinking) {
-      thinking.style.transition = "opacity .35s ease";
-      thinking.style.opacity = "0";
-      setTimeout(() => thinking.style.display = "none", 350);
-    }
+    // brief thinking, then fade out and type
+    setTimeout(() => {
+      if (thinking) {
+        thinking.style.transition = "opacity .35s ease";
+        thinking.style.opacity = "0";
+        setTimeout(() => thinking.style.display = "none", 350);
+      }
 
-    let i = 0;
-    const interval = setInterval(() => {
-      aiMessage.textContent += text.charAt(i);
-      i++;
-      if (i >= text.length) clearInterval(interval);
-    }, 15);
-  }, 2000);
-});
-
+      let i = 0;
+      const interval = setInterval(() => {
+        aiMessage.textContent += text.charAt(i);
+        i++;
+        if (i >= text.length) clearInterval(interval);
+      }, 15);
+    }, 2000);
+  });
 </script>
