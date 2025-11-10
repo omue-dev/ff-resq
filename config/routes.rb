@@ -9,4 +9,5 @@ Rails.application.routes.draw do
   root "intakes#new"
   post "/intakes", to: "intakes#create"
   get "/chat", to: "intakes#chat", as: :intake_chat
+  get "vets", to: "vets#index"
 end
