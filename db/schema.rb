@@ -10,8 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_11_07_180153) do
+ActiveRecord::Schema[7.1].define(version: 2025_11_08_145759) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "pgcrypto"
   enable_extension "plpgsql"
 
   create_table "active_storage_attachments", force: :cascade do |t|
@@ -42,6 +43,29 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_07_180153) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "chat_messages", force: :cascade do |t|
+    t.bigint "intake_id", null: false
+    t.string "role"
+    t.text "content"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["intake_id"], name: "index_chat_messages_on_intake_id"
+  end
+
+  create_table "intakes", force: :cascade do |t|
+    t.uuid "conversation_uuid", default: -> { "gen_random_uuid()" }, null: false
+    t.string "species"
+    t.text "description"
+    t.string "foto_url"
+    t.string "source", default: "web"
+    t.string "status", default: "pending"
+    t.jsonb "raw_payload", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["conversation_uuid"], name: "index_intakes_on_conversation_uuid", unique: true
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "chat_messages", "intakes"
 end
