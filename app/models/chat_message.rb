@@ -1,19 +1,11 @@
 class ChatMessage < ApplicationRecord
+  # Each chat bubble belongs to the intake shown on the chat page.
   belongs_to :intake
 
   validates :role, presence: true
-  validates :content, presence: true, allow_blank: false  # <- Make sure this allows empty strings if needed
+  validates :content, presence: true, allow_blank: false
 
-  after_create_commit :broadcast_assistant_response, if: -> { role == "assistant" }
-
-  private
-
-  def broadcast_assistant_response
-    broadcast_replace_later_to(
-      intake,
-      target: "ai-placeholder",
-      partial: "intakes/message",
-      locals: { message: self, animate: true }
-    )
-  end
+  # `pending` (see migration) stays true while the Stimulus poll controller
+  # keeps asking the server for an updated version of the bubble. Once Gemini
+  # finishes we update the record (and the browser swaps in the latest HTML).
 end

@@ -11,41 +11,41 @@
 
   <!-- --- Chat window area --- -->
   <div class="chat-window shadow-sm bg-secondary p-4 border border-4 border-dark">
+
     <% if @intake.present? %>
-      <%= turbo_stream_from @intake %>
-
-      <% show_waiting = @status == "pending" && (@chat_messages || []).none? { |msg| msg.role == "assistant" } %>
-      <% last_assistant_id = (@chat_messages || []).select { |msg| msg.role == "assistant" }.last&.id %>
-
+      <!-- Real AI mode: every chat bubble comes from the database so the poll controller can refresh them -->
       <div id="chat_messages">
         <% (@chat_messages || []).each do |message| %>
-          <%= render partial: "intakes/message",
-                     locals: { message: message, animate: message.id == last_assistant_id } %>
-        <% end %>
-
-        <% if show_waiting %>
-          <div class="chat-bubble ai-message bg-dark text-white animated-bubble position-relative mb-3"
-               id="ai-placeholder">
-            <div class="thinking-loader" aria-live="polite" aria-label="AI is thinking">
-              <svg class="typing-dots" width="56" height="20" viewBox="0 0 56 20" role="img" aria-hidden="true">
-                <circle cx="8"  cy="10" r="4"></circle>
-                <circle cx="28" cy="10" r="4"></circle>
-                <circle cx="48" cy="10" r="4"></circle>
-              </svg>
-            </div>
-            <span class="visually-hidden">Waiting for AI response</span>
-          </div>
+          <%= render partial: "intakes/message", locals: { message: message } %>
         <% end %>
       </div>
 
-    <% elsif @result.present? %>
+    <% elsif @mock %>
+      <!-- --- MOCK MODE (Frontend only, no database) ---
+           When mock mode is active, there is no Intake record in the database.
+           Instead, fake data is generated in the controller and rendered directly here.
+           This is purely for demo/testing purposes, so refreshing the page will lose the data.
+           -->
       <div id="chat_messages">
-        <%= render partial: "intakes/message",
-                  locals: { message: OpenStruct.new(id: "mock", role: "user", content: "Mock user message"), animate: false } %>
 
+        <!-- --- Mock user message bubble ---
+            This represents what a user would type into the chat.
+            -->
+        <div class="chat-bubble user-message mb-3">
+          I found an injured pigeon near the park. It can’t fly and looks weak. What should I do?
+        </div>
+
+        <!-- --- Mock assistant (AI) reply bubble ---
+            This simulates the AI’s response without calling any backend.
+            -->
         <%= render partial: "intakes/message",
-                  locals: { message: OpenStruct.new(id: "mock-ai", role: "assistant", content: @result.dig("user_message")), animate: true } %>
+        locals: { message: OpenStruct.new(id: "mock-ai",
+                                          role: "assistant",
+                                          content: "Try to keep the pigeon calm and warm in a ventilated box. Offer a little water, but don’t feed it yet. Avoid touching the wings — and if it’s bleeding or can’t move, contact a local wildlife rescue center for proper care."),
+        animate: true } %>
+
       </div>
+
     <% else %>
       <!-- Fallback if no AI response -->
       <div class="alert alert-warning text-center fw-bold">
@@ -54,7 +54,11 @@
     <% end %>
   </div>
 
-  <!-- --- Chat input area --- -->
+  <!-- --- Chat input area ---
+       The user can submit a new message here.
+       When mock mode is enabled, the request will generate fake data in the controller
+       and render this same view without any database interaction.
+       -->
   <div class="chat-input-area mt-3">
     <%= form_with url: intakes_path, method: :post, local: true, data: { turbo: false }, class: "d-flex" do |f| %>
       <%= f.text_field :description, placeholder: "Type your message...", class: "form-control me-2 chat-input" %>
@@ -62,7 +66,39 @@
     <% end %>
   </div>
 
+  <!-- --- Navigation area --- -->
   <div class="text-center mt-4">
     <%= link_to "Show vets nearby", root_path, class: "btn btn-outline-dark btn-lg" %>
   </div>
 </div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // Find all AI message bubbles that should animate
+  const aiBubbles = document.querySelectorAll(".ai-message[data-message]");
+
+  aiBubbles.forEach(bubble => {
+    const text = bubble.dataset.message || "";
+    const aiText = bubble.querySelector(".ai-text");
+    const thinking = bubble.querySelector("[data-thinking]");
+
+    // Only run animation if animate==true in the render call
+    if (!aiText || !text.length) return;
+
+    // Brief thinking delay, then fade out the loader and type text
+    setTimeout(() => {
+      if (thinking) {
+        thinking.style.transition = "opacity .35s ease";
+        thinking.style.opacity = "0";
+        setTimeout(() => thinking.remove(), 350);
+      }
+
+      let i = 0;
+      const interval = setInterval(() => {
+        aiText.textContent += text.charAt(i);
+        i++;
+        if (i >= text.length) clearInterval(interval);
+      }, 15);
+    }, 1500); // 1.5s "thinking" delay
+  });
+});
+</script>
