@@ -36,29 +36,23 @@
 }
 
 /* --- Thinking loader inside AI bubble --- */
-.thinking-loader {
+.thinking-note {
   position: absolute;
   left: 1rem;
+  bottom: .8rem;
+  font-size: .85rem;
+  opacity: .8;
 }
-.thinking-loader.hidden {
-  opacity: 0;
-  pointer-events: none;
+.thinking-loader {
+  position: absolute;
+  right: 1rem;
+  bottom: .8rem;
 }
+.typing-dots circle { fill:#fff; transform-origin:center; animation: dot-bounce 1s ease-in-out infinite; opacity:.6 }
+.typing-dots circle:nth-child(2){ animation-delay:.15s }
+.typing-dots circle:nth-child(3){ animation-delay:.30s }
+@keyframes dot-bounce { 0%,80%,100%{ transform:translateY(0); opacity:.6 } 40%{ transform:translateY(-4px); opacity:1 } }
 
-/* --- Typing dots animation --- */
-.typing-dots circle {
-  fill: #fff;
-  transform-origin: center;
-  animation: dot-bounce 1s ease-in-out infinite;
-  opacity: 0.6;
-}
-.typing-dots circle:nth-child(2) { animation-delay: 0.15s; }
-.typing-dots circle:nth-child(3) { animation-delay: 0.30s; }
-
-@keyframes dot-bounce {
-  0%, 80%, 100% { transform: translateY(0);   opacity: 0.6; }
-  40%           { transform: translateY(-4px); opacity: 1;   }
-}
 
 /* --- User message bubble --- */
 .user-message {
