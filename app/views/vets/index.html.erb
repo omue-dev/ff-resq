@@ -1,31 +1,32 @@
 <h1>Nearby Vets</h1>
 
-<!-- The div where the map will appear -->
+<!-- Map container -->
 <div id="map" style="height: 500px; width: 100%; border-radius: 10px;"></div>
 
-<!-- Load the Google Maps JavaScript SDK with the Places library -->
+<!-- Load the new Google Maps JavaScript SDK with the Places library -->
 <script async defer
   src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&libraries=places">
 </script>
 
 <script>
-  // 🔹 When the page finishes loading, run the initMap function
+  // ✅ Wait until the page finishes loading before starting
   window.addEventListener("load", initMap);
 
-  // 🔹 Main function that sets up the map
-  function initMap() {
-    // Check if the browser supports geolocation
+  // ------------------------------------------------------------
+  // STEP 1: Initialize the map and ask for the user's location
+  // ------------------------------------------------------------
+  async function initMap() {
     if (navigator.geolocation) {
-      // If yes, ask for the user's location
       navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
     } else {
-      // If not, show an alert
       alert("Geolocation is not supported by your browser!");
     }
   }
 
-  // 🔹 Runs if the user's location is successfully found
-  function successCallback(position) {
+  // ------------------------------------------------------------
+  // STEP 2: If location is found, show the map and find nearby vets
+  // ------------------------------------------------------------
+  async function successCallback(position) {
     // Store the user's latitude and longitude
     const userLocation = {
       lat: position.coords.latitude,
@@ -38,72 +39,93 @@
       zoom: 14
     });
 
-    // Add a marker to show where the user is
-    new google.maps.Marker({
+    // Add a blue marker showing where the user is
+    new google.maps.marker.AdvancedMarkerElement({
+      map,
       position: userLocation,
-      map: map,
       title: "You are here",
-      icon: {
-        url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" // blue marker icon
-      }
+      content: createCustomMarker("📍 You are here")
     });
 
-    // Create a PlacesService instance linked to the map
-    const service = new google.maps.places.PlacesService(map);
+    // ------------------------------------------------------------
+    // STEP 3: Use the new Places API to search for nearby vets
+    // ------------------------------------------------------------
+    try {
+      // Define your search request
+      const request = {
+        // What information to return for each place
+        fields: ["displayName", "formattedAddress", "location", "rating"],
+        // Where to search (a circular area)
+        locationBias: {
+          circle: {
+            center: userLocation,
+            radius: 5000 // 5 km search radius
+          }
+        },
+        // Limit to veterinary clinics
+        includedTypes: ["veterinary_care"]
+      };
 
-    // 🔹 Search for nearby vets
-    service.nearbySearch(
-      {
-        // Where to search
-        location: userLocation,
-        // Distance in meters (3000 = 3 km)
-        radius: 10000,
-        // What type of places to search for
-        type: ["veterinary_care"]
-      },
-      // 🔹 Callback function that runs when Google sends back results
-      function(results, status) {
-        // If the request was successful
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-          // Loop through each place found
-          results.forEach(place => {
-            // Create a marker for each vet clinic
-            createMarker(place, map);
-          });
-        } else {
-          // Log an error if something went wrong
-          console.error("Places API request failed:", status);
-        }
+      // Make the request using the new async API
+      const { places } = await google.maps.places.Place.searchNearby(request);
+
+      // If places were found, create markers for each
+      if (places && places.length > 0) {
+        places.forEach(place => createVetMarker(place, map));
+      } else {
+        alert("No nearby vets found within 5 km.");
       }
-    );
+    } catch (error) {
+      console.error("Places API error:", error);
+      alert("Something went wrong fetching nearby vets. Check your API key and billing settings.");
+    }
   }
 
-  // 🔹 Runs if location access fails (user blocks it or error occurs)
+  // ------------------------------------------------------------
+  // STEP 4: If location access fails
+  // ------------------------------------------------------------
   function errorCallback() {
     alert("We couldn't get your location. Please enable location access and reload the page.");
   }
 
-  // 🔹 Helper function to create markers for each vet found
-  function createMarker(place, map) {
-    // Create the marker on the map at the vet's coordinates
-    const marker = new google.maps.Marker({
-      map: map,
-      position: place.geometry.location,
-      title: place.name
+  // ------------------------------------------------------------
+  // STEP 5: Helper function to create a vet marker on the map
+  // ------------------------------------------------------------
+  function createVetMarker(place, map) {
+    // Create the marker using the new AdvancedMarkerElement
+    const marker = new google.maps.marker.AdvancedMarkerElement({
+      map,
+      position: place.location,
+      title: place.displayName,
+      content: createCustomMarker("🐾")
     });
 
-    // Create an info window that pops up when you click a marker
+    // Create an info window for the marker
     const infoWindow = new google.maps.InfoWindow({
       content: `
-        <strong>${place.name}</strong><br>
-        ${place.vicinity || "Address not available"}<br>
+        <strong>${place.displayName}</strong><br>
+        ${place.formattedAddress || "Address not available"}<br>
         ${place.rating ? "⭐ " + place.rating + "/5" : ""}
       `
     });
 
-    // Add a click listener to open the info window
+    // Show info window on click
     marker.addListener("click", () => {
       infoWindow.open(map, marker);
     });
+  }
+
+  // ------------------------------------------------------------
+  // STEP 6: Small helper to make custom markers with emojis or icons
+  // ------------------------------------------------------------
+  function createCustomMarker(label) {
+    const div = document.createElement("div");
+    div.style.background = "#fff";
+    div.style.border = "2px solid #000";
+    div.style.borderRadius = "50%";
+    div.style.padding = "6px";
+    div.style.fontSize = "16px";
+    div.textContent = label;
+    return div;
   }
 </script>
