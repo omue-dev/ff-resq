@@ -7,6 +7,14 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   root "intakes#new"
-  post "/intakes", to: "intakes#create"
-  get "/chat", to: "intakes#chat", as: :intake_chat
+
+  # Intake routes
+  resources :intakes, only: [:new, :create] do
+    member do
+      get 'chat', to: 'intakes#chat', as: :chat
+    end
+  end
+
+  # Chat message polling endpoint
+  resources :chat_messages, only: [:show], path: "messages"
 end

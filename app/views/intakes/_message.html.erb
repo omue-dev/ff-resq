@@ -1,42 +1,42 @@
 <% animate = local_assigns.fetch(:animate, false) %>
+<% message_dom_id = message.respond_to?(:to_key) ? dom_id(message) : "message_#{message.id}" %>
 
 <% if message.role == "assistant" %>
-  <div class="chat-bubble ai-message bg-dark text-white animated-bubble position-relative mb-3"
-       id="ai-wrapper-<%= message.id %>"
-       data-message="<%= message.content %>">
-    <span id="ai-message-<%= message.id %>">
+  <!-- WRAPPER FÜR ALLES -->
+  <div id="<%= message_dom_id %>_wrapper">
+    <div class="chat-bubble ai-message bg-dark text-white animated-bubble position-relative mb-3"
+     data-message="<%= message.content %>">
+
       <% if animate %>
-        <span class="visually-hidden">AI response incoming</span>
+        <!-- Placeholder for typing -->
+        <span class="ai-text"></span>
       <% else %>
         <%= message.content %>
       <% end %>
-    </span>
+
+      <% if message.respond_to?(:pending?) && message.pending? %>
+        <!-- thinking loader shown while pending -->
+        <div class="thinking-note"></div>
+        <div class="thinking-loader" data-thinking>
+          <svg class="typing-dots" width="24" height="8" viewBox="0 0 24 8">
+            <circle cx="4"  cy="4" r="3"></circle>
+            <circle cx="12" cy="4" r="3"></circle>
+            <circle cx="20" cy="4" r="3"></circle>
+          </svg>
+        </div>
+      <% end %>
+    </div>
+
+    <% if message.is_a?(ChatMessage) && message.persisted? && message.pending? %>
+      <!-- Stimulus poll controller keeps replacing this bubble until pending? turns false -->
+      <div data-controller="poll"
+           data-poll-url-value="<%= chat_message_path(message) %>"
+           data-poll-target-value="<%= message_dom_id %>_wrapper">
+      </div>
+    <% end %>
   </div>
-
-  <% if animate %>
-    <script>
-      (function() {
-        const wrapper = document.getElementById("ai-wrapper-<%= message.id %>");
-        if (!wrapper || wrapper.dataset.animated === "true") return;
-
-        wrapper.dataset.animated = "true";
-        const aiMessage = document.getElementById("ai-message-<%= message.id %>");
-        if (!aiMessage) return;
-
-        const text = wrapper.dataset.message || "";
-        aiMessage.textContent = "";
-
-        let i = 0;
-        const interval = setInterval(() => {
-          aiMessage.textContent += text.charAt(i);
-          i += 1;
-          if (i >= text.length) clearInterval(interval);
-        }, 15);
-      })();
-    </script>
-  <% end %>
 <% else %>
-  <div class="chat-bubble user-message animated-bubble mb-3">
+  <div class="chat-bubble user-message animated-bubble mb-3" id="<%= message_dom_id %>">
     <%= message.content %>
   </div>
 <% end %>

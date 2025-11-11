@@ -8,60 +8,55 @@ class IntakesController < ApplicationController
     species     = data[:species].to_s.strip
     description = data[:description].to_s.strip
     foto_url    = data[:foto_url].to_s.strip
-    mock        = ActiveModel::Type::Boolean.new.cast(data[:mock])
+    # mock mode active?
+    mock_mode = ActiveModel::Type::Boolean.new.cast(data[:mock])
 
-    # --- Mock mode: use static data for UI testing, no AI call ---
-    if mock
-      result = {
-        analysis: {
-          species: "hedgehog",
-          condition: "very bad condition",
-          injury: "large wound on the back",
-          handling: "place it carefully in a box with a soft cloth",
-          danger: "be careful, hedgehogs can bite",
-          foto_url: "https://res.cloudinary.com/dtrtke9f2/image/upload/v1762606938/ltdwh0aldgwemqx8anvg.jpg"
-        },
-        user_message: "It looks like the hedgehog is in very bad condition, with a large wound on its back. Please handle it carefully — place it in a box lined with a soft cloth to keep it warm and safe. Avoid touching it directly, as hedgehogs can bite when stressed. Contact a local wildlife rescue center as soon as possible for proper treatment."
-      }
-
-      # Pass fake result directly to chat view (skips database + AI)
-      redirect_to intake_chat_path(result: result.to_json)
-
-    else
-      # --- Real mode: store data in DB and let model handle AI ---
-      intake = Intake.create!(
-        species: species,
-        description: description,
-        status: "pending",
-        foto_url: foto_url.presence
-      )
-
-      # Save user's initial message
-      intake.chat_messages.create!(
-        role: "user",
-        content: description
-      )
-
-      # Model triggers after_create → generate_ai_summary (Gemini call)
-      redirect_to intake_chat_path(id: intake.id)
+    # use mock data in chat.html.erb
+    if mock_mode
+      @mock = true
+      render :chat
+      return
     end
+
+    # store data in DB so the polling view can watch for updates ---
+    intake = Intake.create!(
+      species: species,
+      description: description,
+      status: "pending",
+      foto_url: foto_url.presence
+    )
+
+    # Save user's initial message (shows up immediately in the chat view)
+    intake.chat_messages.create!(
+      role: "user",
+      content: description
+    )
+
+    # Pre-create a placeholder AI message so the Stimulus poll controller knows what to refresh.
+    pending_message = intake.chat_messages.create!(
+      role: "assistant",
+      content: "Analyzing",
+      pending: true
+    )
+
+
+    # Fire Gemini in the background and tell it which record to update afterwards.
+    intake.generate_ai_summary_async(pending_message_id: pending_message.id)
+
+    # FIXED: Use the correct nested route helper
+    redirect_to chat_intake_path(intake)
   end
 
   # --- Shows chat with AI response ---
   def chat
-    if params[:result].present?
-      # Mock mode
-      @result = JSON.parse(params[:result]) rescue {}
-    else
-      # Real AI mode
-      @intake = Intake.find(params[:id])
-      @result = @intake.parsed_payload
-      @chat_messages = @intake.chat_messages.order(:created_at) # Load all messages
+    @intake = Intake.find(params[:id])
+    @result = @intake.parsed_payload
+    # The view loops over these records and injects poll controllers for pending ones.
+    @chat_messages = @intake.chat_messages.order(:created_at)
 
-      # Pass error + status info to the view
-      @status = @intake.status
-      @error_message = @intake.parsed_payload.dig("error") rescue nil
-    end
+    # Pass error + status info to the view
+    @status = @intake.status
+    @error_message = @intake.parsed_payload.dig("error") rescue nil
   end
 
   private
