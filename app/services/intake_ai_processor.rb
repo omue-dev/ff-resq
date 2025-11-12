@@ -46,42 +46,13 @@ class IntakeAiProcessor
     }
   PROMPT
 
-  # called in InatkesController:
-  # intake.generate_ai_summary_async(pending_message_id: pending_message.id)
-  def process_async(pending_message_id: nil)
-    Rails.logger.info "🎬 Starting async Gemini call for Intake #{@intake.id}, Message #{pending_message_id}"
-
-    Concurrent::Future.execute do
-      begin
-        ActiveRecord::Base.connection_pool.with_connection do
-          Timeout.timeout(20) do
-            generate_ai_summary(pending_message_id: pending_message_id)
-          end
-        end
-      rescue Timeout::Error => e
-        Rails.logger.error "TIMEOUT ERROR for Intake #{@intake.id}: #{e.message}"
-        handle_ai_failure(
-          message_id: pending_message_id,
-          fallback_text: "The analysis took too long. Please try again later.",
-          status_value: "timeout",
-          payload: { error: "AI request timed out" }
-        )
-      rescue => e
-        Rails.logger.error "EXCEPTION in async for Intake #{@intake.id}: #{e.class} - #{e.message}"
-        Rails.logger.error "   Backtrace: #{e.backtrace.first(10).join("\n   ")}"
-        handle_ai_failure(
-          message_id: pending_message_id,
-          fallback_text: "Sorry, something went wrong: #{e.message}",
-          status_value: "error",
-          payload: { error: e.message, class: e.class.to_s, backtrace: e.backtrace.first(5) }
-        )
-      end
-    end
+  # from InatkesController > intake.generate_ai_summary_async(pending_message_id: pending_message.id)
+  # from Intake > def generate_ai_summary_async(pending_message_id:)
+  def process_async(pending_message_id:)
+    ProcessIntakeWithAiJob.perform_later(@intake.id, pending_message_id)
   end
 
-  private
-
-  # called in generate_Ai_summary_async
+  # from jobs > ProcessIntakeWithAiJob > IntakeAiProcessor.new(intake).generate_ai_summary
   def generate_ai_summary(pending_message_id: nil)
     Rails.logger.info "=" * 80
     Rails.logger.info "🚀 GEMINI CALL START"
@@ -167,6 +138,8 @@ class IntakeAiProcessor
           payload: { error: e.message, class: e.class.to_s }
         )
   end
+
+  private
 
   # called in generate_Ai_summary_async
   def handle_ai_failure(message_id:, fallback_text:, status_value:, payload:)
