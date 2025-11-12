@@ -1,6 +1,8 @@
 # app/models/concerns/ai_processable.rb
-module AiProcessable
-  extend ActiveSupport::Concern
+class IntakeAiProcessor
+  def initialize(intake)
+    @intake = intake
+  end
 
   # --- AI Config ---
   AI_SUMMARY_SCHEMA = {
@@ -46,8 +48,8 @@ module AiProcessable
 
   # called in InatkesController:
   # intake.generate_ai_summary_async(pending_message_id: pending_message.id)
-  def generate_ai_summary_async(pending_message_id: nil)
-    Rails.logger.info "🎬 Starting async Gemini call for Intake #{id}, Message #{pending_message_id}"
+  def process_async(pending_message_id: nil)
+    Rails.logger.info "🎬 Starting async Gemini call for Intake #{@intake.id}, Message #{pending_message_id}"
 
     Concurrent::Future.execute do
       begin
@@ -57,7 +59,7 @@ module AiProcessable
           end
         end
       rescue Timeout::Error => e
-        Rails.logger.error "TIMEOUT ERROR for Intake #{id}: #{e.message}"
+        Rails.logger.error "TIMEOUT ERROR for Intake #{@intake.id}: #{e.message}"
         handle_ai_failure(
           message_id: pending_message_id,
           fallback_text: "The analysis took too long. Please try again later.",
@@ -65,7 +67,7 @@ module AiProcessable
           payload: { error: "AI request timed out" }
         )
       rescue => e
-        Rails.logger.error "EXCEPTION in async for Intake #{id}: #{e.class} - #{e.message}"
+        Rails.logger.error "EXCEPTION in async for Intake #{@intake.id}: #{e.class} - #{e.message}"
         Rails.logger.error "   Backtrace: #{e.backtrace.first(10).join("\n   ")}"
         handle_ai_failure(
           message_id: pending_message_id,
@@ -83,20 +85,20 @@ module AiProcessable
   def generate_ai_summary(pending_message_id: nil)
     Rails.logger.info "=" * 80
     Rails.logger.info "🚀 GEMINI CALL START"
-    Rails.logger.info "   Intake ID: #{id}"
+    Rails.logger.info "   Intake ID: #{@intake.id}"
     Rails.logger.info "   Message ID: #{pending_message_id}"
     Rails.logger.info "=" * 80
 
     prompt = format(
       AI_SUMMARY_PROMPT,
-      species: species.presence || "unknown",
-      description: description
+      species: @intake.species.presence || "unknown",
+      description: @intake.description
     )
 
     # send request to gemini
     Rails.logger.info "Sending request to Gemini..."
     client = GeminiClient.new
-    ai_data = client.generate_content(prompt, image_url: foto_url.presence)
+    ai_data = client.generate_content(prompt, image_url: @intake.foto_url.presence)
     Rails.logger.info "Received response from Gemini"
 
     # Extract the text response
@@ -118,13 +120,13 @@ module AiProcessable
                    "I've analyzed your submission but couldn't generate a response message."
 
     # Update the placeholder message (or create one if we couldn't find it)
-    response_message = chat_messages.find_by(id: pending_message_id)
+    response_message = @intake.chat_messages.find_by(id: pending_message_id)
 
     if response_message
       Rails.logger.info "Found message: #{response_message.id}"
     else
       Rails.logger.warn "Message #{pending_message_id} not found! Creating new one..."
-      response_message = chat_messages.create!(role: "assistant", pending: true)
+      response_message = @intake.chat_messages.create!(role: "assistant", pending: true)
     end
 
     Rails.logger.info "Updating message..."
@@ -132,17 +134,17 @@ module AiProcessable
 
     # Save the full AI payload for later reference
     Rails.logger.info "Saving raw payload to Intake..."
-    update!(status: "responded", raw_payload: ai_data.to_json)
+    @intake.update!(status: "responded", raw_payload: ai_data.to_json)
 
     Rails.logger.info "=" * 40
     Rails.logger.info "GEMINI CALL SUCCESS"
-    Rails.logger.info "  Intake status: #{status}"
+    Rails.logger.info "  Intake status: #{@intake.status}"
     Rails.logger.info "  Message pending: #{response_message.pending?}"
     Rails.logger.info "=" * 40
 
     # ExceptionHandler for parsed = JSON.parse(cleaned_text)
     rescue JSON::ParserError => e
-      Rails.logger.error "❌ JSON PARSE ERROR for Intake #{id}: #{e.message}"
+      Rails.logger.error "❌ JSON PARSE ERROR for Intake #{@intake.id}: #{e.message}"
       Rails.logger.error "   Raw text was: #{ai_text}"
       Rails.logger.error "   Cleaned text was: #{cleaned_text}"
 
@@ -155,7 +157,7 @@ module AiProcessable
 
       # ExceptionHandler for all other errors
       rescue => e
-        Rails.logger.error "❌ GENERAL ERROR in generate_ai_summary for Intake #{id}: #{e.message}"
+        Rails.logger.error "❌ GENERAL ERROR in generate_ai_summary for Intake #{@intake.id}: #{e.message}"
         Rails.logger.error "   Backtrace: #{e.backtrace.join("\n   ")}"
 
         handle_ai_failure(
@@ -173,7 +175,7 @@ module AiProcessable
     Rails.logger.error "   Status: #{status_value}"
     Rails.logger.error "   Payload: #{payload.inspect}"
 
-    response_message = chat_messages.find_by(id: message_id)
+    response_message = @intake.chat_messages.find_by(id: message_id)
 
     if response_message
       Rails.logger.info "   Found message, updating to error state..."
@@ -181,18 +183,18 @@ module AiProcessable
       Rails.logger.info "   Message pending after error: #{response_message.reload.pending?}"
     else
       Rails.logger.warn "   Message #{message_id} not found, creating error message..."
-      response_message = chat_messages.create!(
+      response_message = @intake.chat_messages.create!(
         role: "assistant",
         content: fallback_text,
         pending: false
       )
     end
 
-    update!(
+    @intake.update!(
       status: status_value,
       raw_payload: payload.to_json
     )
 
-    Rails.logger.info "   Intake status updated to: #{status}"
+    Rails.logger.info "   Intake status updated to: #{@intake.status}"
   end
 end
