@@ -93,35 +93,9 @@ class IntakeAiProcessor
     Rails.logger.info "   Message ID: #{pending_message_id}"
     Rails.logger.info "=" * 80
 
-    # Build prompt based on conversation history
-    prompt = build_prompt_with_context
-
-    Rails.logger.info "Prompt length: #{prompt.length} characters"
-    Rails.logger.info "Total messages in conversation: #{@intake.chat_messages.count}"
-
-    # send request to gemini
-    Rails.logger.info "Sending request to Gemini..."
-    client = GeminiClient.new
-    ai_data = client.generate_content(prompt, image_url: @intake.foto_url.presence)
-    Rails.logger.info "Received response from Gemini"
-
-    # Extract the text response
-    ai_text = ai_data.dig("candidates", 0, "content", "parts", 0, "text")
-
-    # Strip markdown code blocks before parsing
-    cleaned_text = ai_text.to_s
-                         .gsub(/^```json\s*\n?/, "")
-                         .gsub(/\n?```\s*$/, "")
-                         .strip
-
-    # Parse the JSON response
-    parsed = JSON.parse(cleaned_text)
-
-    # Extract user message with fallback
-    user_message = parsed["user_message"].presence ||
-                   "I've analyzed your submission but couldn't generate a response message."
-
-    # Update the placeholder message (or create one if we couldn't find it)
+    # ══════════════════════════════════════════════════════════════════════════
+    # WORKFLOW PART 1: Get the pending message from DB (chat_messages table)
+    # ══════════════════════════════════════════════════════════════════════════
     response_message = @intake.chat_messages.find_by(id: pending_message_id)
 
     if response_message
@@ -131,10 +105,49 @@ class IntakeAiProcessor
       response_message = @intake.chat_messages.create!(role: "assistant", pending: true)
     end
 
-    Rails.logger.info "Updating message..."
-    update_result = response_message.update!(content: user_message, pending: false)
+    # ══════════════════════════════════════════════════════════════════════════
+    # WORKFLOW PART 2: Build context-aware prompt
+    # ══════════════════════════════════════════════════════════════════════════
+    prompt = build_prompt_with_context  # Calls private method below
 
-    # Save the full AI payload for later reference
+    Rails.logger.info "Prompt length: #{prompt.length} characters"
+    Rails.logger.info "Total messages in conversation: #{@intake.chat_messages.count}"
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # WORKFLOW PART 3: Call Gemini API
+    # ══════════════════════════════════════════════════════════════════════════
+    Rails.logger.info "Sending request to Gemini..."
+    client = GeminiClient.new
+    ai_data = client.generate_content(prompt, image_url: @intake.foto_url.presence)
+    Rails.logger.info "Received response from Gemini"
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # WORKFLOW PART 4: Parse AI response
+    # ══════════════════════════════════════════════════════════════════════════
+    ai_text = ai_data.dig("candidates", 0, "content", "parts", 0, "text")
+
+    # Strip markdown code blocks before parsing
+    cleaned_text = ai_text.to_s
+                        .gsub(/^```json\s*\n?/, "")
+                        .gsub(/\n?```\s*$/, "")
+                        .strip
+
+    # Parse the JSON response
+    parsed = JSON.parse(cleaned_text)
+
+    # Extract user message with fallback
+    user_message = parsed["user_message"].presence ||
+                  "I've analyzed your submission but couldn't generate a response message."
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # WORKFLOW PART 5: Update ChatMessage in DB (chat_messages table)
+    # ══════════════════════════════════════════════════════════════════════════
+    Rails.logger.info "Updating message..."
+    response_message.update!(content: user_message, pending: false)
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # WORKFLOW PART 6: Update Intake in DB (intakes table)
+    # ══════════════════════════════════════════════════════════════════════════
     Rails.logger.info "Saving raw payload to Intake..."
     @intake.update!(status: "responded", raw_payload: ai_data.to_json)
 
@@ -170,7 +183,10 @@ class IntakeAiProcessor
 
   private
 
-  # Build prompt with full conversation context
+  # ══════════════════════════════════════════════════════════════════════════
+  # Called in WORKFLOW PART 2
+  # Builds either initial prompt or conversation prompt with full history
+  # ══════════════════════════════════════════════════════════════════════════
   def build_prompt_with_context
     # Get all non-pending messages in chronological order
     messages = @intake.chat_messages

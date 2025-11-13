@@ -25,6 +25,7 @@ class Intake < ApplicationRecord
     JSON.parse(raw_payload) rescue {}
   end
 
+  # used in IntakesController &
   def error_message
     data = parsed_payload
     return unless data.is_a?(Hash)

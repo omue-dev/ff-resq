@@ -1,0 +1,341 @@
+<mxfile host="app.diagrams.net" modified="2025-01-13T12:00:00.000Z" agent="Claude Code" version="24.0.0">
+  <diagram name="FF-RESQ Complete Workflow" id="ff-resq-workflow">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2000" pageHeight="1400" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- SWIMLANE: FRONTEND -->
+        <mxCell id="swimlane-frontend" value="FRONTEND" style="swimlane;horizontal=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="1900" height="180" as="geometry"/>
+        </mxCell>
+
+        <!-- User Form -->
+        <mxCell id="user-form" value="&lt;b&gt;new.html.erb&lt;/b&gt;&lt;br&gt;&lt;br&gt;User Form&lt;br&gt;Species&lt;br&gt;Description&lt;br&gt;Photo" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="swimlane-frontend">
+          <mxGeometry x="40" y="40" width="140" height="110" as="geometry"/>
+        </mxCell>
+
+        <!-- Chat View -->
+        <mxCell id="chat-view" value="&lt;b&gt;chat.html.erb&lt;/b&gt;&lt;br&gt;&lt;br&gt;Chat View&lt;br&gt;Shows conversation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="swimlane-frontend">
+          <mxGeometry x="480" y="40" width="140" height="110" as="geometry"/>
+        </mxCell>
+
+        <!-- Poll Controller -->
+        <mxCell id="poll-controller" value="&lt;b&gt;poll_controller.js&lt;/b&gt;&lt;br&gt;&lt;br&gt;• Polls every 2s&lt;br&gt;• GET /messages/:id&lt;br&gt;• Checks pending flag&lt;br&gt;• Stops when false&lt;br&gt;• Typing animation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="swimlane-frontend">
+          <mxGeometry x="1140" y="30" width="160" height="130" as="geometry"/>
+        </mxCell>
+
+        <!-- AI Bubble -->
+        <mxCell id="ai-bubble" value="&lt;b&gt;AI-BUBBLE&lt;/b&gt;&lt;br&gt;&lt;br&gt;&quot;Analyzing...&quot;&lt;br&gt;↓&lt;br&gt;&quot;AI Response&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="swimlane-frontend">
+          <mxGeometry x="1700" y="40" width="140" height="110" as="geometry"/>
+        </mxCell>
+
+        <!-- SWIMLANE: CONTROLLERS -->
+        <mxCell id="swimlane-controllers" value="CONTROLLERS" style="swimlane;horizontal=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="240" width="1900" height="220" as="geometry"/>
+        </mxCell>
+
+        <!-- IntakesController#create -->
+        <mxCell id="intakes-create" value="&lt;b&gt;IntakesController#create&lt;/b&gt;&lt;br&gt;&lt;br&gt;1️⃣ Create Intake (DB)&lt;br&gt;2️⃣ Create User ChatMessage (DB)&lt;br&gt;3️⃣ Create AI Placeholder (DB)&lt;br&gt;   • role: &quot;assistant&quot;&lt;br&gt;   • content: &quot;Analyzing&quot;&lt;br&gt;   • pending: true&lt;br&gt;4️⃣ Queue ProcessIntakeWithAiJob&lt;br&gt;5️⃣ Redirect to chat_intake_path" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;verticalAlign=top;" vertex="1" parent="swimlane-controllers">
+          <mxGeometry x="220" y="40" width="240" height="160" as="geometry"/>
+        </mxCell>
+
+        <!-- ChatMessagesController#show -->
+        <mxCell id="chat-messages-show" value="&lt;b&gt;ChatMessagesController#show&lt;/b&gt;&lt;br&gt;&lt;br&gt;1️⃣ Find ChatMessage by ID (DB)&lt;br&gt;2️⃣ Render partial: &quot;intakes/message&quot;&lt;br&gt;3️⃣ layout: false (HTML only!)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;verticalAlign=top;" vertex="1" parent="swimlane-controllers">
+          <mxGeometry x="1320" y="40" width="260" height="110" as="geometry"/>
+        </mxCell>
+
+        <!-- IntakesController#create_message -->
+        <mxCell id="intakes-create-message" value="&lt;b&gt;IntakesController#create_message&lt;/b&gt;&lt;br&gt;&lt;br&gt;1️⃣ Create User ChatMessage (DB)&lt;br&gt;2️⃣ Create AI Placeholder (DB)&lt;br&gt;3️⃣ Queue ProcessIntakeWithAiJob&lt;br&gt;   (with conversation history!)&lt;br&gt;4️⃣ Redirect to chat_intake_path" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;verticalAlign=top;" vertex="1" parent="swimlane-controllers">
+          <mxGeometry x="660" y="40" width="280" height="140" as="geometry"/>
+        </mxCell>
+
+        <!-- SWIMLANE: MODELS -->
+        <mxCell id="swimlane-models" value="MODELS" style="swimlane;horizontal=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="480" width="1900" height="140" as="geometry"/>
+        </mxCell>
+
+        <!-- Intake Model -->
+        <mxCell id="intake-model" value="&lt;b&gt;Intake Model&lt;/b&gt;&lt;br&gt;&lt;br&gt;has_many :chat_messages&lt;br&gt;&lt;br&gt;generate_ai_summary_async(pending_message_id:)&lt;br&gt;  → calls IntakeAiProcessor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d4edda;strokeColor=#82b366;align=left;verticalAlign=top;" vertex="1" parent="swimlane-models">
+          <mxGeometry x="220" y="30" width="280" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- ChatMessage Model -->
+        <mxCell id="chatmessage-model" value="&lt;b&gt;ChatMessage Model&lt;/b&gt;&lt;br&gt;&lt;br&gt;belongs_to :intake&lt;br&gt;&lt;br&gt;Fields: role, content, pending" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d4edda;strokeColor=#82b366;align=left;verticalAlign=top;" vertex="1" parent="swimlane-models">
+          <mxGeometry x="560" y="30" width="220" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- SWIMLANE: SERVICES -->
+        <mxCell id="swimlane-services" value="SERVICES" style="swimlane;horizontal=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="640" width="1900" height="260" as="geometry"/>
+        </mxCell>
+
+        <!-- IntakeAiProcessor -->
+        <mxCell id="intake-ai-processor" value="&lt;b&gt;IntakeAiProcessor&lt;/b&gt;&lt;br&gt;&lt;br&gt;PART 1: Get pending message from DB&lt;br&gt;        chat_messages.find_by(id)&lt;br&gt;&lt;br&gt;PART 2: Build context-aware prompt&lt;br&gt;        • ≤1 msgs: AI_INITIAL_PROMPT&lt;br&gt;        • &gt;1 msgs: AI_CONVERSATION_PROMPT&lt;br&gt;&lt;br&gt;PART 3: Call GeminiClient&lt;br&gt;&lt;br&gt;PART 4: Parse AI response JSON&lt;br&gt;&lt;br&gt;PART 5: Update ChatMessage (DB)&lt;br&gt;        content, pending: false&lt;br&gt;&lt;br&gt;PART 6: Update Intake (DB)&lt;br&gt;        status, raw_payload" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#cce5ff;strokeColor=#6c8ebf;align=left;verticalAlign=top;" vertex="1" parent="swimlane-services">
+          <mxGeometry x="160" y="30" width="260" height="210" as="geometry"/>
+        </mxCell>
+
+        <!-- GeminiClient -->
+        <mxCell id="gemini-client" value="&lt;b&gt;GeminiClient&lt;/b&gt;&lt;br&gt;&lt;br&gt;generate_content(prompt, image_url)&lt;br&gt;&lt;br&gt;• Downloads &amp; encodes image (Base64)&lt;br&gt;• POST to Google Gemini API&lt;br&gt;• Model: gemini-2.0-flash-exp&lt;br&gt;• Returns: JSON response" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#cce5ff;strokeColor=#6c8ebf;align=left;verticalAlign=top;" vertex="1" parent="swimlane-services">
+          <mxGeometry x="480" y="70" width="260" height="140" as="geometry"/>
+        </mxCell>
+
+        <!-- SWIMLANE: BACKGROUND JOBS -->
+        <mxCell id="swimlane-jobs" value="BACKGROUND JOBS" style="swimlane;horizontal=1;whiteSpace=wrap;html=1;fillColor=#b3cde0;strokeColor=#084298;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="920" width="1900" height="140" as="geometry"/>
+        </mxCell>
+
+        <!-- ProcessIntakeWithAiJob -->
+        <mxCell id="process-job" value="&lt;b&gt;⚙️ ProcessIntakeWithAiJob&lt;/b&gt;&lt;br&gt;&lt;br&gt;Queue: :default&lt;br&gt;Retry: 3 attempts (5s wait)&lt;br&gt;&lt;br&gt;perform(intake_id, pending_message_id)&lt;br&gt;  intake = Intake.find(intake_id)&lt;br&gt;  IntakeAiProcessor.new(intake)&lt;br&gt;    .generate_ai_summary(pending_message_id)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9fc5e8;strokeColor=#084298;align=left;verticalAlign=top;" vertex="1" parent="swimlane-jobs">
+          <mxGeometry x="240" y="30" width="320" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- SWIMLANE: EXTERNAL API -->
+        <mxCell id="swimlane-external" value="EXTERNAL API" style="swimlane;horizontal=1;whiteSpace=wrap;html=1;fillColor=#333333;strokeColor=#000000;fontSize=14;fontStyle=1;fontColor=#ffffff" vertex="1" parent="1">
+          <mxGeometry x="40" y="1080" width="1900" height="120" as="geometry"/>
+        </mxCell>
+
+        <!-- Google Gemini API -->
+        <mxCell id="gemini-api" value="&lt;b&gt;☁️ Google Gemini API&lt;/b&gt;&lt;br&gt;&lt;br&gt;POST generativeai.googleapis.com&lt;br&gt;Model: gemini-2.0-flash-exp&lt;br&gt;&lt;br&gt;Returns: JSON with candidates" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#666666;strokeColor=#000000;fontColor=#ffffff;align=left;verticalAlign=top;" vertex="1" parent="swimlane-external">
+          <mxGeometry x="480" y="30" width="280" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- SWIMLANE: DATABASE -->
+        <mxCell id="swimlane-database" value="DATABASE (PostgreSQL)" style="swimlane;horizontal=1;whiteSpace=wrap;html=1;fillColor=#f4cccc;strokeColor=#cc0000;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="1220" width="1900" height="180" as="geometry"/>
+        </mxCell>
+
+        <!-- intakes Table -->
+        <mxCell id="intakes-table" value="&lt;b&gt;🗄️ intakes&lt;/b&gt;&lt;br&gt;&lt;br&gt;• id&lt;br&gt;• species&lt;br&gt;• description&lt;br&gt;• foto_url&lt;br&gt;• status (pending/responded/error)&lt;br&gt;• raw_payload (JSONB)&lt;br&gt;• source&lt;br&gt;• created_at, updated_at" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffcccc;strokeColor=#cc0000;align=left;verticalAlign=top;" vertex="1" parent="swimlane-database">
+          <mxGeometry x="100" y="30" width="260" height="130" as="geometry"/>
+        </mxCell>
+
+        <!-- chat_messages Table -->
+        <mxCell id="chat-messages-table" value="&lt;b&gt;🗄️ chat_messages&lt;/b&gt;&lt;br&gt;&lt;br&gt;• id&lt;br&gt;• intake_id (FK → intakes)&lt;br&gt;• role (user/assistant)&lt;br&gt;• content&lt;br&gt;• pending (boolean)&lt;br&gt;• created_at, updated_at" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffcccc;strokeColor=#cc0000;align=left;verticalAlign=top;" vertex="1" parent="swimlane-database">
+          <mxGeometry x="420" y="30" width="240" height="130" as="geometry"/>
+        </mxCell>
+
+        <!-- ARROWS: INITIAL SUBMISSION FLOW (BLUE) -->
+
+        <!-- User Form -> IntakesController#create -->
+        <mxCell id="arrow1" value="1️⃣ POST /intakes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0066CC;strokeWidth=3;fontColor=#0066CC;fontStyle=1" edge="1" parent="1" source="user-form" target="intakes-create">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- IntakesController -> Intake Model -->
+        <mxCell id="arrow2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0066CC;strokeWidth=2" edge="1" parent="1" source="intakes-create" target="intake-model">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- IntakesController -> intakes Table -->
+        <mxCell id="arrow3" value="3️⃣ INSERT&lt;br&gt;Intake record" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0066CC;strokeWidth=3;fontColor=#0066CC;fontStyle=1" edge="1" parent="1" source="intakes-create" target="intakes-table">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="360" y="1150"/>
+              <mxPoint x="230" y="1150"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- IntakesController -> chat_messages Table (2x) -->
+        <mxCell id="arrow4" value="4️⃣ INSERT (2x!)&lt;br&gt;User msg + AI placeholder" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0066CC;strokeWidth=3;fontColor=#0066CC;fontStyle=1" edge="1" parent="1" source="intakes-create" target="chat-messages-table">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="400" y="1150"/>
+              <mxPoint x="540" y="1150"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- IntakesController -> ProcessJob -->
+        <mxCell id="arrow5" value="5️⃣ Queue Job" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0066CC;strokeWidth=3;fontColor=#0066CC;fontStyle=1" edge="1" parent="1" source="intakes-create" target="process-job">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="360" y="870"/>
+              <mxPoint x="400" y="870"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- IntakesController -> Chat View -->
+        <mxCell id="arrow6" value="6️⃣ Redirect&lt;br&gt;(IMMEDIATE!)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0066CC;strokeWidth=3;fontColor=#0066CC;fontStyle=1" edge="1" parent="1" source="intakes-create" target="chat-view">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="520" y="220"/>
+              <mxPoint x="520" y="135"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ARROWS: BACKGROUND PROCESSING FLOW (RED) -->
+
+        <!-- ProcessJob -> IntakeAiProcessor -->
+        <mxCell id="arrow7" value="7️⃣ Execute" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#CC0000;strokeWidth=3;fontColor=#CC0000;fontStyle=1" edge="1" parent="1" source="process-job" target="intake-ai-processor">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="400" y="900"/>
+              <mxPoint x="290" y="900"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- IntakeAiProcessor -> chat_messages (PART 1: READ) -->
+        <mxCell id="arrow8" value="8️⃣ PART 1: READ&lt;br&gt;find_by(id)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#CC0000;strokeWidth=2;fontColor=#CC0000;fontStyle=1;dashed=1" edge="1" parent="1" source="intake-ai-processor" target="chat-messages-table">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="210" y="1190"/>
+              <mxPoint x="540" y="1190"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- IntakeAiProcessor -> GeminiClient -->
+        <mxCell id="arrow9" value="🔟 PART 3: Call" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#CC0000;strokeWidth=3;fontColor=#CC0000;fontStyle=1" edge="1" parent="1" source="intake-ai-processor" target="gemini-client">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- GeminiClient -> Google API -->
+        <mxCell id="arrow10" value="HTTP POST" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#CC0000;strokeWidth=3;fontColor=#CC0000;fontStyle=1" edge="1" parent="1" source="gemini-client" target="gemini-api">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="610" y="1040"/>
+              <mxPoint x="620" y="1040"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Google API -> GeminiClient -->
+        <mxCell id="arrow11" value="JSON Response" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#CC0000;strokeWidth=3;fontColor=#CC0000;fontStyle=1" edge="1" parent="1" source="gemini-api" target="gemini-client">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="660" y="1040"/>
+              <mxPoint x="650" y="1040"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- IntakeAiProcessor -> chat_messages (PART 5: UPDATE) -->
+        <mxCell id="arrow12" value="1️⃣2️⃣ PART 5: UPDATE&lt;br&gt;content, pending: false" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#CC0000;strokeWidth=3;fontColor=#CC0000;fontStyle=1" edge="1" parent="1" source="intake-ai-processor" target="chat-messages-table">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="250" y="1200"/>
+              <mxPoint x="580" y="1200"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- IntakeAiProcessor -> intakes (PART 6: UPDATE) -->
+        <mxCell id="arrow13" value="1️⃣3️⃣ PART 6: UPDATE&lt;br&gt;status, raw_payload" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#CC0000;strokeWidth=3;fontColor=#CC0000;fontStyle=1" edge="1" parent="1" source="intake-ai-processor" target="intakes-table">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="190" y="1200"/>
+              <mxPoint x="270" y="1200"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ARROWS: POLLING FLOW (GREEN, DASHED) -->
+
+        <!-- Poll Controller -> ChatMessagesController -->
+        <mxCell id="arrow14" value="1️⃣5️⃣ GET /messages/:id&lt;br&gt;(every 2s)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#00CC00;strokeWidth=3;fontColor=#00CC00;fontStyle=1;dashed=1" edge="1" parent="1" source="poll-controller" target="chat-messages-show">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ChatMessagesController -> chat_messages Table -->
+        <mxCell id="arrow15" value="1️⃣6️⃣ READ&lt;br&gt;find(id)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#00CC00;strokeWidth=2;fontColor=#00CC00;fontStyle=1;dashed=1" edge="1" parent="1" source="chat-messages-show" target="chat-messages-table">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1450" y="1180"/>
+              <mxPoint x="600" y="1180"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ChatMessagesController -> Poll Controller -->
+        <mxCell id="arrow16" value="1️⃣7️⃣ HTML Partial" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#00CC00;strokeWidth=3;fontColor=#00CC00;fontStyle=1;dashed=1" edge="1" parent="1" source="chat-messages-show" target="poll-controller">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1410" y="220"/>
+              <mxPoint x="1220" y="220"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Poll Controller -> AI Bubble -->
+        <mxCell id="arrow17" value="1️⃣8️⃣ Update when&lt;br&gt;pending: false" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#00CC00;strokeWidth=3;fontColor=#00CC00;fontStyle=1;dashed=1" edge="1" parent="1" source="poll-controller" target="ai-bubble">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1400" y="135"/>
+              <mxPoint x="1770" y="135"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ARROWS: FOLLOW-UP FLOW (PURPLE) -->
+
+        <!-- Chat View -> IntakesController#create_message -->
+        <mxCell id="arrow18" value="1️⃣9️⃣ POST /intakes/:id/messages&lt;br&gt;(Follow-up question)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9900CC;strokeWidth=3;fontColor=#9900CC;fontStyle=1" edge="1" parent="1" source="chat-view" target="intakes-create-message">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="640" y="135"/>
+              <mxPoint x="800" y="135"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- IntakesController#create_message -> chat_messages Table -->
+        <mxCell id="arrow19" value="2️⃣0️⃣ INSERT (2x)&lt;br&gt;User + AI placeholder" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9900CC;strokeWidth=3;fontColor=#9900CC;fontStyle=1" edge="1" parent="1" source="intakes-create-message" target="chat-messages-table">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="800" y="1170"/>
+              <mxPoint x="620" y="1170"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- IntakesController#create_message -> ProcessJob -->
+        <mxCell id="arrow20" value="2️⃣1️⃣ Queue Job&lt;br&gt;(with history!)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9900CC;strokeWidth=3;fontColor=#9900CC;fontStyle=1" edge="1" parent="1" source="intakes-create-message" target="process-job">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="700" y="880"/>
+              <mxPoint x="500" y="880"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ADDITIONAL TEXT BOXES -->
+
+        <!-- DB Relations Note -->
+        <mxCell id="note1" value="&lt;b&gt;📝 Database Relations&lt;/b&gt;&lt;br&gt;&lt;br&gt;intakes (1) ←→ (∞) chat_messages&lt;br&gt;&lt;br&gt;Foreign Key:&lt;br&gt;chat_messages.intake_id" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="740" y="1260" width="240" height="120" as="geometry"/>
+        </mxCell>
+
+        <!-- Polling Note -->
+        <mxCell id="note2" value="&lt;b&gt;📝 Polling Mechanism&lt;/b&gt;&lt;br&gt;&lt;br&gt;Why Polling?&lt;br&gt;• Simpler than WebSockets&lt;br&gt;• 2-second interval sufficient&lt;br&gt;• Stops when pending: false&lt;br&gt;• HTML partial updates" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1620" y="260" width="240" height="130" as="geometry"/>
+        </mxCell>
+
+        <!-- Multi-Turn Chat Note -->
+        <mxCell id="note3" value="&lt;b&gt;📝 Multi-Turn Chat&lt;/b&gt;&lt;br&gt;&lt;br&gt;Context-Aware Prompts:&lt;br&gt;&lt;br&gt;Initial: AI_INITIAL_PROMPT&lt;br&gt;(species + description)&lt;br&gt;&lt;br&gt;Follow-up: AI_CONVERSATION_PROMPT&lt;br&gt;(full conversation history!)&lt;br&gt;&lt;br&gt;Example:&lt;br&gt;USER: Found injured pigeon&lt;br&gt;ASSISTANT: Keep it warm...&lt;br&gt;USER: How give water?&lt;br&gt;ASSISTANT knows context!" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="800" y="680" width="260" height="200" as="geometry"/>
+        </mxCell>
+
+        <!-- Async Processing Note -->
+        <mxCell id="note4" value="&lt;b&gt;📝 Async Processing&lt;/b&gt;&lt;br&gt;&lt;br&gt;Why Background Job?&lt;br&gt;• AI response: 3-10 seconds&lt;br&gt;• User doesn't wait&lt;br&gt;• Immediate redirect to chat&lt;br&gt;• Retry logic handles failures&lt;br&gt;• Polling bridges async gap" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="640" y="960" width="240" height="140" as="geometry"/>
+        </mxCell>
+
+        <!-- Color Legend -->
+        <mxCell id="legend" value="&lt;b&gt;🎨 FLOW LEGEND&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#0066CC&quot;&gt;━━━ Blue: Initial Submission&lt;/font&gt;&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#CC0000&quot;&gt;━━━ Red: Background Processing&lt;/font&gt;&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#00CC00&quot;&gt;┉┉┉ Green (dashed): Polling&lt;/font&gt;&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#9900CC&quot;&gt;━━━ Purple: Follow-up Messages&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="1240" width="280" height="140" as="geometry"/>
+        </mxCell>
+
+        <!-- Title -->
+        <mxCell id="title" value="&lt;b style=&quot;font-size: 24px;&quot;&gt;FF-RESQ Complete Workflow&lt;/b&gt;&lt;br&gt;&lt;br&gt;Wildlife Rescue AI Assistant with Multi-Turn Chat&lt;br&gt;Rails + Gemini API + Stimulus.js Polling" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="680" y="-60" width="640" height="80" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
