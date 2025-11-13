@@ -43,8 +43,37 @@ class IntakesController < ApplicationController
     # Fire Gemini in the background and tell it which record to update afterwards.
     intake.generate_ai_summary_async(pending_message_id: pending_message.id)
 
-    # FIXED: Use the correct nested route helper
+    # GET /intakes/:id/chat > chat_intake
     redirect_to chat_intake_path(intake)
+  end
+
+  # Handles follow-up messages in existing conversation ---
+  def create_message
+    # Find the existing conversation
+    @intake = Intake.find(params[:id])
+
+    # Get message from form
+    user_message = message_params[:content]
+
+    # Write user message to database
+    # (has_may :chat_messages)
+    @intake.chat_messages.create!({
+      role: "user",
+      content: user_message
+    })
+
+    # Create AI placeholder
+    pending_message = @intake.chat_messages.create!(
+      role: "assistant",
+      content: "Thinking",
+      pending: true
+    )
+
+    # Start the AI job in background
+    @intake.generate_ai_summary_async(pending_message_id: pending_message.id)
+
+    # Redirect back to chat page
+    redirect_to chat_intake_path(@intake)
   end
 
   # --- Shows chat with AI response ---
@@ -59,9 +88,14 @@ class IntakesController < ApplicationController
     @error_message = @intake.parsed_payload.dig("error") rescue nil
   end
 
+
   private
 
   def intake_params
     params.require(:intake).permit(:species, :description, :foto_url, :mock)
+  end
+
+  def message_params
+    params.require(:message).permit(:content)
   end
 end

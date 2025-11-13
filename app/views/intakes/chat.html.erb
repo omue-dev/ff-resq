@@ -12,7 +12,7 @@
   <!-- --- Chat window area --- -->
   <div class="chat-window shadow-sm bg-secondary p-4 border border-4 border-dark">
 
-    <% if @intake.present? %>
+    <% if @intake.present? && !@mock%>
       <!-- Real AI mode: every chat bubble comes from the database so the poll controller can refresh them -->
       <div id="chat_messages">
         <% (@chat_messages || []).each do |message| %>
@@ -59,12 +59,20 @@
        When mock mode is enabled, the request will generate fake data in the controller
        and render this same view without any database interaction.
        -->
-  <div class="chat-input-area mt-3">
-    <%= form_with url: intakes_path, method: :post, local: true, data: { turbo: false }, class: "d-flex" do |f| %>
-      <%= f.text_field :description, placeholder: "Type your message...", class: "form-control me-2 chat-input" %>
-      <%= f.submit "Send", class: "btn btn-dark" %>
-    <% end %>
-  </div>
+  <% if @intake.present? && @intake.persisted? && !@mock %>
+    <div class="chat-input-area mt-3">
+      <%= form_with url: message_intake_path(@intake), method: :post, local: true, data: { turbo: false }, class: "d-flex" do |f| %>
+        <%= f.text_field :content, name: "message[content]", placeholder: "Type your message...", class: "form-control me-2 chat-input" %>
+        <%= f.submit "Send", class: "btn btn-dark" %>
+      <% end %>
+    </div>
+  <% elsif @mock %>
+    <div class="chat-input-area mt-3">
+      <div class="alert alert-info text-center">
+        📝 Mock mode - Input disabled. Refresh to start a real conversation.
+      </div>
+    </div>
+  <% end %>
 
   <!-- --- Navigation area --- -->
   <div class="text-center mt-4">
