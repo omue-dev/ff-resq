@@ -7,6 +7,7 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   root "intakes#new"
+  get "vets", to: "vets#index"
 
   # Intake routes
   resources :intakes, only: [:new, :create] do
