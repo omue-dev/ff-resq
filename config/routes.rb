@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   resources :intakes, only: [:new, :create] do
     member do
       get 'chat', to: 'intakes#chat', as: :chat
+      post 'messages', to: 'intakes#create_message', as: :message
     end
   end
 
