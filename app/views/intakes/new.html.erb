@@ -3,12 +3,12 @@
 
   <!-- Main intake form -->
   <!-- Submits to IntakesController#create -->
-  <%= simple_form_for :intake,
+  <%= simple_form_for (@intake || Intake.new),
                       url: intakes_path,
                       method: :post,
-                      local: true,               # no AJAX/Turbo
+                      local: true,
                       data: { turbo: false },
-                      class: "card p-4 shadow-sm" do |f| %>
+                      html: { multipart: true, class: "card p-4 shadow-sm" } do |f| %>
 
     <!-- --- Mock switch --- -->
     <!-- When checked: skips AI call, uses fake test data -->
