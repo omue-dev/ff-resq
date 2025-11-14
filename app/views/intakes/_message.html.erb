@@ -2,7 +2,7 @@
 <% message_dom_id = message.respond_to?(:to_key) ? dom_id(message) : "message_#{message.id}" %>
 
 <% if message.role == "assistant" %>
-  <!-- WRAPPER FÜR ALLES -->
+  <!-- WRAPPER -->
   <div id="<%= message_dom_id %>_wrapper">
     <div class="chat-bubble ai-message bg-dark text-white animated-bubble position-relative mb-3"
      data-message="<%= message.content %>">
@@ -11,7 +11,7 @@
         <!-- Placeholder for typing -->
         <span class="ai-text"></span>
       <% else %>
-        <%= message.content %>
+        <%= raw(message.content) %>
       <% end %>
 
       <% if message.respond_to?(:pending?) && message.pending? %>
@@ -42,6 +42,6 @@
         <%= image_tag message.photo_url, class: "img-thumbnail", style: "max-width: 200px; max-height: 200px; object-fit: cover;" %>
       </div>
     <% end %>
-    <%= message.content %>
+    <%= simple_format(message.content) %>
   </div>
 <% end %>

@@ -38,12 +38,13 @@
         <!-- --- Mock assistant (AI) reply bubble ---
             This simulates the AI’s response without calling any backend.
             -->
-        <%= render partial: "intakes/message",
-        locals: { message: OpenStruct.new(id: "mock-ai",
-                                          role: "assistant",
-                                          content: "Try to keep the pigeon calm and warm in a ventilated box. Offer a little water, but don’t feed it yet. Avoid touching the wings — and if it’s bleeding or can’t move, contact a local wildlife rescue center for proper care."),
-        animate: true } %>
-
+        <div class="chat-bubble ai-message bg-dark text-white animated-bubble position-relative mb-3">
+          <div>Thank you for helping this bird of prey. Your quick actions can make a real difference. Please follow these instructions carefully to protect yourself and the bird until you can get it to a professional.</div>
+              <h5 class="subtitle mt-4">Approach</h5>
+              <p> Approach slowly and quietly. Be aware of the bird's beak and talons, even if it appears unresponsive. Cover its head with a towel or blanket before attempting to handle. This will help calm the bird and protect you.</p>
+            </div>
+          </div>
+        </div>
       </div>
 
     <% else %>

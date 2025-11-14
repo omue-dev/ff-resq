@@ -97,12 +97,15 @@ export default class extends Controller {
       const aiText = bubble.querySelector(".ai-text") // element where we type
       const thinking = bubble.querySelector("[data-thinking]") // loading dots
 
-      // If there’s no message text or the animation already ran, skip it
+      // If there's no message text or the animation already ran, skip it
       if (!aiText || !text.length) return
       if (aiText.dataset.animated) return
 
       // Mark this element as already animated to avoid re-running it
       aiText.dataset.animated = "1"
+
+      // Check if the message contains HTML (handling instructions or cards)
+      const hasHTML = text.includes('<div class="handling-instructions') || text.includes('<div class="card')
 
       // Wait a short moment ("thinking...") before starting to type
       setTimeout(() => {
@@ -115,22 +118,31 @@ export default class extends Controller {
           setTimeout(() => {
             thinking.remove()
 
-            // Type one character every 15 ms
+            if (hasHTML) {
+              // If content has HTML, just show it all at once
+              aiText.innerHTML = text
+            } else {
+              // Type one character every 15 ms
+              let i = 0
+              const interval = setInterval(() => {
+                aiText.textContent += text.charAt(i)
+                i++
+                if (i >= text.length) clearInterval(interval)
+              }, 15)
+            }
+          }, 250)
+        } else {
+          // If there's no "thinking" element, just show immediately
+          if (hasHTML) {
+            aiText.innerHTML = text
+          } else {
             let i = 0
             const interval = setInterval(() => {
               aiText.textContent += text.charAt(i)
               i++
               if (i >= text.length) clearInterval(interval)
             }, 15)
-          }, 250)
-        } else {
-          // If there’s no "thinking" element, just type immediately
-          let i = 0
-          const interval = setInterval(() => {
-            aiText.textContent += text.charAt(i)
-            i++
-            if (i >= text.length) clearInterval(interval)
-          }, 15)
+          }
         }
       }, 800) // Wait ~0.8s before typing
     })
