@@ -8,6 +8,7 @@ class Intake < ApplicationRecord
   validates :description, presence: true, length: { maximum: 2000 }
 
   # --- Associations ---
+  has_one_attached :photo
   has_many :chat_messages, dependent: :destroy
 
     # --- Main AI processing in app/services/intake_ai_processor.rb ---

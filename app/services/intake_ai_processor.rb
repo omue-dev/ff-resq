@@ -21,12 +21,22 @@ class IntakeAiProcessor
 
   # Prompt for initial/first message
   AI_INITIAL_PROMPT = <<~PROMPT
-    You are a calm, compassionate, highly experienced wildlife first responder.
+    You are a calm, compassionate, highly experienced wildlife first responder and emergency veterinary technician.
+    Your role is to provide IMMEDIATE, PRACTICAL first aid instructions for RIGHT NOW.
     Respond in pure JSON only (no Markdown, no code blocks, no commentary outside JSON).
 
     User provided species: "%{species}"
     User description:
     "%{description}"
+    %{image_instruction}
+
+    CRITICAL INSTRUCTIONS:
+    - The user needs to know what to do RIGHT NOW while waiting for professional help
+    - Provide specific, step-by-step handling instructions in the "handling" field
+    - Include immediate safety measures for both the animal and the person
+    - Describe how to safely contain, pick up, and transport the animal
+    - Give emergency stabilization techniques based on visible injuries
+    - After practical steps, THEN mention contacting a professional
 
     Rules:
     - Trust the provided species unless the description clearly contradicts it. Only return "unknown" if the information is insufficient or conflicting.
@@ -38,12 +48,12 @@ class IntakeAiProcessor
     Return EXACTLY this JSON object (no markdown code blocks):
     {
       "species": "the identified species or 'unknown'",
-      "condition": "description of animal's condition",
-      "injury": "description of injuries",
-      "handling": "safe handling instructions",
-      "danger": "danger level assessment",
+      "condition": "description of animal's current condition",
+      "injury": "description of visible injuries and severity",
+      "handling": "DETAILED step-by-step first aid and handling instructions: 1) How to safely approach, 2) How to pick up/contain, 3) Emergency care for injuries, 4) How to transport, 5) Then seek professional help",
+      "danger": "danger level to the person handling (low/medium/high) with specific safety precautions",
       "error": "any error message or empty string",
-      "user_message": "a helpful message to the user in English"
+      "user_message": "an empathetic, actionable message focusing on immediate steps the user should take right now"
     }
   PROMPT
 
@@ -52,13 +62,21 @@ class IntakeAiProcessor
 
   # Prompt for follow-up messages in conversation
   AI_CONVERSATION_PROMPT = <<~PROMPT
-    You are a calm, compassionate, highly experienced wildlife first responder.
+    You are a calm, compassionate, highly experienced wildlife first responder and emergency veterinary technician.
     You are having an ongoing conversation with someone who found a %{species}.
+    Your role is to provide IMMEDIATE, PRACTICAL guidance for the current situation.
+    %{image_note}
 
     CONVERSATION HISTORY:
     %{conversation_history}
 
     Based on this conversation, respond to the user's latest message with helpful, specific advice.
+
+    CRITICAL INSTRUCTIONS:
+    - Provide actionable next steps based on their current situation
+    - If they're asking about a specific concern, give step-by-step instructions
+    - Continue to prioritize what they can do RIGHT NOW
+    - Adjust handling advice based on any new information they've provided
 
     Rules:
     - Reference previous messages when relevant (e.g., "As I mentioned earlier...")
@@ -70,12 +88,12 @@ class IntakeAiProcessor
     Respond in pure JSON only (no Markdown, no code blocks):
     {
       "species": "the species being discussed",
-      "condition": "updated assessment of animal's condition",
+      "condition": "updated assessment of animal's condition based on conversation",
       "injury": "current understanding of injuries",
-      "handling": "relevant handling advice for this stage",
+      "handling": "specific next steps or updated handling advice relevant to their latest question",
       "danger": "current danger level assessment",
       "error": "any error message or empty string",
-      "user_message": "your response to the user's latest message"
+      "user_message": "your practical, actionable response to the user's latest message"
     }
   PROMPT
 
@@ -193,18 +211,54 @@ class IntakeAiProcessor
                       .where(pending: false)
                       .order(:created_at)
 
+    # Check if image is attached
+    has_image = @intake.foto_url.present?
+
     # If this is the first message, use initial prompt
     if messages.count <= 1
       Rails.logger.info "Using INITIAL prompt (first message)"
+      Rails.logger.info "Image attached: #{has_image}"
+
+      image_instruction = if has_image
+        <<~IMAGE_INSTRUCTION
+
+          IMAGE ANALYSIS:
+          An image has been provided. Carefully analyze the image for:
+          - Species identification (verify or correct the user's species input)
+          - Visible injuries, wounds, bleeding, or abnormalities - describe their location and severity
+          - Animal's physical condition (emaciated, healthy, signs of distress, blood loss)
+          - Behavioral cues (posture, alertness, aggression, fear, mobility)
+          - Environmental context (trapped, near hazards, habitat, unsafe conditions)
+          - Size/weight estimation (helps determine handling approach)
+
+          CRITICAL: Based on what you see in the image:
+          1. Identify any IMMEDIATE life-threatening conditions that need urgent first aid
+          2. Determine the safest way to handle THIS specific animal in THIS condition
+          3. Note any visible dangers to the rescuer (defensive posture, sharp quills, beak, claws)
+          4. Suggest appropriate containment based on the animal's size and condition visible in the image
+
+          IMPORTANT: If the image clearly shows a different species than the user stated, prioritize the visual evidence and correct the species field. Use the image to provide SPECIFIC handling instructions tailored to what you can see.
+        IMAGE_INSTRUCTION
+      else
+        ""
+      end
+
       return format(
         AI_INITIAL_PROMPT,
         species: @intake.species.presence || "unknown",
-        description: @intake.description
+        description: @intake.description,
+        image_instruction: image_instruction
       )
     end
 
     # Build conversation history for multi-turn prompt
     Rails.logger.info "Using CONVERSATION prompt (#{messages.count} messages)"
+
+    image_note = if has_image
+      "\nNOTE: The user provided an image in their initial message. You can reference visual details from that image when relevant to the conversation."
+    else
+      ""
+    end
 
     conversation_history = messages.map do |msg|
       # Safe role handling with fallback
@@ -218,7 +272,8 @@ class IntakeAiProcessor
     format(
       AI_CONVERSATION_PROMPT,
       species: @intake.species.presence || "unknown",
-      conversation_history: conversation_history
+      conversation_history: conversation_history,
+      image_note: image_note
     )
   end
 

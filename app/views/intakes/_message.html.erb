@@ -37,6 +37,11 @@
   </div>
 <% else %>
   <div class="chat-bubble user-message animated-bubble mb-3" id="<%= message_dom_id %>">
+    <% if message.photo_url.present? %>
+      <div class="mb-2">
+        <%= image_tag message.photo_url, class: "img-thumbnail", style: "max-width: 200px; max-height: 200px; object-fit: cover;" %>
+      </div>
+    <% end %>
     <%= message.content %>
   </div>
 <% end %>

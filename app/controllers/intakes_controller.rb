@@ -1,6 +1,11 @@
 class IntakesController < ApplicationController
   require "json"
 
+  # --- Shows the intake form ---
+  def new
+    @intake = Intake.new
+  end
+
   # --- Handles form submission ---
   def create
     # Extract form data safely and normalize it
@@ -8,6 +13,13 @@ class IntakesController < ApplicationController
     species     = data[:species].to_s.strip
     description = data[:description].to_s.strip
     foto_url    = data[:foto_url].to_s.strip
+
+    # Upload photo to Cloudinary if present
+    if data[:photo].present?
+      result = Cloudinary::Uploader.upload(data[:photo].tempfile.path)
+      foto_url = result["secure_url"]
+    end
+
     # mock mode active?
     mock_mode = ActiveModel::Type::Boolean.new.cast(data[:mock])
 
@@ -18,33 +30,40 @@ class IntakesController < ApplicationController
       return
     end
 
+
     # store data in DB so the polling view can watch for updates ---
-    intake = Intake.create!(
+    @intake = Intake.new(
       species: species,
       description: description,
       status: "pending",
       foto_url: foto_url.presence
     )
 
+    unless @intake.save
+      # Validation failed - show errors in the form
+      render :new, status: :unprocessable_entity
+      return
+    end
+
     # Save user's initial message (shows up immediately in the chat view)
-    intake.chat_messages.create!(
+    @intake.chat_messages.create!(
       role: "user",
-      content: description
+      content: description,
+      photo_url: foto_url
     )
 
     # Pre-create a placeholder AI message so the Stimulus poll controller knows what to refresh.
-    pending_message = intake.chat_messages.create!(
+    pending_message = @intake.chat_messages.create!(
       role: "assistant",
       content: "Analyzing",
       pending: true
     )
 
-
     # Fire Gemini in the background and tell it which record to update afterwards.
-    intake.generate_ai_summary_async(pending_message_id: pending_message.id)
+    @intake.generate_ai_summary_async(pending_message_id: pending_message.id)
 
     # GET /intakes/:id/chat > chat_intake
-    redirect_to chat_intake_path(intake)
+    redirect_to chat_intake_path(@intake)
   end
 
   # Handles follow-up messages in existing conversation ---
@@ -92,7 +111,7 @@ class IntakesController < ApplicationController
   private
 
   def intake_params
-    params.require(:intake).permit(:species, :description, :foto_url, :mock)
+    params.require(:intake).permit(:species, :description, :photo, :foto_url, :mock)
   end
 
   def message_params
