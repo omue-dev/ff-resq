@@ -39,21 +39,29 @@ class IntakeAiProcessor
     - After practical steps, THEN mention contacting a professional
 
     Rules:
-    - Trust the provided species unless the description clearly contradicts it. Only return "unknown" if the information is insufficient or conflicting.
-    - Always write every field, including "user_message", in clear, empathetic English regardless of the input language.
-    - No links, placeholders, or mentions of model internals or images.
-    - If species is unknown, set "species":"unknown" and explain in "error".
-    - ALWAYS provide a "user_message" - never leave it empty.
+    - Trust the provided species unless the description clearly contradicts it.
+    - Always write in clear, empathetic English.
+    - No links, placeholders, or mentions of model internals.
+
+    MANDATORY: The "handling" field MUST contain exactly 5 labeled steps:
+    STEP 1: Approach - specific approach instructions for this animal
+    STEP 2: Containment - if possible: exactly how to pick up and contain safely
+    STEP 3: First Aid - emergency care for the specific injuries visible
+    STEP 4: Transport - specific transport container and conditions
+    STEP 5: Professional Help - then contact vet - if necessary
+
+    EXAMPLE for hedgehog with wound:
+    "handling": "STEP 1: Approach - Wear thick gloves or use a towel. Hedgehog may curl into a defensive ball. Move slowly and speak calmly. STEP 2: Containment - Gently scoop from underneath with both hands supporting the body. Avoid touching the wound area. Place in a ventilated cardboard box (shoe box size) lined with a soft towel. STEP 3: First Aid - Do NOT touch the wound directly. If actively bleeding, place a clean, dry gauze pad over it without pressure. Do not attempt to clean or treat. STEP 4: Transport - Keep box in a warm (75-80°F), quiet, dark location. Ensure air holes in the box. No food or water during transport. STEP 5: Professional Help - Contact a wildlife rehabilitator experienced with hedgehogs immediately. Transport within 2 hours if possible."
 
     Return EXACTLY this JSON object (no markdown code blocks):
     {
       "species": "the identified species or 'unknown'",
       "condition": "description of animal's current condition",
       "injury": "description of visible injuries and severity",
-      "handling": "DETAILED step-by-step first aid and handling instructions: 1) How to safely approach, 2) How to pick up/contain, 3) Emergency care for injuries, 4) How to transport, 5) Then seek professional help",
-      "danger": "danger level to the person handling (low/medium/high) with specific safety precautions",
+      "handling": "YOU MUST USE THIS FORMAT: STEP 1: Approach - [details]. STEP 2: Containment - [details]. STEP 3: First Aid - [details]. STEP 4: Transport - [details]. STEP 5: Professional Help - [details].",
+      "danger": "low/medium/high with specific safety precautions",
       "error": "any error message or empty string",
-      "user_message": "an empathetic, actionable message focusing on immediate steps the user should take right now"
+      "user_message": "empathetic message focusing on immediate steps"
     }
   PROMPT
 
@@ -153,9 +161,32 @@ class IntakeAiProcessor
     # Parse the JSON response
     parsed = JSON.parse(cleaned_text)
 
-    # Extract user message with fallback
+    # Extract user message - keep it simple, formatting will happen in the view
     user_message = parsed["user_message"].presence ||
                   "I've analyzed your submission but couldn't generate a response message."
+
+    # Add handling instructions with Bootstrap cards
+    if parsed['handling'].present?
+      handling_html = '<div class="handling-instructions mt-4"><h4 class="handling-title text- bold">Handling Instructions</h4>'
+
+      # Split the handling text into individual steps
+      steps = parsed['handling'].scan(/STEP\s*(\d+):\s*(.+?)(?=STEP\s*\d+:|$)/mi)
+
+      steps.each do |step_num, step_content|
+        # Parse step title and content (format: "STEP X: Title - Content")
+        title_and_content = step_content.strip.split(' - ', 2)
+        step_title = title_and_content[0]&.strip || "Step #{step_num}"
+        step_text = title_and_content[1]&.strip || step_content.strip
+
+        handling_html += %{
+          <h5 class="subtitle mt-2">#{step_title}</h5>
+          <p>#{step_text}</p>
+        }
+      end
+
+      handling_html += '</div>'
+      user_message += "\n\n" + handling_html
+    end
 
     # ══════════════════════════════════════════════════════════════════════════
     # WORKFLOW PART 5: Update ChatMessage in DB (chat_messages table)
