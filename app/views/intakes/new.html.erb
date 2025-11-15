@@ -1,58 +1,200 @@
-<div class="container mt-5">
-  <h1>Animal Rescue Assistant</h1>
+<div class="container mt-5" data-controller="slide-transition" data-slide-transition-initial-load-value="true" style="background: transparent;">
 
-  <!-- Main intake form -->
-  <!-- Submits to IntakesController#create -->
-  <%= simple_form_for (@intake || Intake.new),
-                      url: intakes_path,
-                      method: :post,
-                      local: true,
-                      data: { turbo: false },
-                      html: { multipart: true, class: "card p-4 shadow-sm" } do |f| %>
+  <!-- Flip Card Container -->
+  <div class="flip-card" data-slide-transition-target="flipCard">
 
-    <!-- --- Mock switch --- -->
-    <!-- When checked: skips AI call, uses fake test data -->
-    <div class="mb-3">
-      <div class="form-check form-switch">
-        <%= f.input :mock,
-                    as: :boolean,
-                    label: "Mock Data (toggle to use fake data, no AI call will be made)",
-                    input_html: { class: "form-check-input", role: "switch", checked: true } %>
+    <!-- Front Face - Branding -->
+    <div class="flip-card-front">
+      <div class="p-5 text-center" style="min-height: 500px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <h1 class="display-3 fw-bold text-white mb-2" style="font-family: 'Inter', sans-serif;">
+          fur&feather<br>
+          <span style="color: #ffd700;">resQ</span>
+        </h1>
+        <p class="lead text-white mb-4" style="font-size: 1.5rem; font-weight: 300;">
+          Your Animal<br>
+          Rescue<br>
+          Assistant
+        </p>
+        <button type="button" class="btn btn-light btn-lg px-5 py-3" data-action="click->slide-transition#flipToForm" style="font-size: 1.2rem; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+          How can I help? →
+        </button>
       </div>
     </div>
 
-    <!-- --- Species field --- -->
-    <!-- Saved to intake.species, validated in model -->
-    <div class="mb-3">
-      <%= f.input :species,
-                  label: "Species*",
-                  placeholder: "e.g. Labrador, Mancoon, Pigeon...",
-                  required: true,
-                  input_html: { class: "form-control" } %>
+    <!-- Back Face - Form -->
+    <div class="flip-card-back">
+      <!-- Mobile Form Header -->
+      <div class="mobile-form-header">
+        <h1>I'm here to help!</h1>
+        <p class="subtitle">Tell me about the animal</p>
+      </div>
+
+      <!-- Main intake form -->
+      <%= simple_form_for (@intake || Intake.new),
+                          url: intakes_path,
+                          method: :post,
+                          local: true,
+                          data: {
+                            turbo: false,
+                            action: "submit->slide-transition#slideOut",
+                            controller: "mobile-form"
+                          },
+                          html: { multipart: true, class: "mobile-form", id: "intakeForm" } do |f| %>
+
+        <!-- --- Mock switch - Mobile Toggle --- -->
+        <div class="mobile-toggle">
+          <%= f.label :mock, "Mock Data" %>
+          <%= f.input :mock,
+                      as: :boolean,
+                      label: false,
+                      wrapper: false,
+                      input_html: {
+                        class: "form-check-input",
+                        role: "switch",
+                        checked: true,
+                        id: "mockSwitch"
+                      } %>
+        </div>
+
+        <!-- --- Species field --- -->
+        <%= f.input :species,
+                    label: "Species",
+                    placeholder: "e.g., Blackbird, Hedgehog, Pigeon",
+                    required: true,
+                    input_html: {
+                      class: "form-control",
+                      autocomplete: "off",
+                      autocapitalize: "words"
+                    } %>
+
+        <!-- --- Description field --- -->
+        <%= f.input :description,
+                    label: "Description",
+                    as: :text,
+                    required: true,
+                    input_html: {
+                      placeholder: "What happened? Describe the situation...",
+                      class: "form-control",
+                      rows: 4,
+                      autocomplete: "off"
+                    } %>
+
+        <!-- --- Photo upload - Mobile Camera Style --- -->
+        <div class="form-group">
+          <label>Photo (optional)</label>
+          <div class="mobile-photo-upload">
+            <%= f.input :photo,
+                        as: :file,
+                        label: false,
+                        wrapper: false,
+                        input_html: {
+                          accept: "image/*",
+                          capture: "environment",
+                          class: "d-none",
+                          id: "photoInput"
+                        } %>
+
+            <div class="upload-area" onclick="document.getElementById('photoInput').click()">
+              <div class="upload-icon">📷</div>
+              <div class="upload-text">Tap to take photo</div>
+              <div class="upload-hint">or choose from gallery</div>
+            </div>
+
+            <div class="file-preview" id="filePreview">
+              <div class="preview-icon">🖼️</div>
+              <div class="preview-info">
+                <div class="file-name" id="previewFileName"></div>
+                <div class="file-size" id="previewFileSize"></div>
+              </div>
+              <button type="button" class="remove-file" id="removeFile" aria-label="Remove photo">×</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- --- Submit button --- -->
+        <button type="submit" class="mobile-submit" id="submitBtn">
+          <span class="submit-text">Get instant help</span>
+        </button>
+
+      <% end %>
     </div>
 
-    <!-- --- Description field --- -->
-    <!-- Saved to intake.description, used in AI prompt -->
-    <div class="mb-3">
-      <%= f.input :description,
-                  label: "Description",
-                  as: :text,
-                  required: true,
-                  input_html: { placeholder: "What happened?", class: "form-control" } %>
-    </div>
-
-    <!-- --- Photo upload --- -->
-    <!-- Optional image URL, used by GeminiClient if present -->
-    <div class="mb-3">
-      <%= f.input :photo,
-                  as: :file,
-                  label: "Submit a Photo (optional)",
-                  input_html: { accept: "image/*", class: "form-control form-control-lg" } %>
-    </div>
-
-    <!-- --- Submit button --- -->
-    <!-- Triggers create action (either mock or real AI mode) -->
-    <%= submit_tag "Send to AI", class: "btn btn-primary w-100" %>
-
-  <% end %>
+  </div>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const photoInput = document.getElementById("photoInput");
+    const filePreview = document.getElementById("filePreview");
+    const previewFileName = document.getElementById("previewFileName");
+    const previewFileSize = document.getElementById("previewFileSize");
+    const removeFileBtn = document.getElementById("removeFile");
+    const form = document.getElementById("intakeForm");
+
+    // Handle file selection
+    if (photoInput) {
+      photoInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          // Show preview
+          previewFileName.textContent = file.name;
+          previewFileSize.textContent = formatFileSize(file.size);
+          filePreview.classList.add("active");
+
+          // Haptic feedback simulation (for mobile browsers that support it)
+          if (navigator.vibrate) {
+            navigator.vibrate(10);
+          }
+        }
+      });
+    }
+
+    // Remove file
+    if (removeFileBtn) {
+      removeFileBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        photoInput.value = "";
+        filePreview.classList.remove("active");
+
+        if (navigator.vibrate) {
+          navigator.vibrate(10);
+        }
+      });
+    }
+
+    // Form submission - add loading state
+    if (form) {
+      form.addEventListener("submit", (e) => {
+        const submitBtn = document.getElementById("submitBtn");
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          form.classList.add("loading");
+        }
+
+        // Haptic feedback on submit
+        if (navigator.vibrate) {
+          navigator.vibrate([10, 50, 10]);
+        }
+      });
+    }
+
+    // Touch feedback for inputs
+    const inputs = document.querySelectorAll('.mobile-form input, .mobile-form textarea');
+    inputs.forEach(input => {
+      input.addEventListener('focus', () => {
+        if (navigator.vibrate) {
+          navigator.vibrate(5);
+        }
+      });
+    });
+
+    // Helper function to format file size
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+    }
+  });
+</script>

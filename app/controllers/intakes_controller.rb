@@ -26,6 +26,7 @@ class IntakesController < ApplicationController
     # use mock data in chat.html.erb
     if mock_mode
       @mock = true
+      session[:slide_transition] = true
       render :chat
       return
     end
@@ -61,6 +62,9 @@ class IntakesController < ApplicationController
 
     # Fire Gemini in the background and tell it which record to update afterwards.
     @intake.generate_ai_summary_async(pending_message_id: pending_message.id)
+
+    # Mark that we should slide in the chat view
+    session[:slide_transition] = true
 
     # GET /intakes/:id/chat > chat_intake
     redirect_to chat_intake_path(@intake)
