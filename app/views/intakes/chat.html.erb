@@ -1,17 +1,21 @@
 <% should_slide = session.delete(:slide_transition) || false %>
-<div class="chat-container mt-5" data-controller="slide-transition" data-slide-transition-slide-in-value="<%= should_slide %>" style="<%= 'transform: translateX(100%);' if should_slide %>">
-  <h1 class="text-center mb-4">resQ AI Chat</h1>
+<div class="chat-page" data-controller="slide-transition chat-scroll" data-slide-transition-slide-in-value="<%= should_slide %>" id="chat-page-container">
 
-  <!-- --- Error alert if AI failed --- -->
+  <!-- Chat Header (Fixed) -->
+  <div class="chat-page-header">
+    <%= link_to "Show vets nearby", vets_path, class: "vets-link" %>
+    <span class="cta-arrow">→</span>
+  </div>
+
+  <!-- Error alert if AI failed -->
   <% if @status == "error" %>
-    <div class="alert alert-danger text-center fw-bold">
-      ⚠️ AI error:
-      <%= @error_message.presence || "An unexpected problem occurred. Please try again later." %>
+    <div class="alert alert-danger mx-3 mt-3 text-center">
+      ⚠️ AI error: <%= @error_message.presence || "An unexpected problem occurred. Please try again later." %>
     </div>
   <% end %>
 
-  <!-- --- Chat window area --- -->
-  <div class="chat-window shadow-sm bg-secondary p-4 border border-4 border-dark">
+  <!-- Scrollable Messages Area -->
+  <div class="chat-messages-container" data-chat-scroll-target="container">
 
     <% if @intake.present? && !@mock%>
       <!-- Real AI mode: every chat bubble comes from the database so the poll controller can refresh them -->
@@ -32,15 +36,26 @@
         <!-- --- Mock user message bubble ---
             This represents what a user would type into the chat.
             -->
-        <div class="chat-bubble user-message mb-3">
-          I found an injured pigeon near the park. It can't fly and looks weak. What should I do?
+        <div class="message-row user-row">
+          <div class="chat-bubble user-message">
+            I found an injured pigeon near the park. It can't fly and looks weak. What should I do?
+          </div>
+          <div class="message-avatar user-avatar">
+            <svg class="avatar-img" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="8" r="4" fill="currentColor"/>
+              <path d="M6 21C6 17.134 8.686 14 12 14C15.314 14 18 17.134 18 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
         </div>
 
         <!-- --- Mock assistant (AI) reply bubble with animation testing ---
             This simulates the AI's response with proper structure for testing GSAP animations.
             -->
-        <div id="mock_message_wrapper" data-controller="animation-test">
-          <div class="chat-bubble ai-message bg-dark text-white animated-bubble position-relative mb-3"
+        <div id="mock_message_wrapper" data-controller="animation-test" class="message-row ai-row">
+          <div class="message-avatar ai-avatar">
+            <%= image_tag 'ffresq-logo-optimized-min.png', alt: 'resQ AI', class: 'avatar-img' %>
+          </div>
+          <div class="chat-bubble ai-message text-white animated-bubble position-relative"
                data-message="Thank you for helping this bird! Let's get it safely contained and then find it expert care.<div class='mt-3'><h5>Approach</h5><p>Approach slowly and quietly. Avoid sudden movements to reduce stress on the bird.</p><h5>Containment</h5><p>Gently place a lightweight towel over the bird. Carefully pick it up, supporting its body and wings.</p></div>"
                data-animation-test-target="bubble">
 
@@ -75,28 +90,16 @@
     <% end %>
   </div>
 
-  <!-- --- Chat input area ---
-       The user can submit a new message here.
-       When mock mode is enabled, the request will generate fake data in the controller
-       and render this same view without any database interaction.
-       -->
-  <% if @intake.present? && @intake.persisted? && !@mock %>
-    <div class="chat-input-area mt-3">
-      <%= form_with url: message_intake_path(@intake), method: :post, local: true, data: { turbo: false }, class: "d-flex" do |f| %>
-        <%= f.text_field :content, name: "message[content]", placeholder: "Type your message...", class: "form-control me-2 chat-input" %>
-        <%= f.submit "Send", class: "btn btn-dark" %>
+  <!-- Fixed Input Area at Bottom -->
+  <div class="chat-input-fixed">
+    <% if @intake.present? && @intake.persisted? && !@mock %>
+      <%= form_with url: message_intake_path(@intake), method: :post, local: true, data: { turbo: false, action: "submit->chat-scroll#scrollToBottom" }, class: "chat-input-form" do |f| %>
+        <div class="input-wrapper">
+          <%= f.text_field :content, name: "message[content]", placeholder: "Type your message...", class: "chat-input", autocomplete: "off" %>
+          <%= f.submit "Send", class: "chat-send-btn" %>
+        </div>
       <% end %>
-    </div>
-  <% elsif @mock %>
-    <div class="chat-input-area mt-3">
-      <div class="alert alert-info text-center">
-        📝 Mock mode - Input disabled. Refresh to start a real conversation.
-      </div>
-    </div>
-  <% end %>
-
-  <!-- --- Navigation area --- -->
-  <div class="text-center mt-4">
-    <%= link_to "Show vets nearby", vets_path, class: "btn btn-outline-dark btn-lg" %>
+    <% end %>
   </div>
+
 </div>

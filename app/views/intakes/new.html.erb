@@ -5,20 +5,14 @@
 
     <!-- Front Face - Branding -->
     <div class="flip-card-front">
-      <div class="p-5 text-center" style="min-height: 500px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-        <h1 class="display-3 fw-bold text-white mb-2" style="font-family: 'Inter', sans-serif;">
-          fur&feather<br>
-          <span style="color: #ffd700;">resQ</span>
-        </h1>
-        <p class="lead text-white mb-4" style="font-size: 1.5rem; font-weight: 300;">
-          Your Animal<br>
-          Rescue<br>
-          Assistant
-        </p>
-        <button type="button" class="btn btn-light btn-lg px-5 py-3" data-action="click->slide-transition#flipToForm" style="font-size: 1.2rem; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-          How can I help? →
-        </button>
+      <div class="welcome-card-header">
+        <%= image_tag 'ffresq-logo-optimized-min.png', class: 'welcome-logo', alt: 'fur&feather resQ - Your Animal Rescue Assistant' %>
+        <p class="welcome-subtitle">Your Animal Rescue Assistant</p>
       </div>
+      <button type="button" class="welcome-cta" data-action="click->slide-transition#flipToForm">
+        <span class="cta-text">How can I help?</span>
+        <span class="cta-arrow">→</span>
+      </button>
     </div>
 
     <!-- Back Face - Form -->
