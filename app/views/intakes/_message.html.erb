@@ -3,8 +3,11 @@
 
 <% if message.role == "assistant" %>
   <!-- WRAPPER -->
-  <div id="<%= message_dom_id %>_wrapper">
-    <div class="chat-bubble ai-message bg-dark text-white animated-bubble position-relative mb-3"
+  <div id="<%= message_dom_id %>_wrapper" class="message-row ai-row">
+    <div class="message-avatar ai-avatar">
+      <%= image_tag 'fox-avatar-min.png', alt: 'resQ AI', class: 'avatar-img' %>
+    </div>
+    <div class="chat-bubble ai-message text-white animated-bubble position-relative"
      data-message="<%= message.content %>">
 
       <% if animate %>
@@ -36,12 +39,17 @@
     <% end %>
   </div>
 <% else %>
-  <div class="chat-bubble user-message animated-bubble mb-3" id="<%= message_dom_id %>">
-    <% if message.photo_url.present? %>
-      <div class="mb-2">
-        <%= image_tag message.photo_url, class: "img-thumbnail", style: "max-width: 200px; max-height: 200px; object-fit: cover;" %>
-      </div>
-    <% end %>
-    <%= simple_format(message.content) %>
+  <div class="message-row user-row" id="<%= message_dom_id %>">
+    <div class="chat-bubble user-message animated-bubble">
+      <% if message.photo_url.present? %>
+        <div class="mb-2">
+          <%= image_tag message.photo_url, class: "img-thumbnail", style: "max-width: 200px; max-height: 200px; object-fit: cover;" %>
+        </div>
+      <% end %>
+      <%= simple_format(message.content) %>
+    </div>
+    <div class="message-avatar user-avatar">
+      <%= content_tag :i, "", class: "fa-solid fa-user" %>
+    </div>
   </div>
 <% end %>

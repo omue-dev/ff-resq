@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>FfResq</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -13,7 +13,10 @@
   </head>
 
   <body>
-    <div id="floating-animals"></div>
+    <div id="floating-animals">
+      <%= image_tag 'bird-min.png', class: 'animal-img bird-img', id: 'bird-img', style: 'display: none;', alt: 'a cute fox looks at you' %>
+      <%= image_tag 'fox-min.png', class: 'animal-img fox-img', id: 'fox-img', style: 'display: none;', alt: 'the head of an eagle looks at the fox' %>
+    </div>
     <%= yield %>
   </body>
 </html>

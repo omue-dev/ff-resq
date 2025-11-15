@@ -16,9 +16,15 @@ export default class extends Controller {
       this.curtainOpen()
     }
     // Slide in animation for chat view after form submission
-    else if (this.slideInValue) {
-      // The element already has inline transform from ERB
-      // Just animate it to 0
+    // Only check sessionStorage (Rails session value is no longer used)
+    else if (sessionStorage.getItem('chatShouldSlideIn') === 'true') {
+      // Clear the flag immediately to prevent double animation
+      sessionStorage.removeItem('chatShouldSlideIn')
+
+      // Set initial position off-screen to the right
+      gsap.set(this.element, { opacity: '0' })
+
+      // Animate it to 0 immediately
       requestAnimationFrame(() => {
         this.performSlideIn()
       })
@@ -52,19 +58,13 @@ export default class extends Controller {
       this.element.appendChild(leftSplit)
       this.element.appendChild(rightSplit)
 
-      // Create animal images (bird and fox)
-      const birdImg = document.createElement('img')
-      const foxImg = document.createElement('img')
+      // Get existing animal images from DOM (created in layout with Rails helpers)
+      const birdImg = document.getElementById('bird-img')
+      const foxImg = document.getElementById('fox-img')
 
-      birdImg.src = '/assets/bird-min.png'
-      foxImg.src = '/assets/fox-min.png'
-
-      // Add classes for easier debugging
-      birdImg.className = 'animal-img bird-img'
-      foxImg.className = 'animal-img fox-img'
-
-      document.body.appendChild(birdImg)
-      document.body.appendChild(foxImg)
+      // Make them visible for animation
+      birdImg.style.display = 'block'
+      foxImg.style.display = 'block'
 
       // Set initial states
       gsap.set(flipCard, { scale: 0 })
@@ -158,7 +158,7 @@ export default class extends Controller {
         opacity: 1,
         x: '0%',
         duration: 0.3,
-        ease: "power2.inOut"
+        ease: "power2.in"
       }, "<")
     }
   }
@@ -166,7 +166,7 @@ export default class extends Controller {
   // Slide in animation (for chat page after form submission)
   performSlideIn() {
     gsap.to(this.element, {
-      x: "0%",
+      opacity:1,
       duration: 0.5,
       ease: "power2.out",
       clearProps: "transform" // Clear inline transform when done
@@ -180,16 +180,22 @@ export default class extends Controller {
 
     const form = event.target
     console.log("Sliding out form...")
-    // Animate the form sliding out to the left
+
+    // Set flag so chat page knows to slide in immediately
+    sessionStorage.setItem('chatShouldSlideIn', 'true')
+
+    // Start the slide-out animation
     gsap.to(this.element, {
       x: "-100%",
       opacity: 0,
       duration: 0.4,
-      ease: "power2.in",
-      onComplete: () => {
-        // After animation completes, submit the form
-        form.submit()
-      }
+      ease: "power2.in"
     })
+
+    // Submit form immediately (don't wait for animation)
+    // The animation will continue during page navigation
+    setTimeout(() => {
+      form.submit()
+    }, 100) // Small delay to ensure sessionStorage is set and animation has started
   }
 }
