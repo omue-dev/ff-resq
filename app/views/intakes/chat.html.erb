@@ -1,5 +1,6 @@
-<div class="chat-container mt-5">
-  <h1 class="text-center mb-4">Rescue AI Chat</h1>
+<% should_slide = session.delete(:slide_transition) || false %>
+<div class="chat-container mt-5" data-controller="slide-transition" data-slide-transition-slide-in-value="<%= should_slide %>" style="<%= 'transform: translateX(100%);' if should_slide %>">
+  <h1 class="text-center mb-4">resQ AI Chat</h1>
 
   <!-- --- Error alert if AI failed --- -->
   <% if @status == "error" %>
@@ -32,17 +33,36 @@
             This represents what a user would type into the chat.
             -->
         <div class="chat-bubble user-message mb-3">
-          I found an injured pigeon near the park. It can’t fly and looks weak. What should I do?
+          I found an injured pigeon near the park. It can't fly and looks weak. What should I do?
         </div>
 
-        <!-- --- Mock assistant (AI) reply bubble ---
-            This simulates the AI’s response without calling any backend.
+        <!-- --- Mock assistant (AI) reply bubble with animation testing ---
+            This simulates the AI's response with proper structure for testing GSAP animations.
             -->
-        <div class="chat-bubble ai-message bg-dark text-white animated-bubble position-relative mb-3">
-          <div>Thank you for helping this bird of prey. Your quick actions can make a real difference. Please follow these instructions carefully to protect yourself and the bird until you can get it to a professional.</div>
-              <h5 class="subtitle mt-4">Approach</h5>
-              <p> Approach slowly and quietly. Be aware of the bird's beak and talons, even if it appears unresponsive. Cover its head with a towel or blanket before attempting to handle. This will help calm the bird and protect you.</p>
+        <div id="mock_message_wrapper" data-controller="animation-test">
+          <div class="chat-bubble ai-message bg-dark text-white animated-bubble position-relative mb-3"
+               data-message="Thank you for helping this bird! Let's get it safely contained and then find it expert care.<div class='mt-3'><h5>Approach</h5><p>Approach slowly and quietly. Avoid sudden movements to reduce stress on the bird.</p><h5>Containment</h5><p>Gently place a lightweight towel over the bird. Carefully pick it up, supporting its body and wings.</p></div>"
+               data-animation-test-target="bubble">
+
+            <!-- Empty span that will be filled with content via animation -->
+            <span class="ai-text"></span>
+
+            <!-- Thinking indicator (will be removed after animation) -->
+            <div class="thinking-loader" data-thinking>
+              <span class="thinking-text">Thinking</span>
+              <svg class="typing-dots" width="24" height="16" viewBox="0 -6 24 16">
+                <circle cx="4"  cy="4" r="3"></circle>
+                <circle cx="12" cy="4" r="3"></circle>
+                <circle cx="20" cy="4" r="3"></circle>
+              </svg>
             </div>
+          </div>
+
+          <!-- Animation testing controls -->
+          <div class="text-center mt-3 mb-3">
+            <button class="btn btn-primary" data-action="click->animation-test#replay">
+              🔄 Replay Animation
+            </button>
           </div>
         </div>
       </div>
@@ -80,34 +100,3 @@
     <%= link_to "Show vets nearby", vets_path, class: "btn btn-outline-dark btn-lg" %>
   </div>
 </div>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  // Find all AI message bubbles that should animate
-  const aiBubbles = document.querySelectorAll(".ai-message[data-message]");
-
-  aiBubbles.forEach(bubble => {
-    const text = bubble.dataset.message || "";
-    const aiText = bubble.querySelector(".ai-text");
-    const thinking = bubble.querySelector("[data-thinking]");
-
-    // Only run animation if animate==true in the render call
-    if (!aiText || !text.length) return;
-
-    // Brief thinking delay, then fade out the loader and type text
-    setTimeout(() => {
-      if (thinking) {
-        thinking.style.transition = "opacity .35s ease";
-        thinking.style.opacity = "0";
-        setTimeout(() => thinking.remove(), 350);
-      }
-
-      let i = 0;
-      const interval = setInterval(() => {
-        aiText.textContent += text.charAt(i);
-        i++;
-        if (i >= text.length) clearInterval(interval);
-      }, 15);
-    }, 1500); // 1.5s "thinking" delay
-  });
-});
-</script>

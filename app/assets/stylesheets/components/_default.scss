@@ -1,0 +1,29 @@
+
+
+html {
+  min-height: 100vh;
+  position: relative;
+}
+
+html::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: image-url('background-min.png');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  z-index: -1;
+}
+
+body {
+  background: transparent;
+  min-height: 100vh;
+  color: #f1f1f1;
+}
+h1, h2, h3, h4, h5, h6 {
+font-weight: 300;
+}
