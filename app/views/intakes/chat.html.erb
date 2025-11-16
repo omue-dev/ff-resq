@@ -74,9 +74,10 @@
           </div>
 
           <!-- Animation testing controls -->
-          <div class="text-center mt-3 mb-3">
-            <button class="btn btn-primary" data-action="click->animation-test#replay">
-              🔄 Replay Animation
+          <div class="text-center mt-3 mb-3 p-3 border rounded bg-dark text-white">
+            <h6 class="mb-2">Mock Mode Testing</h6>
+            <button class="btn btn-success ms-2" data-action="click->animation-test#addNewMessage">
+              Add New Message
             </button>
           </div>
         </div>
@@ -93,10 +94,10 @@
   <!-- Fixed Input Area at Bottom -->
   <div class="chat-input-fixed">
     <% if @intake.present? && @intake.persisted? && !@mock %>
-      <%= form_with url: message_intake_path(@intake), method: :post, local: true, data: { turbo: false, action: "submit->chat-scroll#scrollToBottom" }, class: "chat-input-form" do |f| %>
+      <%= form_with url: message_intake_path(@intake), method: :post, local: true, data: { controller: "chat-form", action: "submit->chat-form#submitMessage" }, class: "chat-input-form" do |f| %>
         <div class="input-wrapper">
-          <%= f.text_field :content, name: "message[content]", placeholder: "Type your message...", class: "chat-input", autocomplete: "off" %>
-          <%= f.submit "Send", class: "chat-send-btn" %>
+          <%= f.text_field :content, name: "message[content]", placeholder: "Type your message...", class: "chat-input", autocomplete: "off", data: { chat_form_target: "input" } %>
+          <%= f.submit "Send", class: "chat-send-btn", data: { chat_form_target: "submit" } %>
         </div>
       <% end %>
     <% end %>

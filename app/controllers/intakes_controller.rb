@@ -80,8 +80,7 @@ class IntakesController < ApplicationController
     user_message = message_params[:content]
 
     # Write user message to database
-    # (has_may :chat_messages)
-    @intake.chat_messages.create!({
+    user_chat_message = @intake.chat_messages.create!({
       role: "user",
       content: user_message
     })
@@ -96,8 +95,23 @@ class IntakesController < ApplicationController
     # Start the AI job in background
     @intake.generate_ai_summary_async(pending_message_id: pending_message.id)
 
-    # Redirect back to chat page
-    redirect_to chat_intake_path(@intake)
+    respond_to do |format|
+      format.html { redirect_to chat_intake_path(@intake) }
+      format.json {
+        render json: {
+          user_message_html: render_to_string(
+            partial: "intakes/message",
+            locals: { message: user_chat_message },
+            formats: [:html]
+          ),
+          ai_message_html: render_to_string(
+            partial: "intakes/message",
+            locals: { message: pending_message },
+            formats: [:html]
+          )
+        }
+      }
+    end
   end
 
   # --- Shows chat with AI response ---

@@ -81,8 +81,8 @@
 
 /* --- Message Row with Avatar --- */
 .message-row {
+  position: relative;
   display: flex;
-  gap: 0.75rem;
   align-items: flex-end;
   margin-bottom: 1rem;
 }
@@ -97,19 +97,28 @@
   justify-content: flex-start;
 }
 
-/* --- Avatar Styling --- */
+/* --- Avatar Styling (Overlaid on bubble edge) --- */
 .message-avatar {
-  flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  position: absolute;
+  bottom: 0;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  z-index: 10;
+  border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
+.ai-row .message-avatar {
+  left: -8px;
+}
 
+.user-row .message-avatar {
+  right: -8px;
+}
 
 .user-avatar {
   background: rgba(255, 255, 255, 0.25);
@@ -126,7 +135,7 @@
 
 /* --- Chat bubbles with glassmorphism --- */
 .chat-bubble {
-  max-width: 70%;
+  max-width: 80%;
   padding: 1rem 1.25rem;
   border-radius: 20px;
   line-height: 1.5;
@@ -280,23 +289,64 @@
 .chat-footer-action {
   text-align: center;
 }
-
-.vets-link {
-  display: inline-block;
-  color: rgba(255, 255, 255, 0.8);
-  text-decoration: none;
-  font-size: 0.95rem;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
+/* Scroll to top button for long AI messages */
+.scroll-to-top-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 20px;
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
   transition: all 0.2s ease;
+  z-index: 10;
 
-  &:hover {
-    color: white;
-    background: rgba(255, 255, 255, 0.1);
-  }
+  /* Ensure it's above message content */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.scroll-to-top-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.scroll-to-top-btn:active {
+  transform: translateY(0);
+}
+
+.scroll-to-top-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.5;
+}
+
+.scroll-to-top-btn span {
+  line-height: 1;
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+  .scroll-to-top-btn {
+    padding: 10px 14px;
+    font-size: 13px;
+    /* Larger tap target for mobile */
+  }
+
+  .scroll-to-top-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+}
 /* --- Hide animal images on chat page --- */
 body:has(.chat-page) {
   #floating-animals {
@@ -326,16 +376,20 @@ body:has(.chat-page) {
 
   .chat-bubble {
     font-size: 0.9rem;
-    max-width: 75%;
+    max-width: 85%;
   }
 
   .message-avatar {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
   }
 
-  .message-row {
-    gap: 0.5rem;
+  .ai-row .message-avatar {
+    left: -6px;
+  }
+
+  .user-row .message-avatar {
+    right: -6px;
   }
 
   .chat-input-fixed {
