@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import { curtainOpen, slideCardTransition, performSlideIn, performSlideOut } from "utils/slide_animations"
 
 /**
- * Handles slide transitions between form and chat views
+ * Handles slide transitions between welcome and form screens
  */
 export default class extends Controller {
   static values = {
@@ -10,7 +10,7 @@ export default class extends Controller {
     initialLoad: { type: Boolean, default: false }
   }
 
-  static targets = ["flipCard"]
+  static targets = ["slideCard"]
 
   connect() {
     if (this.initialLoadValue) {
@@ -23,25 +23,25 @@ export default class extends Controller {
   }
 
   handleCurtainOpen() {
-    const flipCard = this.hasFlipCardTarget ? this.flipCardTarget : this.element.querySelector('.flip-card')
-    if (!flipCard) return
+    const slideCard = this.hasSlideCardTarget ? this.slideCardTarget : this.element.querySelector('.slide-card')
+    if (!slideCard) return
 
     const birdImg = document.getElementById('bird-img')
     const foxImg = document.getElementById('fox-img')
 
-    const animals = curtainOpen(this.element, flipCard, birdImg, foxImg)
+    const animals = curtainOpen(this.element, slideCard, birdImg, foxImg)
     this.birdImg = animals.birdImg
     this.foxImg = animals.foxImg
   }
 
-  flipToForm() {
-    if (!this.hasFlipCardTarget) return
+  transitionToForm() {
+    if (!this.hasSlideCardTarget) return
 
-    const flipCard = this.flipCardTarget
-    const frontCard = flipCard.querySelector('.flip-card-front')
-    const backCard = flipCard.querySelector('.flip-card-back')
+    const slideCard = this.slideCardTarget
+    const welcomeCard = slideCard.querySelector('.welcome-card')
+    const formCard = slideCard.querySelector('.form-card')
 
-    slideCardTransition(flipCard, frontCard, backCard, this.foxImg, this.birdImg)
+    slideCardTransition(slideCard, welcomeCard, formCard, this.foxImg, this.birdImg)
   }
 
   handleSlideIn() {

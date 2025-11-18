@@ -1,10 +1,58 @@
-// Define variables for your color scheme
+// =============================================================================
+// COLORS - Complete color system
+// =============================================================================
 
-// For example:
-$red: #FD1015;
+// Base colors
+$black: #000000;
+$white: #ffffff;
+
+// Brand colors
 $blue: #0D6EFD;
-$yellow: #FFC65A;
-$orange: #E67E22;
 $green: #1EDD88;
+$green-dark: #059669;
+$green-primary: #10b981;
+$orange: #E67E22;
+$red: #FD1015;
+$yellow: #FFC65A;
+
+// Grayscale
 $gray: #0E0000;
-$light-gray: #F4F4F4;
+$gray-dark: #1a1a1a;
+$gray-light: #F4F4F4;
+$gray-medium: #6b7280;
+$gray-mid: #a0a0a0;
+
+// Text colors
+$text-dark: #1a1a1a;
+$text-light: #f1f1f1;
+
+// Accent colors
+$gold: #ffd700;
+
+// Glassmorphism - White overlays with varying opacity
+$glass-white-05: rgba(255, 255, 255, 0.05);
+$glass-white-08: rgba(255, 255, 255, 0.08);
+$glass-white-1: rgba(255, 255, 255, 0.1);
+$glass-white-15: rgba(255, 255, 255, 0.15);
+$glass-white-2: rgba(255, 255, 255, 0.2);
+$glass-white-25: rgba(255, 255, 255, 0.25);
+$glass-white-3: rgba(255, 255, 255, 0.3);
+$glass-white-5: rgba(255, 255, 255, 0.5);
+$glass-white-8: rgba(255, 255, 255, 0.8);
+$glass-white-9: rgba(255, 255, 255, 0.9);
+
+// Glassmorphism - Black overlays with varying opacity
+$glass-black-1: rgba(0, 0, 0, 0.1);
+$glass-black-15: rgba(0, 0, 0, 0.15);
+$glass-black-2: rgba(0, 0, 0, 0.2);
+$glass-black-37: rgba(0, 0, 0, 0.37);
+$glass-black-4: rgba(0, 0, 0, 0.4);
+$glass-black-46: rgba(0, 0, 0, 0.46);
+$glass-black-7: rgba(0, 0, 0, 0.7);
+$glass-black-8: rgba(0, 0, 0, 0.8);
+
+// Glassmorphism - Colored overlays
+$glass-gold-2: rgba(255, 215, 0, 0.2);
+$glass-gold-3: rgba(255, 215, 0, 0.3);
+$glass-green-3: rgba(16, 185, 129, 0.3);
+$glass-green-4: rgba(16, 185, 129, 0.4);

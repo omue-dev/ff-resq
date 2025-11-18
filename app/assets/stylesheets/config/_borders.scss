@@ -1,0 +1,23 @@
+// =============================================================================
+// BORDERS - Border radius and border styles
+// =============================================================================
+
+// Border radius scale
+$radius-none: 0;
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 15px;
+$radius-xl: 20px;
+$radius-2xl: 30px;
+$radius-pill: 50px;
+$radius-circle: 50%;
+
+// Border widths
+$border-width-thin: 1px;
+$border-width-base: 2px;
+$border-width-thick: 3px;
+
+// Border styles
+$border-style-solid: solid;
+$border-style-dashed: dashed;
+$border-style-dotted: dotted;

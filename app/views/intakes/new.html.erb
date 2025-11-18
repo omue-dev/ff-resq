@@ -1,22 +1,22 @@
 <div class="container mt-5" data-controller="slide-transition" data-slide-transition-initial-load-value="true" style="background: transparent;">
 
-  <!-- Flip Card Container -->
-  <div class="flip-card" data-slide-transition-target="flipCard">
+  <!-- Slide Card Container -->
+  <div class="slide-card" data-slide-transition-target="slideCard">
 
-    <!-- Front Face - Branding -->
-    <div class="flip-card-front">
+    <!-- Welcome Screen -->
+    <div class="welcome-card">
       <div class="welcome-card-header">
         <%= image_tag 'ffresq-logo-optimized-min.png', class: 'welcome-logo', alt: 'fur&feather resQ - Your Animal Rescue Assistant' %>
         <p class="welcome-subtitle">Your Animal Rescue Assistant</p>
       </div>
-      <button type="button" class="welcome-cta" data-action="click->slide-transition#flipToForm">
+      <button type="button" class="welcome-cta" data-action="click->slide-transition#transitionToForm">
         <span class="cta-text">How can I help?</span>
         <span class="cta-arrow">→</span>
       </button>
     </div>
 
-    <!-- Back Face - Form -->
-    <div class="flip-card-back">
+    <!-- Form Screen -->
+    <div class="form-card">
       <!-- Mobile Form Header -->
       <div class="mobile-form-header">
         <h1>I'm here to help!</h1>

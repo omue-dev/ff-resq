@@ -1,104 +1,117 @@
-/* Mobile Welcome Screen */
+// =============================================================================
+// MOBILE FORM - Mobile-first form with custom inputs and toggle
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Mobile welcome screen
+// -----------------------------------------------------------------------------
+
 .mobile-welcome {
-  min-height: 500px;
+  // Layout
+  align-items: center;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  align-items: center;
-  padding: 3rem 2rem 2rem;
+  min-height: 500px;
+  padding: $space-3xl $space-2xl $space-2xl;
   text-align: center;
 
   .welcome-content {
-    flex: 1;
+    align-items: center;
     display: flex;
+    flex: 1;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
   }
 
   .brand-title {
-    font-size: 3rem;
-    font-weight: 700;
-    color: white;
-    margin-bottom: 1.5rem;
-    line-height: 1.1;
-    letter-spacing: -0.5px;
+    // Typography
+    color: $white;
     font-family: 'Inter', sans-serif;
+    font-size: $font-4xl;
+    font-weight: $font-weight-bold;
+    letter-spacing: $letter-spacing-tight;
+    line-height: $line-height-tight;
 
-    @media (max-width: 375px) {
-      font-size: 2.5rem;
-    }
+    // Spacing
+    margin-bottom: $space-xl;
   }
 
   .brand-accent {
-    color: #ffd700;
+    color: $gold;
   }
 
   .brand-tagline {
-    font-size: 1.5rem;
+    // Typography
+    color: $white;
+    font-size: $font-xl;
     font-weight: 300;
-    color: white;
-    line-height: 1.4;
+    line-height: $line-height-normal;
     opacity: 0.95;
-
-    @media (max-width: 375px) {
-      font-size: 1.25rem;
-    }
   }
 
   .mobile-cta {
-    width: 100%;
-    max-width: 320px;
-    padding: 1.25rem 2rem;
-    font-size: 1.125rem;
-    font-weight: 600;
-    border: none;
-    border-radius: 50px;
-    background: white;
-    color: #1a1a1a;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
+    // Layout
+    align-items: center;
     cursor: pointer;
     display: flex;
-    align-items: center;
+    gap: $space-sm;
     justify-content: center;
-    gap: 0.5rem;
-    min-height: 56px;
-    position: relative;
+    margin: 0 auto;
+    max-width: 320px;
+    min-height: $avatar-md;
     overflow: hidden;
+    padding: $space-lg $space-2xl;
+    position: relative;
+    width: 100%;
 
+    // Visual
+    background: $white;
+    border: 0;
+    border-radius: $radius-pill;
+    box-shadow: $shadow-md;
+    color: $text-dark;
+
+    // Typography
+    font-size: $font-md;
+    font-weight: $font-weight-semibold;
+
+    // Animation
+    transition: $transition-all-base;
+
+    // Ripple effect
     &::before {
+      background: $glass-black-1;
+      border-radius: $radius-circle;
       content: '';
+      height: 0;
+      left: 50%;
       position: absolute;
       top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      border-radius: 50%;
-      background: rgba(0, 0, 0, 0.1);
       transform: translate(-50%, -50%);
-      transition: width 0.6s, height 0.6s;
-    }
-
-    &:active::before {
-      width: 300px;
-      height: 300px;
+      transition: width $transition-slow, height $transition-slow;
+      width: 0;
     }
 
     &:active {
+      box-shadow: $shadow-sm;
       transform: scale(0.98);
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+
+      &::before {
+        height: 300px;
+        width: 300px;
+      }
     }
 
-    .cta-text,
-    .cta-arrow {
+    .cta-arrow,
+    .cta-text {
       position: relative;
-      z-index: 1;
+      z-index: $z-base;
     }
 
     .cta-arrow {
-      font-size: 1.25rem;
-      transition: transform 0.3s ease;
+      font-size: $font-lg;
+      transition: transform $transition-base $ease-in-out;
     }
 
     &:hover .cta-arrow {
@@ -107,57 +120,65 @@
   }
 }
 
-/* Mobile-First Form Styles */
+// -----------------------------------------------------------------------------
+// Mobile form
+// -----------------------------------------------------------------------------
 
 .mobile-form {
   padding: 0;
 
-  /* Form Group Spacing */
+  // Form group spacing
   .form-group {
-    margin-bottom: 1.25rem;
+    margin-bottom: $space-lg;
   }
 
-  /* Labels */
+  // Labels
   label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
-    margin-bottom: 0.5rem;
+    color: $glass-white-9;
     display: block;
-    letter-spacing: 0.3px;
+    font-size: $font-sm;
+    font-weight: $font-weight-semibold;
+    letter-spacing: $letter-spacing-wide;
+    margin-bottom: $space-sm;
   }
 
-  /* Required asterisk */
+  // Required asterisk
   .required {
-    color: #ffd700;
+    color: $gold;
     margin-left: 2px;
   }
 
-  /* All Inputs */
+  // All inputs
   input[type="text"],
-  textarea,
-  select {
+  select,
+  textarea {
+    // Layout
+    min-height: $touch-target-min;
+    padding: $space-base;
     width: 100%;
-    padding: 1rem;
-    font-size: 1rem;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    color: white;
-    transition: all 0.3s ease;
-    min-height: 48px; /* Thumb-friendly */
+
+    // Visual
+    @include glass(0.1);
+    border: $border-width-base solid $glass-white-2;
+    border-radius: $radius-md;
+    color: $white;
+
+    // Typography
+    font-size: $font-base;
+
+    // Animation
+    transition: $transition-all-base;
 
     &::placeholder {
-      color: rgba(255, 255, 255, 0.5);
-      font-size: 0.95rem;
+      color: $glass-white-5;
+      font-size: $font-sm;
     }
 
     &:focus {
-      outline: none;
-      border-color: #ffd700;
-      background: rgba(255, 255, 255, 0.15);
-      box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+      @include glass(0.15);
+      border-color: $gold;
+      box-shadow: 0 0 0 3px $glass-gold-2;
+      outline: 0;
     }
 
     &:active {
@@ -165,64 +186,74 @@
     }
   }
 
-  /* Textarea specific */
+  // Textarea specific
   textarea {
+    line-height: $line-height-normal;
     min-height: 120px;
     resize: vertical;
-    line-height: 1.5;
   }
 
-  /* Toggle Switch - Mobile Optimized */
+  // -----------------------------------------------------------------------------
+  // Toggle switch - Mobile optimized
+  // -----------------------------------------------------------------------------
+
   .mobile-toggle {
-    display: flex;
+    // Layout
     align-items: center;
+    display: flex;
     justify-content: space-between;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    margin-bottom: 1.5rem;
-    min-height: 56px;
+    margin-bottom: $space-xl;
+    min-height: $avatar-md;
+    padding: $space-base;
+
+    // Visual
+    background: $glass-white-08;
+    border-radius: $radius-md;
 
     label {
-      margin: 0;
-      font-size: 1rem;
       flex: 1;
+      font-size: $font-base;
+      margin: 0;
     }
 
     .form-check-input {
-      width: 52px;
-      height: 30px;
-      border-radius: 15px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      background-color: rgba(255, 255, 255, 0.2);
-      background-image: none;
+      // Layout
       cursor: pointer;
-      position: relative;
       flex-shrink: 0;
+      height: 30px;
       margin: 0;
+      position: relative;
+      width: 52px;
+
+      // Visual
+      background-color: $glass-white-2;
+      background-image: none;
+      border: $border-width-base solid $glass-white-3;
+      border-radius: $radius-lg;
 
       &:checked {
-        background-color: #ffd700;
-        border-color: #ffd700;
+        background-color: $gold;
+        border-color: $gold;
       }
 
       &:focus {
-        box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.3);
-        outline: none;
+        box-shadow: 0 0 0 3px $glass-gold-3;
+        outline: 0;
       }
 
+      // Toggle knob
       &::after {
+        background: $white;
+        border-radius: $radius-circle;
+        box-shadow: $shadow-sm;
         content: '';
-        position: absolute;
-        width: 22px;
         height: 22px;
-        border-radius: 50%;
-        background: white;
-        top: 50%;
         left: 3px;
+        position: absolute;
+        top: 50%;
         transform: translateY(-50%);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        transition: all $transition-base $ease-cubic;
+        width: 22px;
       }
 
       &:checked::after {
@@ -231,62 +262,73 @@
     }
   }
 
-  /* Photo Upload - Mobile Camera Style */
+  // -----------------------------------------------------------------------------
+  // Photo upload - Mobile camera style
+  // -----------------------------------------------------------------------------
+
   .mobile-photo-upload {
     position: relative;
 
     .upload-area {
+      // Layout
+      align-items: center;
+      cursor: pointer;
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: center;
-      padding: 2rem 1rem;
-      border: 2px dashed rgba(255, 255, 255, 0.3);
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.05);
-      transition: all 0.3s ease;
       min-height: 120px;
-      cursor: pointer;
+      padding: $space-2xl $space-base;
+
+      // Visual
+      background: $glass-white-05;
+      border: $border-width-base dashed $glass-white-3;
+      border-radius: $radius-md;
+
+      // Animation
+      transition: $transition-all-base;
 
       &:active {
+        background: $glass-white-1;
         transform: scale(0.98);
-        background: rgba(255, 255, 255, 0.1);
       }
 
       .upload-icon {
-        font-size: 2.5rem;
-        margin-bottom: 0.5rem;
+        font-size: $font-3xl;
+        margin-bottom: $space-sm;
         opacity: 0.7;
       }
 
       .upload-text {
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 0.95rem;
+        color: $glass-white-8;
+        font-size: $font-sm;
+        margin-bottom: $space-xs;
         text-align: center;
-        margin-bottom: 0.25rem;
       }
 
       .upload-hint {
-        color: rgba(255, 255, 255, 0.5);
-        font-size: 0.8rem;
+        color: $glass-white-5;
+        font-size: $font-xs;
       }
     }
 
     .file-preview {
-      display: none;
-      margin-top: 1rem;
-      padding: 0.75rem;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
+      // Layout
       align-items: center;
-      gap: 0.75rem;
+      display: none;
+      gap: $space-md;
+      margin-top: $space-base;
+      padding: $space-md;
+
+      // Visual
+      background: $glass-white-1;
+      border-radius: $radius-sm;
 
       &.active {
         display: flex;
       }
 
       .preview-icon {
-        font-size: 1.5rem;
+        font-size: $font-xl;
       }
 
       .preview-info {
@@ -294,164 +336,190 @@
         min-width: 0;
 
         .file-name {
-          color: white;
-          font-size: 0.9rem;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
+          @include truncate;
+          color: $white;
+          font-size: $font-sm;
         }
 
         .file-size {
-          color: rgba(255, 255, 255, 0.6);
-          font-size: 0.8rem;
+          color: $glass-white-5;
+          font-size: $font-xs;
         }
       }
 
       .remove-file {
-        background: rgba(255, 255, 255, 0.2);
-        border: none;
-        color: white;
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        display: flex;
+        // Layout
         align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
+        border-radius: $radius-circle;
         cursor: pointer;
-        transition: all 0.2s ease;
+        display: flex;
+        height: 32px;
+        justify-content: center;
+        width: 32px;
+
+        // Visual
+        background: $glass-white-2;
+        border: 0;
+        color: $white;
+
+        // Typography
+        font-size: $font-lg;
+
+        // Animation
+        transition: $transition-all-fast;
 
         &:active {
+          background: $glass-white-3;
           transform: scale(0.9);
-          background: rgba(255, 255, 255, 0.3);
         }
       }
     }
   }
 
-  /* Submit Button - Mobile Optimized */
-  .mobile-submit {
-    width: 100%;
-    padding: 1rem;
-    font-size: 1.125rem;
-    font-weight: 600;
-    border: none;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-    min-height: 56px;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-    transition: all 0.3s ease;
-    cursor: pointer;
-    margin-top: 1.5rem;
-    position: relative;
-    overflow: hidden;
+  // -----------------------------------------------------------------------------
+  // Submit button - Mobile optimized
+  // -----------------------------------------------------------------------------
 
+  .mobile-submit {
+    // Layout
+    cursor: pointer;
+    margin-top: $space-xl;
+    min-height: $avatar-md;
+    overflow: hidden;
+    padding: $space-base;
+    position: relative;
+    width: 100%;
+
+    // Visual
+    background: linear-gradient(135deg, $green-primary 0%, $green-dark 100%);
+    border: 0;
+    border-radius: $radius-md;
+    box-shadow: $shadow-glow-green;
+    color: $white;
+
+    // Typography
+    font-size: $font-md;
+    font-weight: $font-weight-semibold;
+
+    // Animation
+    transition: $transition-all-base;
+
+    // Ripple effect
     &::before {
+      background: $glass-white-2;
+      border-radius: $radius-circle;
       content: '';
+      height: 0;
+      left: 50%;
       position: absolute;
       top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.2);
       transform: translate(-50%, -50%);
-      transition: width 0.6s, height 0.6s;
-    }
-
-    &:active::before {
-      width: 300px;
-      height: 300px;
+      transition: width $transition-slow, height $transition-slow;
+      width: 0;
     }
 
     &:active {
+      box-shadow: 0 2px 8px $glass-green-3;
       transform: scale(0.98);
-      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+
+      &::before {
+        height: 300px;
+        width: 300px;
+      }
     }
 
     &:disabled {
-      opacity: 0.6;
       cursor: not-allowed;
+      opacity: 0.6;
       transform: none;
     }
 
     .submit-text {
       position: relative;
-      z-index: 1;
+      z-index: $z-base;
     }
   }
 
-  /* Loading State */
+  // Loading state
   &.loading {
     pointer-events: none;
 
     .mobile-submit {
-      background: #6b7280;
+      background: $gray-medium;
 
       .submit-text {
         opacity: 0;
       }
 
+      // Loading spinner
       &::after {
+        animation: spin 0.8s linear infinite;
+        border: 3px solid $glass-white-3;
+        border-radius: $radius-circle;
+        border-top-color: $white;
         content: '';
+        height: 24px;
+        left: 50%;
+        margin: -12px 0 0 -12px;
         position: absolute;
         top: 50%;
-        left: 50%;
         width: 24px;
-        height: 24px;
-        margin: -12px 0 0 -12px;
-        border: 3px solid rgba(255, 255, 255, 0.3);
-        border-top-color: white;
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
       }
     }
   }
 }
 
-/* Form Header */
+// -----------------------------------------------------------------------------
+// Form header
+// -----------------------------------------------------------------------------
+
 .mobile-form-header {
+  margin-bottom: $space-2xl;
   text-align: center;
-  margin-bottom: 2rem;
 
   h1 {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: white;
-    margin-bottom: 0.5rem;
+    color: $white;
+    font-size: $font-2xl;
+    font-weight: $font-weight-bold;
+    margin-bottom: $space-sm;
   }
 
   .subtitle {
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.7);
-    font-weight: 400;
+    color: $glass-white-8;
+    font-size: $font-base;
+    font-weight: $font-weight-normal;
   }
 }
 
-/* Animations */
+// -----------------------------------------------------------------------------
+// Animations
+// -----------------------------------------------------------------------------
+
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-/* Safe Area Support for iOS */
+// -----------------------------------------------------------------------------
+// Safe area support for iOS
+// -----------------------------------------------------------------------------
+
 @supports (padding: env(safe-area-inset-left)) {
   .mobile-form {
-    padding-left: calc(1rem + env(safe-area-inset-left));
-    padding-right: calc(1rem + env(safe-area-inset-right));
+    padding-left: calc($space-base + env(safe-area-inset-left));
+    padding-right: calc($space-base + env(safe-area-inset-right));
   }
 
   .mobile-submit {
-    margin-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+    margin-bottom: calc($space-xl + env(safe-area-inset-bottom));
   }
 }
 
-/* Haptic Feedback Preparation */
-.haptic-light {
-  /* JS will trigger haptic feedback */
-}
+// -----------------------------------------------------------------------------
+// Accessibility - Reduced motion
+// -----------------------------------------------------------------------------
 
-/* Accessibility - Larger text support */
 @media (prefers-reduced-motion: reduce) {
   .mobile-form *,
   .mobile-submit,
@@ -461,27 +529,43 @@
   }
 }
 
-/* Dark mode enhancement */
+// -----------------------------------------------------------------------------
+// Dark mode enhancement
+// -----------------------------------------------------------------------------
+
 @media (prefers-color-scheme: dark) {
   .mobile-form {
     input[type="text"],
-    textarea,
-    select {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.15);
+    select,
+    textarea {
+      background: $glass-white-08;
+      border-color: $glass-white-15;
     }
   }
 }
 
-/* Small phones */
-@media (max-width: 375px) {
+// -----------------------------------------------------------------------------
+// Mobile responsive adjustments
+// -----------------------------------------------------------------------------
+
+@include respond-to-max('xs') {
+  .mobile-welcome {
+    .brand-title {
+      font-size: $font-3xl;
+    }
+
+    .brand-tagline {
+      font-size: $font-lg;
+    }
+  }
+
   .mobile-form {
     .mobile-form-header h1 {
-      font-size: 1.5rem;
+      font-size: $font-xl;
     }
 
     .mobile-submit {
-      font-size: 1rem;
+      font-size: $font-base;
     }
   }
 }

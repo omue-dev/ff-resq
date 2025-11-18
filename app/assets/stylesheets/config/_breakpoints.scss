@@ -1,0 +1,22 @@
+// =============================================================================
+// BREAKPOINTS - Mobile-first responsive breakpoints
+// =============================================================================
+// Use with the respond-to mixin for mobile-first media queries.
+
+// Breakpoint values
+$breakpoint-xs: 375px;   // Small phones (iPhone SE)
+$breakpoint-sm: 576px;   // Mobile devices
+$breakpoint-md: 768px;   // Tablets
+$breakpoint-lg: 992px;   // Desktops
+$breakpoint-xl: 1200px;  // Large desktops
+$breakpoint-xxl: 1400px; // Extra large screens
+
+// Breakpoint map for mixin
+$breakpoints: (
+  'xs': $breakpoint-xs,
+  'sm': $breakpoint-sm,
+  'md': $breakpoint-md,
+  'lg': $breakpoint-lg,
+  'xl': $breakpoint-xl,
+  'xxl': $breakpoint-xxl
+);

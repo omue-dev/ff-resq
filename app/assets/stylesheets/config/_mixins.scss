@@ -1,0 +1,104 @@
+// =============================================================================
+// MIXINS - Reusable style patterns
+// =============================================================================
+
+// Mobile-first responsive breakpoint mixin
+// Usage: @include respond-to('md') { ... }
+@mixin respond-to($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    @media (min-width: map-get($breakpoints, $breakpoint)) {
+      @content;
+    }
+  } @else {
+    @warn "Invalid breakpoint: #{$breakpoint}. Available breakpoints: #{map-keys($breakpoints)}";
+  }
+}
+
+// Max-width media query (use sparingly, prefer mobile-first)
+// Usage: @include respond-to-max('sm') { ... }
+@mixin respond-to-max($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    @media (max-width: #{map-get($breakpoints, $breakpoint) - 1px}) {
+      @content;
+    }
+  } @else {
+    @warn "Invalid breakpoint: #{$breakpoint}. Available breakpoints: #{map-keys($breakpoints)}";
+  }
+}
+
+// Glassmorphism effect
+// Usage: @include glass(0.2);
+@mixin glass($opacity: 0.2, $blur: $glass-blur) {
+  backdrop-filter: blur($blur);
+  background: rgba(255, 255, 255, $opacity);
+}
+
+// Glassmorphism with dark background
+// Usage: @include glass-dark(0.3);
+@mixin glass-dark($opacity: 0.3, $blur: $glass-blur) {
+  backdrop-filter: blur($blur);
+  background: rgba(0, 0, 0, $opacity);
+}
+
+// Focus state with consistent styling
+// Usage: @include focus-state;
+@mixin focus-state($color: $blue, $offset: 2px) {
+  outline: $border-width-base solid $color;
+  outline-offset: $offset;
+}
+
+// Truncate text with ellipsis
+// Usage: @include truncate;
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Visually hidden but accessible to screen readers
+// Usage: @include visually-hidden;
+@mixin visually-hidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+// Reset button styles
+// Usage: @include button-reset;
+@mixin button-reset {
+  appearance: none;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+}
+
+// Center content with flexbox
+// Usage: @include flex-center;
+@mixin flex-center {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+// Aspect ratio container
+// Usage: @include aspect-ratio(16, 9);
+@mixin aspect-ratio($width, $height) {
+  aspect-ratio: #{$width} / #{$height};
+
+  // Fallback for older browsers
+  @supports not (aspect-ratio: 1 / 1) {
+    &::before {
+      content: '';
+      display: block;
+      padding-bottom: percentage($height / $width);
+    }
+  }
+}
