@@ -29,9 +29,16 @@ export default class extends Controller {
       return
     }
 
+    const options = {
+      enableHighAccuracy: true,  // Request GPS location
+      timeout: 10000,            // 10 second timeout
+      maximumAge: 0              // Don't use cached position
+    }
+
     navigator.geolocation.getCurrentPosition(
       this.successCallback.bind(this),
-      this.errorCallback.bind(this)
+      this.errorCallback.bind(this),
+      options
     )
   }
 
@@ -84,7 +91,12 @@ export default class extends Controller {
       return
     }
 
-    places.forEach(place => this.createVetMarker(place))
+    places.forEach(place => {
+      console.log("[nearby-vets] Place object:", place)
+      console.log("[nearby-vets] displayName:", place.displayName)
+      console.log("[nearby-vets] location:", place.location)
+      this.createVetMarker(place)
+    })
   }
 
   errorCallback(error) {
