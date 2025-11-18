@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { ANIMATION_CONFIG } from "../config/animation_constants.js"
+import { ANIMATION_CONFIG } from "config/animation_constants"
 import { revealMessageBubble, animateThinkingDots } from "utils/message_animations"
 
 /**
