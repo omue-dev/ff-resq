@@ -1,0 +1,22 @@
+// =============================================================================
+// SPACING - Consistent spacing scale
+// =============================================================================
+// Use these variables for padding, margin, gap, and other spacing properties
+// to maintain visual consistency across the application.
+
+// Base spacing scale (rem-based for accessibility)
+$space-xs: 0.25rem;   // 4px
+$space-sm: 0.5rem;    // 8px
+$space-md: 0.75rem;   // 12px
+$space-base: 1rem;    // 16px
+$space-lg: 1.25rem;   // 20px
+$space-xl: 1.5rem;    // 24px
+$space-2xl: 2rem;     // 32px
+$space-3xl: 3rem;     // 48px
+$space-4xl: 4rem;     // 64px
+
+// Semantic spacing (for specific use cases)
+$space-input-padding: 0.65rem;
+$space-button-padding-x: $space-lg;
+$space-button-padding-y: $space-md;
+$space-card-padding: $space-2xl;

@@ -1,0 +1,33 @@
+// =============================================================================
+// TYPOGRAPHY - Font size and weight scale
+// =============================================================================
+// Consistent typography scale using rem units for accessibility.
+// Always use rem for font-size, never px.
+
+// Font size scale
+$font-xs: 0.75rem;     // 12px
+$font-sm: 0.875rem;    // 14px
+$font-base: 1rem;      // 16px
+$font-md: 1.125rem;    // 18px
+$font-lg: 1.25rem;     // 20px
+$font-xl: 1.5rem;      // 24px
+$font-2xl: 1.75rem;    // 28px
+$font-3xl: 2.5rem;     // 40px
+$font-4xl: 3rem;       // 48px
+
+// Font weights
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$font-weight-black: 900;
+
+// Line heights
+$line-height-tight: 1.25;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.75;
+
+// Letter spacing
+$letter-spacing-tight: -0.025em;
+$letter-spacing-normal: 0;
+$letter-spacing-wide: 0.025em;

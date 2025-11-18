@@ -1,0 +1,17 @@
+// =============================================================================
+// Z-INDEX - Stacking order hierarchy
+// =============================================================================
+// Centralized z-index values to prevent conflicts and maintain clear
+// layering hierarchy throughout the application.
+
+// Base layers
+$z-base: 1;
+$z-overlay: 10;
+$z-dropdown: 50;
+$z-modal: 100;
+$z-notification: 1000;
+
+// Special layers (component-specific)
+$z-animals: 998;
+$z-animals-bird: 999;
+$z-fixed-background: -1;

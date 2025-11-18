@@ -24,7 +24,7 @@ function createGlassOverlay(side) {
 /**
  * Curtain opening animation with animal images
  */
-export function curtainOpen(containerElement, flipCard, birdImg, foxImg) {
+export function curtainOpen(containerElement, slideCard, birdImg, foxImg) {
   const leftSplit = createGlassOverlay('left')
   const rightSplit = createGlassOverlay('right')
 
@@ -34,7 +34,7 @@ export function curtainOpen(containerElement, flipCard, birdImg, foxImg) {
   birdImg.style.display = 'block'
   foxImg.style.display = 'block'
 
-  gsap.set(flipCard, { scale: 0 })
+  gsap.set(slideCard, { scale: 0 })
 
   const timeline = gsap.timeline()
 
@@ -54,7 +54,7 @@ export function curtainOpen(containerElement, flipCard, birdImg, foxImg) {
     stagger: 0.2
   })
 
-  timeline.to(flipCard, {
+  timeline.to(slideCard, {
     scale: 1,
     opacity: 1,
     duration: 0.4,
@@ -70,14 +70,14 @@ export function curtainOpen(containerElement, flipCard, birdImg, foxImg) {
 }
 
 /**
- * Slide transition between cards with animal animations
+ * Slide transition between welcome and form screens with animal animations
  */
-export function slideCardTransition(flipCard, frontCard, backCard, foxImg, birdImg, onComplete) {
-  gsap.set(backCard, { x: '100%', visibility: 'hidden', opacity: 0 })
+export function slideCardTransition(slideCard, welcomeCard, formCard, foxImg, birdImg, onComplete) {
+  gsap.set(formCard, { x: '100%', visibility: 'hidden', opacity: 0 })
 
   const timeline = gsap.timeline({
     onComplete: () => {
-      flipCard.classList.add("flipped")
+      slideCard.classList.add("show-form")
       if (onComplete) onComplete()
     }
   })
@@ -99,14 +99,14 @@ export function slideCardTransition(flipCard, frontCard, backCard, foxImg, birdI
     ease: "power2.in"
   }, "<")
 
-  timeline.to(frontCard, {
+  timeline.to(welcomeCard, {
     y: '-120%',
     duration: 0.5,
     ease: ANIMATION_CONFIG.CARD_SLIDE.ease
   }, "-=0.8")
 
-  timeline.set(backCard, { visibility: 'visible', opacity: 0 })
-  timeline.to(backCard, {
+  timeline.set(formCard, { visibility: 'visible', opacity: 0 })
+  timeline.to(formCard, {
     opacity: 1,
     x: '0%',
     duration: 0.3,

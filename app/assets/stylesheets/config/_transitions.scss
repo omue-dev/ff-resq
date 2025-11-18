@@ -1,0 +1,24 @@
+// =============================================================================
+// TRANSITIONS - Animation timing and easing functions
+// =============================================================================
+
+// Duration
+$transition-instant: 0.1s;
+$transition-fast: 0.2s;
+$transition-base: 0.3s;
+$transition-slow: 0.6s;
+
+// Easing functions
+$ease-linear: linear;
+$ease-in: ease-in;
+$ease-out: ease-out;
+$ease-in-out: ease-in-out;
+$ease-cubic: cubic-bezier(0.4, 0, 0.2, 1);
+
+// Combined transitions (property + duration + easing)
+$transition-all-fast: all $transition-fast $ease-in-out;
+$transition-all-base: all $transition-base $ease-in-out;
+$transition-transform: transform $transition-base $ease-in-out;
+$transition-opacity: opacity $transition-base $ease-in-out;
+$transition-background: background-color $transition-base $ease-in-out;
+$transition-slide: $transition-slow $ease-in-out;
