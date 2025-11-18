@@ -1,5 +1,5 @@
 import gsap from "gsap"
-import { ANIMATION_CONFIG } from "../config/animation_constants"
+import { ANIMATION_CONFIG } from "../config/animation_constants.js"
 
 /**
  * Reveals a message bubble with blur-fade animation

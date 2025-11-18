@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
-import { ANIMATION_CONFIG } from "../config/animation_constants"
-import { revealMessageBubble, animateThinkingDots } from "../utils/message_animations"
+import { ANIMATION_CONFIG } from "../config/animation_constants.js"
+import { revealMessageBubble, animateThinkingDots } from "../utils/message_animations.js"
 
 /**
  * Polls server for updated message content and reveals with animation.
