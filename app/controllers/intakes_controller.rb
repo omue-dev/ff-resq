@@ -23,15 +23,12 @@ class IntakesController < ApplicationController
     # mock mode active?
     mock_mode = ActiveModel::Type::Boolean.new.cast(data[:mock])
 
-    # use mock data in chat.html.erb
+    # use mock data in chat.html.erb (delete in production)
     if mock_mode
-      @mock = true
-      # Don't set session flag - we use sessionStorage from JavaScript instead
-      # session[:slide_transition] = true
-      render :chat
+      session[:mock_mode] = true # Store in session
+      redirect_to mock_intakes_path # redirect to GET (enables refresh on mock mode)
       return
     end
-
 
     # store data in DB so the polling view can watch for updates ---
     @intake = Intake.new(
@@ -126,6 +123,11 @@ class IntakesController < ApplicationController
     @error_message = @intake.parsed_payload.dig("error") rescue nil
   end
 
+  # mock_chat action to perform refresh on mock mode (delete in production)
+  def mock_chat
+    @mock = true
+    render :chat
+  end
 
   private
 

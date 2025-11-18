@@ -1,5 +1,4 @@
 import { Controller } from "@hotwired/stimulus"
-import gsap from "gsap"
 import { curtainOpen, slideCardTransition, performSlideIn, performSlideOut } from "../utils/slide_animations"
 
 /**
@@ -18,7 +17,7 @@ export default class extends Controller {
       this.handleCurtainOpen()
     } else if (sessionStorage.getItem('chatShouldSlideIn') === 'true') {
       sessionStorage.removeItem('chatShouldSlideIn')
-      gsap.set(this.element, { opacity: '0' })
+      // Opacity already set via inline style in chat.html.erb to prevent flash
       requestAnimationFrame(() => this.handleSlideIn())
     }
   }

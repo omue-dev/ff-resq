@@ -116,28 +116,51 @@ export function slideCardTransition(flipCard, frontCard, backCard, foxImg, birdI
 
 /**
  * Slide in animation for chat page
+ * Combines scale, blur, and fade for smooth entrance from form
  */
 export function performSlideIn(element) {
-  gsap.to(element, {
-    opacity: 1,
-    duration: 0.5,
-    ease: ANIMATION_CONFIG.CARD_SLIDE.ease,
-    clearProps: "transform"
-  })
+  // First remove the inline style that was hiding the element
+  const inlineStyleTag = document.querySelector('style:has([id="chat-page-container"])')
+  if (inlineStyleTag) {
+    inlineStyleTag.remove()
+  }
+
+  gsap.fromTo(element,
+    {
+      scale: 1.05,
+      opacity: 0,
+      filter: "blur(10px)"
+    },
+    {
+      scale: 1,
+      opacity: 1,
+      filter: "blur(0px)",
+      duration: 0.3,
+      ease: "power2.out",
+      clearProps: "scale,filter"
+    }
+  )
 }
 
 /**
  * Slide out animation for form submission
+ * Combines scale, blur, and fade for smooth transition to chat
  */
 export function performSlideOut(element, callback) {
-  gsap.to(element, {
-    x: "-100%",
-    opacity: 0,
-    duration: 0.4,
-    ease: "power2.in"
+  const timeline = gsap.timeline({
+    onComplete: () => {
+      if (callback) callback()
+    }
   })
 
-  if (callback) {
-    setTimeout(callback, ANIMATION_CONFIG.DELAYS.formSubmit)
-  }
+  // Zoom out and blur effect
+  timeline.to(element, {
+    scale: 0.95,
+    opacity: 0,
+    filter: "blur(10px)",
+    duration: 0.3,
+    ease: "power2.inOut"
+  })
+
+  return timeline
 }

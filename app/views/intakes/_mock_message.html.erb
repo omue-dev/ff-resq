@@ -1,0 +1,37 @@
+<div id="chat_messages">
+  <!-- --- Mock user message bubble ---
+    This represents what a user would type into the chat.
+    -->
+  <div class="message-row user-row">
+    <div class="chat-bubble user-message">
+      I found an injured pigeon near the park. It can't fly and looks weak. What should I do?
+    </div>
+  </div>
+
+  <!-- --- Mock assistant (AI) reply bubble with animation testing ---
+    This simulates the AI's response with proper structure for testing GSAP animations.
+    -->
+  <div id="mock_message_wrapper" data-controller="animation-test" class="message-row ai-row">
+    <div class="chat-bubble ai-message text-white animated-bubble position-relative"
+          data-message="Thank you for helping this bird! Let's get it safely contained and then find it expert care.<div class='mt-3'><h5>Approach</h5><p>Approach slowly and quietly. Avoid sudden movements to reduce stress on the bird.</p><h5>Containment</h5><p>Gently place a lightweight towel over the bird. Carefully pick it up, supporting its body and wings.</p></div>"
+          data-animation-test-target="bubble">
+
+      <!-- Empty span that will be filled with content via animation -->
+      <span class="ai-text"></span>
+
+      <!-- Thinking indicator (will be removed after animation) -->
+      <div class="thinking-loader" data-thinking>
+        <span class="thinking-text">Thinking</span>
+        <svg class="typing-dots" width="24" height="16" viewBox="0 -6 24 16">
+          <circle cx="4"  cy="4" r="3"></circle>
+          <circle cx="12" cy="4" r="3"></circle>
+          <circle cx="20" cy="4" r="3"></circle>
+        </svg>
+      </div>
+    </div>
+    <!-- Animation testing controls -->
+    <button class="btn btn-success ms-2" data-action="click->animation-test#addNewMessage" style="position: fixed;right: 0;z-index: 999;">
+      mock message
+    </button>
+  </div>
+</div>

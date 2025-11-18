@@ -1,10 +1,23 @@
+<!-- Prevent flash by hiding element before render if animation is needed -->
+<script>
+  if (sessionStorage.getItem('chatShouldSlideIn') === 'true') {
+    document.write('<style>#chat-page-container { opacity: 0; }</style>');
+  }
+</script>
+
 <% should_slide = session.delete(:slide_transition) || false %>
 <div class="chat-page" data-controller="slide-transition chat-scroll" data-slide-transition-slide-in-value="<%= should_slide %>" id="chat-page-container">
 
   <!-- Chat Header (Fixed) -->
   <div class="chat-page-header">
-    <%= link_to "Show vets nearby", vets_path, class: "vets-link" %>
-    <span class="cta-arrow">→</span>
+    <%= link_to new_intake_path, class: "header-button-dark" do %>
+    <span class="cta-arrow">←</span>
+       Back
+    <% end %>
+    <%= link_to vets_path, class: "header-button-dark" do %>
+      vets nearby
+      <span class="cta-arrow">→</span>
+    <% end %>
   </div>
 
   <!-- Error alert if AI failed -->
@@ -31,57 +44,7 @@
            Instead, fake data is generated in the controller and rendered directly here.
            This is purely for demo/testing purposes, so refreshing the page will lose the data.
            -->
-      <div id="chat_messages">
-
-        <!-- --- Mock user message bubble ---
-            This represents what a user would type into the chat.
-            -->
-        <div class="message-row user-row">
-          <div class="chat-bubble user-message">
-            I found an injured pigeon near the park. It can't fly and looks weak. What should I do?
-          </div>
-          <div class="message-avatar user-avatar">
-            <svg class="avatar-img" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="8" r="4" fill="currentColor"/>
-              <path d="M6 21C6 17.134 8.686 14 12 14C15.314 14 18 17.134 18 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </div>
-        </div>
-
-        <!-- --- Mock assistant (AI) reply bubble with animation testing ---
-            This simulates the AI's response with proper structure for testing GSAP animations.
-            -->
-        <div id="mock_message_wrapper" data-controller="animation-test" class="message-row ai-row">
-          <div class="message-avatar ai-avatar">
-            <%= image_tag 'ffresq-logo-optimized-min.png', alt: 'resQ AI', class: 'avatar-img' %>
-          </div>
-          <div class="chat-bubble ai-message text-white animated-bubble position-relative"
-               data-message="Thank you for helping this bird! Let's get it safely contained and then find it expert care.<div class='mt-3'><h5>Approach</h5><p>Approach slowly and quietly. Avoid sudden movements to reduce stress on the bird.</p><h5>Containment</h5><p>Gently place a lightweight towel over the bird. Carefully pick it up, supporting its body and wings.</p></div>"
-               data-animation-test-target="bubble">
-
-            <!-- Empty span that will be filled with content via animation -->
-            <span class="ai-text"></span>
-
-            <!-- Thinking indicator (will be removed after animation) -->
-            <div class="thinking-loader" data-thinking>
-              <span class="thinking-text">Thinking</span>
-              <svg class="typing-dots" width="24" height="16" viewBox="0 -6 24 16">
-                <circle cx="4"  cy="4" r="3"></circle>
-                <circle cx="12" cy="4" r="3"></circle>
-                <circle cx="20" cy="4" r="3"></circle>
-              </svg>
-            </div>
-          </div>
-
-          <!-- Animation testing controls -->
-          <div class="text-center mt-3 mb-3 p-3 border rounded bg-dark text-white">
-            <h6 class="mb-2">Mock Mode Testing</h6>
-            <button class="btn btn-success ms-2" data-action="click->animation-test#addNewMessage">
-              Add New Message
-            </button>
-          </div>
-        </div>
-      </div>
+      <%= render partial: "intakes/mock_message" %>
 
     <% else %>
       <!-- Fallback if no AI response -->
@@ -92,15 +55,15 @@
   </div>
 
   <!-- Fixed Input Area at Bottom -->
-  <div class="chat-input-fixed">
     <% if @intake.present? && @intake.persisted? && !@mock %>
-      <%= form_with url: message_intake_path(@intake), method: :post, local: true, data: { controller: "chat-form", action: "submit->chat-form#submitMessage" }, class: "chat-input-form" do |f| %>
-        <div class="input-wrapper">
-          <%= f.text_field :content, name: "message[content]", placeholder: "Type your message...", class: "chat-input", autocomplete: "off", data: { chat_form_target: "input" } %>
-          <%= f.submit "Send", class: "chat-send-btn", data: { chat_form_target: "submit" } %>
-        </div>
-      <% end %>
+      <div class="chat-input-fixed">
+        <%= form_with url: message_intake_path(@intake), method: :post, local: true, data: { controller: "chat-form", action: "submit->chat-form#submitMessage" }, class: "chat-input-form" do |f| %>
+          <div class="input-wrapper">
+            <%= f.text_field :content, name: "message[content]", placeholder: "Type your message...", class: "chat-input", autocomplete: "off", data: { chat_form_target: "input" } %>
+            <%= f.submit "Send", class: "chat-send-btn", data: { chat_form_target: "submit" } %>
+          </div>
+        <% end %>
+      </div>
     <% end %>
-  </div>
 
 </div>
