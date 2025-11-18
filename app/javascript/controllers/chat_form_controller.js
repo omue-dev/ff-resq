@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { slideInUserMessage, slideInAIMessage, animateThinkingDots } from "../utils/message_animations.js"
+import { slideInUserMessage, slideInAIMessage, animateThinkingDots } from "utils/message_animations"
 
 /**
  * Handles AJAX form submission for chat messages with slide-in animations

@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { curtainOpen, slideCardTransition, performSlideIn, performSlideOut } from "../utils/slide_animations.js"
+import { curtainOpen, slideCardTransition, performSlideIn, performSlideOut } from "utils/slide_animations"
 
 /**
  * Handles slide transitions between form and chat views

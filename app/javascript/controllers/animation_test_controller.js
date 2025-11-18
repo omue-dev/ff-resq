@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import gsap from "gsap"  // reset()
-import { revealMessageBubble, animateThinkingDots } from "../utils/message_animations.js"
+import { revealMessageBubble, animateThinkingDots } from "utils/message_animations"
 
 /**
  * Animation test controller for mock mode.
