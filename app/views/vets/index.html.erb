@@ -10,7 +10,7 @@
   ></div>
 </div>
 
-<!-- Load Google Maps JS SDK with callback -->
-<script async defer
-  src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&libraries=places&callback=initMap">
+<!-- Load Google Maps JS SDK -->
+<script async
+  src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&libraries=places,marker&loading=async">
 </script>

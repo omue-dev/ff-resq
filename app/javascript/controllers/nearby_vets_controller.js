@@ -8,12 +8,16 @@ export default class extends Controller {
   connect() {
     console.log("[nearby-vets] connected")
 
-    // Bind this controller instance so Google can call it via the global callback
-    window.initMap = this.initMap.bind(this)
+    // Wait for Google Maps to load
+    this.waitForGoogleMaps()
+  }
 
-    // If Google is already loaded (Turbo back nav, etc.)
+  waitForGoogleMaps() {
     if (window.google && window.google.maps) {
       this.initMap()
+    } else {
+      // Poll every 100ms until Google Maps is loaded
+      setTimeout(() => this.waitForGoogleMaps(), 100)
     }
   }
 
@@ -31,7 +35,7 @@ export default class extends Controller {
     )
   }
 
-  successCallback(position) {
+  async successCallback(position) {
     console.log("[nearby-vets] successCallback", position)
 
     const userLocation = {
@@ -39,39 +43,48 @@ export default class extends Controller {
       lng: position.coords.longitude
     }
 
+    console.log("[nearby-vets] User location:", userLocation)
+    console.log("[nearby-vets] Accuracy:", position.coords.accuracy, "meters")
+
     // Create the map centered on the user
     this.map = new google.maps.Map(this.mapTarget, {
       center: userLocation,
-      zoom: 14
+      zoom: 14,
+      mapId: "NEARBY_VETS_MAP"  // Required for AdvancedMarkerElement
     })
 
     // User marker
-    new google.maps.Marker({
+    new google.maps.marker.AdvancedMarkerElement({
       map: this.map,
       position: userLocation,
       title: "You are here"
     })
 
-    // ---- NEW: use classic PlacesService.nearbySearch ----
-    this.placesService = new google.maps.places.PlacesService(this.map)
+    // Use the new Place API with searchNearby
+    const { Place } = await google.maps.importLibrary("places")
 
     const request = {
-      location: userLocation,
-      radius: 5000,                // 5 km
-      type: "veterinary_care"
+      locationRestriction: {
+        center: userLocation,
+        radius: 5000  // 5 km
+      },
+      includedTypes: ["veterinary_care"],
+      maxResultCount: 20,
+      fields: ["displayName", "location", "formattedAddress", "rating"]
     }
 
-    console.log("[nearby-vets] sending nearbySearch request", request)
+    console.log("[nearby-vets] sending searchNearby request", request)
 
-    this.placesService.nearbySearch(request, (results, status) => {
-      console.log("[nearby-vets] nearbySearch status:", status)
-      if (status !== google.maps.places.PlacesServiceStatus.OK || !results) {
-        alert("No nearby vets found or Places API error: " + status)
-        return
-      }
+    const { places } = await Place.searchNearby(request)
 
-      results.forEach(place => this.createVetMarker(place))
-    })
+    console.log("[nearby-vets] searchNearby results:", places)
+
+    if (!places || places.length === 0) {
+      alert("No nearby vets found")
+      return
+    }
+
+    places.forEach(place => this.createVetMarker(place))
   }
 
   errorCallback(error) {
@@ -80,16 +93,16 @@ export default class extends Controller {
   }
 
   createVetMarker(place) {
-    const marker = new google.maps.Marker({
+    const marker = new google.maps.marker.AdvancedMarkerElement({
       map: this.map,
-      position: place.geometry.location,
-      title: place.name
+      position: place.location,
+      title: place.displayName
     })
 
     const infoWindow = new google.maps.InfoWindow({
       content: `
-        <strong>${place.name}</strong><br>
-        ${place.vicinity || place.formatted_address || "Address not available"}<br>
+        <strong>${place.displayName}</strong><br>
+        ${place.formattedAddress || "Address not available"}<br>
         ${place.rating ? "⭐ " + place.rating + "/5" : ""}
       `
     })
