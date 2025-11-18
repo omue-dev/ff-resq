@@ -23,15 +23,12 @@ class IntakesController < ApplicationController
     # mock mode active?
     mock_mode = ActiveModel::Type::Boolean.new.cast(data[:mock])
 
-    # use mock data in chat.html.erb
+    # use mock data in chat.html.erb (delete in production)
     if mock_mode
-      @mock = true
-      # Don't set session flag - we use sessionStorage from JavaScript instead
-      # session[:slide_transition] = true
-      render :chat
+      session[:mock_mode] = true # Store in session
+      redirect_to mock_intakes_path # redirect to GET (enables refresh on mock mode)
       return
     end
-
 
     # store data in DB so the polling view can watch for updates ---
     @intake = Intake.new(
@@ -80,8 +77,7 @@ class IntakesController < ApplicationController
     user_message = message_params[:content]
 
     # Write user message to database
-    # (has_may :chat_messages)
-    @intake.chat_messages.create!({
+    user_chat_message = @intake.chat_messages.create!({
       role: "user",
       content: user_message
     })
@@ -96,8 +92,23 @@ class IntakesController < ApplicationController
     # Start the AI job in background
     @intake.generate_ai_summary_async(pending_message_id: pending_message.id)
 
-    # Redirect back to chat page
-    redirect_to chat_intake_path(@intake)
+    respond_to do |format|
+      format.html { redirect_to chat_intake_path(@intake) }
+      format.json {
+        render json: {
+          user_message_html: render_to_string(
+            partial: "intakes/message",
+            locals: { message: user_chat_message },
+            formats: [:html]
+          ),
+          ai_message_html: render_to_string(
+            partial: "intakes/message",
+            locals: { message: pending_message },
+            formats: [:html]
+          )
+        }
+      }
+    end
   end
 
   # --- Shows chat with AI response ---
@@ -112,6 +123,11 @@ class IntakesController < ApplicationController
     @error_message = @intake.parsed_payload.dig("error") rescue nil
   end
 
+  # mock_chat action to perform refresh on mock mode (delete in production)
+  def mock_chat
+    @mock = true
+    render :chat
+  end
 
   private
 
