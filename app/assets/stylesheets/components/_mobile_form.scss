@@ -159,7 +159,7 @@
 
     // Visual
     @include glass(0.1);
-    border: $border-width-base solid $glass-white-2;
+    border: $border-width-base solid $glass-black-46;
     border-radius: $radius-md;
     color: $white;
 
@@ -207,7 +207,7 @@
     padding: $space-base;
 
     // Visual
-    background: $glass-white-08;
+    background: $glass-black-46;
     border-radius: $radius-md;
 
     label {
@@ -226,7 +226,7 @@
       width: 52px;
 
       // Visual
-      background-color: $glass-white-2;
+      background-color: $glass-black-46;
       background-image: none;
       border: $border-width-base solid $glass-white-3;
       border-radius: $radius-lg;
@@ -280,8 +280,8 @@
       padding: $space-2xl $space-base;
 
       // Visual
-      background: $glass-white-05;
-      border: $border-width-base dashed $glass-white-3;
+      background: $glass-black-46;
+      border: $border-width-base dashed $glass-white-8;
       border-radius: $radius-md;
 
       // Animation
@@ -320,7 +320,7 @@
       padding: $space-md;
 
       // Visual
-      background: $glass-white-1;
+      background: $glass-black-46;
       border-radius: $radius-sm;
 
       &.active {
@@ -454,7 +454,7 @@
       // Loading spinner
       &::after {
         animation: spin 0.8s linear infinite;
-        border: 3px solid $glass-white-3;
+        border: 3px solid $glass-white-8;
         border-radius: $radius-circle;
         border-top-color: $white;
         content: '';
@@ -538,8 +538,8 @@
     input[type="text"],
     select,
     textarea {
-      background: $glass-white-08;
-      border-color: $glass-white-15;
+      background: $glass-black-46;
+      border-color: $glass-white-8;
     }
   }
 }
