@@ -169,36 +169,32 @@
 }
 
 .user-row {
-  flex-direction: row-reverse;
-  justify-content: flex-start;
+  flex-direction: row;
+  justify-content: flex-end;
 }
 
-// Avatar styling (overlaid on bubble edge)
+// Avatar styling (positioned outside bubble)
 .message-avatar {
   // Layout
   align-items: center;
-  bottom: 0;
   display: flex;
+  flex-shrink: 0;
   height: $avatar-chat;
   justify-content: center;
   overflow: hidden;
-  position: absolute;
   width: $avatar-chat;
 
   // Visual
   border: $border-width-base solid $glass-white-3;
   border-radius: $radius-circle;
-
-  // Stacking
-  z-index: $z-overlay;
 }
 
 .ai-row .message-avatar {
-  left: -8px;
+  margin-right: $space-md;
 }
 
 .user-row .message-avatar {
-  right: -8px;
+  margin-left: $space-md;  // Avatar comes after bubble in HTML, appears on right
 }
 
 .user-avatar {
@@ -523,11 +519,11 @@ body:has(.chat-page) {
   }
 
   .ai-row .message-avatar {
-    left: -6px;
+    margin-right: $space-sm;
   }
 
   .user-row .message-avatar {
-    right: -6px;
+    margin-left: $space-sm;
   }
 
   .chat-input-fixed {

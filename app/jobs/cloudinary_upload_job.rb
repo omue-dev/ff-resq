@@ -5,7 +5,7 @@ class CloudinaryUploadJob < ApplicationJob
   retry_on StandardError, wait: 5.seconds, attempts: 3
   retry_on Timeout::Error, wait: 10.seconds, attempts: 2
 
-  def perform(intake_id, photo_data, filename, content_type)
+  def perform(intake_id, photo_data, filename, content_type, pending_message_id = nil)
     intake = Intake.find(intake_id)
 
     # Create a temporary file from the binary data
@@ -25,6 +25,11 @@ class CloudinaryUploadJob < ApplicationJob
       # Update the user's first chat message with the photo URL and mark as complete
       first_user_message = intake.chat_messages.where(role: "user").first
       first_user_message&.update!(photo_url: foto_url, pending: false)
+
+      # Now that photo is uploaded, trigger AI processing if pending_message_id was provided
+      if pending_message_id.present?
+        intake.generate_ai_summary_async(pending_message_id: pending_message_id)
+      end
     ensure
       tempfile.close
       tempfile.unlink
