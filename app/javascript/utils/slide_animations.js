@@ -127,17 +127,14 @@ export function performSlideIn(element) {
 
   gsap.fromTo(element,
     {
-      scale: 1.05,
-      opacity: 0,
-      filter: "blur(10px)"
+      x: '100%',
+      opacity: 1,
     },
     {
-      scale: 1,
+      x: '0',
       opacity: 1,
-      filter: "blur(0px)",
       duration: 0.3,
       ease: "power2.out",
-      clearProps: "scale,filter"
     }
   )
 }
@@ -155,11 +152,9 @@ export function performSlideOut(element, callback) {
 
   // Zoom out and blur effect
   timeline.to(element, {
-    scale: 0.95,
-    opacity: 0,
-    filter: "blur(10px)",
+    x: '-100%',
     duration: 0.3,
-    ease: "power2.inOut"
+    ease: "power2.Out"
   })
 
   return timeline

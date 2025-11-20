@@ -27,9 +27,7 @@
       <%= simple_form_for (@intake || Intake.new),
                           url: intakes_path,
                           method: :post,
-                          local: true,
                           data: {
-                            turbo: false,
                             action: "submit->slide-transition#slideOut",
                             controller: "mobile-form"
                           },
@@ -85,7 +83,15 @@
                           accept: "image/*",
                           capture: "environment",
                           class: "d-none",
-                          id: "photoInput"
+                          id: "photoInput",
+                          onchange: "
+                            const file = this.files[0];
+                            if (file) {
+                              document.getElementById('previewFileName').textContent = file.name;
+                              document.getElementById('previewFileSize').textContent = (file.size / 1024).toFixed(1) + ' KB';
+                              document.getElementById('filePreview').classList.add('active');
+                            }
+                          "
                         } %>
 
             <div class="upload-area" onclick="document.getElementById('photoInput').click()">
@@ -95,12 +101,15 @@
             </div>
 
             <div class="file-preview" id="filePreview">
-              <div class="preview-icon">🖼️</div>
+              <div class="preview-icon"><i class="fa-regular fa-image"></i></div>
               <div class="preview-info">
                 <div class="file-name" id="previewFileName"></div>
                 <div class="file-size" id="previewFileSize"></div>
               </div>
-              <button type="button" class="remove-file" id="removeFile" aria-label="Remove photo">×</button>
+              <button type="button" class="remove-file" onclick="
+                document.getElementById('photoInput').value = '';
+                document.getElementById('filePreview').classList.remove('active');
+              " aria-label="Remove photo">×</button>
             </div>
           </div>
         </div>
@@ -115,80 +124,3 @@
 
   </div>
 </div>
-
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const photoInput = document.getElementById("photoInput");
-    const filePreview = document.getElementById("filePreview");
-    const previewFileName = document.getElementById("previewFileName");
-    const previewFileSize = document.getElementById("previewFileSize");
-    const removeFileBtn = document.getElementById("removeFile");
-    const form = document.getElementById("intakeForm");
-
-    // Handle file selection
-    if (photoInput) {
-      photoInput.addEventListener("change", (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          // Show preview
-          previewFileName.textContent = file.name;
-          previewFileSize.textContent = formatFileSize(file.size);
-          filePreview.classList.add("active");
-
-          // Haptic feedback simulation (for mobile browsers that support it)
-          if (navigator.vibrate) {
-            navigator.vibrate(10);
-          }
-        }
-      });
-    }
-
-    // Remove file
-    if (removeFileBtn) {
-      removeFileBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        photoInput.value = "";
-        filePreview.classList.remove("active");
-
-        if (navigator.vibrate) {
-          navigator.vibrate(10);
-        }
-      });
-    }
-
-    // Form submission - add loading state
-    if (form) {
-      form.addEventListener("submit", (e) => {
-        const submitBtn = document.getElementById("submitBtn");
-        if (submitBtn) {
-          submitBtn.disabled = true;
-          form.classList.add("loading");
-        }
-
-        // Haptic feedback on submit
-        if (navigator.vibrate) {
-          navigator.vibrate([10, 50, 10]);
-        }
-      });
-    }
-
-    // Touch feedback for inputs
-    const inputs = document.querySelectorAll('.mobile-form input, .mobile-form textarea');
-    inputs.forEach(input => {
-      input.addEventListener('focus', () => {
-        if (navigator.vibrate) {
-          navigator.vibrate(5);
-        }
-      });
-    });
-
-    // Helper function to format file size
-    function formatFileSize(bytes) {
-      if (bytes === 0) return '0 Bytes';
-      const k = 1024;
-      const sizes = ['Bytes', 'KB', 'MB'];
-      const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
-    }
-  });
-</script>
