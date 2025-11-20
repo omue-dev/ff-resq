@@ -14,11 +14,9 @@ class IntakesController < ApplicationController
     description = data[:description].to_s.strip
     foto_url    = data[:foto_url].to_s.strip
 
-    # Upload photo to Cloudinary if present
-    if data[:photo].present?
-      result = Cloudinary::Uploader.upload(data[:photo].tempfile.path)
-      foto_url = result["secure_url"]
-    end
+    # Store photo data for async upload
+    photo_file = data[:photo]
+    has_photo = photo_file.present?
 
     # mock mode active?
     mock_mode = ActiveModel::Type::Boolean.new.cast(data[:mock])
@@ -44,11 +42,12 @@ class IntakesController < ApplicationController
       return
     end
 
-    # Save user's initial message (shows up immediately in the chat view)
-    @intake.chat_messages.create!(
+    # Save user's initial message (photo_url will be updated by background job)
+    user_message = @intake.chat_messages.create!(
       role: "user",
       content: description,
-      photo_url: foto_url
+      photo_url: nil,
+      pending: has_photo  # Mark as pending if waiting for photo upload
     )
 
     # Pre-create a placeholder AI message so the Stimulus poll controller knows what to refresh.
@@ -57,6 +56,18 @@ class IntakesController < ApplicationController
       content: "Analyzing",
       pending: true
     )
+
+    # Upload photo to Cloudinary asynchronously if present
+    if has_photo
+      # Read photo data as binary string (ActiveJob can serialize this)
+      photo_data = photo_file.read
+      CloudinaryUploadJob.perform_later(
+        @intake.id,
+        photo_data,
+        photo_file.original_filename,
+        photo_file.content_type
+      )
+    end
 
     # Fire Gemini in the background and tell it which record to update afterwards.
     @intake.generate_ai_summary_async(pending_message_id: pending_message.id)

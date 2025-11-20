@@ -60,12 +60,6 @@ export default class extends Controller {
       <div class="chat-bubble user-message">
         ${text}
       </div>
-      <div class="message-avatar user-avatar">
-        <svg class="avatar-img" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="12" cy="8" r="4" fill="currentColor"/>
-          <path d="M6 21C6 17.134 8.686 14 12 14C15.314 14 18 17.134 18 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-      </div>
     `
     container.appendChild(messageRow)
   }
@@ -78,9 +72,6 @@ export default class extends Controller {
     const logoSrc = existingLogo ? existingLogo.src : '/assets/ffresq-logo-optimized-min.png'
 
     messageRow.innerHTML = `
-      <div class="message-avatar ai-avatar">
-        <img src="${logoSrc}" alt="resQ AI" class="avatar-img">
-      </div>
       <div class="chat-bubble ai-message text-white animated-bubble position-relative" data-message="${text}">
         <span class="ai-text"></span>
         <div class="thinking-loader" data-thinking>

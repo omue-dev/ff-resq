@@ -54,8 +54,10 @@ export default class extends Controller {
 
     sessionStorage.setItem('chatShouldSlideIn', 'true')
 
-    performSlideOut(this.element, () => {
-      form.submit()
-    })
+    // Submit form immediately, animation plays while server processes
+    form.submit()
+
+    // Play slide out animation (purely visual)
+    performSlideOut(this.element)
   }
 }

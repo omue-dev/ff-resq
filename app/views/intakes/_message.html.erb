@@ -39,8 +39,8 @@
     <% end %>
   </div>
 <% else %>
-  <div class="message-row user-row" id="<%= message_dom_id %>">
-    <div class="chat-bubble user-message animated-bubble">
+  <div class="message-row user-row" id="<%= message_dom_id %>_wrapper">
+    <div id="<%= message_dom_id %>" class="chat-bubble user-message animated-bubble">
       <% if message.photo_url.present? %>
         <div class="mb-2">
           <%= image_tag message.photo_url, class: "img-thumbnail", style: "max-width: 200px; max-height: 200px; object-fit: cover;" %>
@@ -51,5 +51,13 @@
     <div class="message-avatar user-avatar">
       <%= content_tag :i, "", class: "fa-solid fa-user" %>
     </div>
+
+    <% if message.is_a?(ChatMessage) && message.persisted? && message.pending? %>
+      <!-- Poll for photo upload completion -->
+      <div data-controller="poll"
+           data-poll-url-value="<%= chat_message_path(message) %>"
+           data-poll-target-value="<%= message_dom_id %>_wrapper">
+      </div>
+    <% end %>
   </div>
 <% end %>
