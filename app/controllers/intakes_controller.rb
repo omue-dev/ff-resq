@@ -61,16 +61,18 @@ class IntakesController < ApplicationController
     if has_photo
       # Read photo data as binary string (ActiveJob can serialize this)
       photo_data = photo_file.read
+      # CloudinaryUploadJob will trigger AI job after upload completes
       CloudinaryUploadJob.perform_later(
         @intake.id,
         photo_data,
         photo_file.original_filename,
-        photo_file.content_type
+        photo_file.content_type,
+        pending_message.id  # Pass the pending message ID so AI can be triggered after upload
       )
+    else
+      # No photo - start AI job immediately
+      @intake.generate_ai_summary_async(pending_message_id: pending_message.id)
     end
-
-    # Fire Gemini in the background and tell it which record to update afterwards.
-    @intake.generate_ai_summary_async(pending_message_id: pending_message.id)
 
     # Don't set session flag - we use sessionStorage from JavaScript instead
     # session[:slide_transition] = true
