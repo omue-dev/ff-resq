@@ -25,4 +25,19 @@ Rails.application.routes.draw do
 
   # Chat message polling endpoint
   resources :chat_messages, only: [:show], path: "messages"
+
+  # Appointment routes
+  resources :appointments, only: [:create, :show] do
+    collection do
+      post 'reset', to: 'appointments#reset'
+    end
+  end
+
+  # Twilio webhook routes
+  namespace :api do
+    namespace :v1 do
+      post 'twilio/appointment_callback', to: 'twilio#appointment_callback'
+      post 'twilio/voice_status', to: 'twilio#voice_status'
+    end
+  end
 end

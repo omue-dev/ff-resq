@@ -10,6 +10,7 @@ class Intake < ApplicationRecord
   # --- Associations ---
   has_one_attached :photo
   has_many :chat_messages, dependent: :destroy
+  has_one :appointment, dependent: :destroy
 
     # --- Main AI processing in app/services/intake_ai_processor.rb ---
   # AI_SUMMARY_SCHEMA

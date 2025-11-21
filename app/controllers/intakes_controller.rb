@@ -74,6 +74,9 @@ class IntakesController < ApplicationController
       @intake.generate_ai_summary_async(pending_message_id: pending_message.id)
     end
 
+    # Store intake_id in session for vets page
+    session[:intake_id] = @intake.id
+
     # Don't set session flag - we use sessionStorage from JavaScript instead
     # session[:slide_transition] = true
 
