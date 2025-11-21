@@ -1,5 +1,50 @@
 <h1>Nearby Vets</h1>
 
+<% if @intake.present? %>
+  <div data-controller="appointment" data-appointment-intake-id-value="<%= @intake.id %>">
+    <div class="mb-3">
+      <button
+        data-action="click->appointment#makeAppointment"
+        data-appointment-target="button"
+        class="btn btn-primary"
+      >
+        Make Appointment
+      </button>
+      <% if Rails.env.development? %>
+        <button
+          data-action="click->appointment#resetAppointment"
+          data-appointment-target="resetButton"
+          class="btn btn-warning ms-2"
+        >
+          Reset Appointment (Test)
+        </button>
+      <% end %>
+      <span data-appointment-target="status" class="ms-2"></span>
+    </div>
+
+    <!-- Appointment Modal -->
+    <div data-appointment-target="modal" class="modal" tabindex="-1" style="display: none;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Appointment Confirmed</h5>
+            <button type="button" class="btn-close" data-action="click->appointment#closeModal"></button>
+          </div>
+          <div class="modal-body">
+            <p><strong>Vet's Response:</strong></p>
+            <p class="text-muted" data-appointment-target="notes"></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-action="click->appointment#closeModal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% else %>
+  <p class="text-muted">Please create an intake first to make an appointment.</p>
+<% end %>
+
 <div
   data-controller="nearby-vets"
   class="map-wrapper"
