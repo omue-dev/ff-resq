@@ -3,21 +3,30 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="nearby-vets"
 export default class extends Controller {
-  static targets = ["map"]
+  static targets = ["map", "list"]
 
   connect() {
     console.log("[nearby-vets] connected")
 
-    // Wait for Google Maps to load
-    this.waitForGoogleMaps()
-  }
-
-  waitForGoogleMaps() {
+    // If Google Maps is already loaded (Turbo back etc.)
     if (window.google && window.google.maps) {
       this.initMap()
-    } else {
-      // Poll every 100ms until Google Maps is loaded
-      setTimeout(() => this.waitForGoogleMaps(), 100)
+      return
+    }
+
+    // Otherwise wait for the script to load
+    const script = document.querySelector(
+      'script[src*="maps.googleapis.com/maps/api/js"]'
+    )
+
+    if (script) {
+      script.addEventListener(
+        "load",
+        () => {
+          this.initMap()
+        },
+        { once: true }
+      )
     }
   }
 
@@ -25,102 +34,101 @@ export default class extends Controller {
     console.log("[nearby-vets] initMap called")
 
     if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser!")
+      console.error("Geolocation is not supported by this browser.")
       return
-    }
-
-    const options = {
-      enableHighAccuracy: true,  // Request GPS location
-      timeout: 10000,            // 10 second timeout
-      maximumAge: 0              // Don't use cached position
     }
 
     navigator.geolocation.getCurrentPosition(
       this.successCallback.bind(this),
-      this.errorCallback.bind(this),
-      options
+      this.errorCallback.bind(this)
     )
   }
 
   async successCallback(position) {
-    console.log("[nearby-vets] successCallback", position)
-
     const userLocation = {
       lat: position.coords.latitude,
-      lng: position.coords.longitude
+      lng: position.coords.longitude,
     }
 
-    console.log("[nearby-vets] User location:", userLocation)
-    console.log("[nearby-vets] Accuracy:", position.coords.accuracy, "meters")
-
-    // Create the map centered on the user
+    // Create the map
     this.map = new google.maps.Map(this.mapTarget, {
       center: userLocation,
       zoom: 14,
-      mapId: "NEARBY_VETS_MAP"  // Required for AdvancedMarkerElement
     })
 
-    // User marker
-    new google.maps.marker.AdvancedMarkerElement({
+    // ✅ User marker (classic Marker, no Map ID required)
+    new google.maps.Marker({
       map: this.map,
       position: userLocation,
-      title: "You are here"
+      title: "You are here",
     })
 
-    // Use the new Place API with searchNearby
-    const { Place } = await google.maps.importLibrary("places")
-
+    // Nearby Search (NEW Places API)
     const request = {
+      fields: [
+        "displayName",
+        "location",
+        "formattedAddress",
+        "rating",
+        "id",
+        "types",
+      ],
       locationRestriction: {
-        center: userLocation,
-        radius: 5000  // 5 km
+        center: userLocation, // { lat, lng }
+        radius: 5000,         // 5km
       },
       includedTypes: ["veterinary_care"],
-      maxResultCount: 20,
-      fields: ["displayName", "location", "formattedAddress", "rating"]
+      maxResultCount: 5,
+      rankPreference: google.maps.places.SearchNearbyRankPreference.DISTANCE,
     }
 
-    console.log("[nearby-vets] sending searchNearby request", request)
+    try {
+      const { places } = await google.maps.places.Place.searchNearby(request)
+      console.log("[nearby-vets] New Places results:", places)
 
-    const { places } = await Place.searchNearby(request)
+      this.listTarget.innerHTML = ""
 
-    console.log("[nearby-vets] searchNearby results:", places)
-
-    if (!places || places.length === 0) {
-      alert("No nearby vets found")
-      return
+      ;(places || []).forEach((place) => {
+        this.createVetMarker(place)
+        this.renderVetCard(place)
+      })
+    } catch (error) {
+      console.error("Places API error:", error)
     }
-
-    places.forEach(place => {
-      console.log("[nearby-vets] Place object:", place)
-      console.log("[nearby-vets] displayName:", place.displayName)
-      console.log("[nearby-vets] location:", place.location)
-      this.createVetMarker(place)
-    })
   }
 
-  errorCallback(error) {
-    console.error("[nearby-vets] geolocation error", error)
-    alert("We couldn't get your location. Please enable location access and reload the page.")
-  }
-
+  // ✅ Vet markers using classic Marker
   createVetMarker(place) {
-    const marker = new google.maps.marker.AdvancedMarkerElement({
+    if (!place.location) return
+
+    new google.maps.Marker({
       map: this.map,
-      position: place.location,
-      title: place.displayName
+      position: place.location, // Place API returns a LatLng object – this is fine
+      title: place.displayName,
     })
+  }
 
-    const infoWindow = new google.maps.InfoWindow({
-      content: `
-        <strong>${place.displayName}</strong><br>
-        ${place.formattedAddress || "Address not available"}<br>
-        ${place.rating ? "⭐ " + place.rating + "/5" : ""}
-      `
-    })
+  renderVetCard(place) {
+    const el = document.createElement("div")
+    el.className = "col-12 col-md-6"
 
-    marker.addListener("click", () => {
-      infoWindow.open(this.map, marker)
-    })
+    const ratingText = place.rating ? `⭐ ${place.rating}/5` : "No rating"
+    const address = place.formattedAddress || "Address not available"
+
+    el.innerHTML = `
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title mb-1">${place.displayName}</h5>
+          <p class="card-text mb-1">${address}</p>
+          <p class="card-text"><strong>Rating:</strong> ${ratingText}</p>
+        </div>
+      </div>
+    `
+
+    this.listTarget.appendChild(el)
+  }
+
+  errorCallback(err) {
+    console.error("Geolocation error:", err)
   }
 }
