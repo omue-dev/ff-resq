@@ -15,18 +15,18 @@
 }
 
 .bird-img {
-  bottom: -7%;
-  height: $card-height-mobile;
-  left: -25%;
+  bottom: 0;
+  height: 90vw;
+  left: -15%;
   position: fixed;
   z-index: $z-animals-bird;
 }
 
 .fox-img {
-  height: $card-height-mobile;
+  height: 46vh;
   position: fixed;
-  bottom: -5%;
-  right: -35%;
+  bottom: 0;
+  right: -25%;
   z-index: $z-animals;
 }
 
