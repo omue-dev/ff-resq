@@ -147,8 +147,8 @@ export default class extends Controller {
     `
     this.currentNotes.style.display = 'block'
 
-    // Re-enable button
-    this.currentButton.disabled = false
+    // Remove the button after confirmation
+    this.currentButton.remove()
   }
 
   get csrfToken() {

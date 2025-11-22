@@ -12,6 +12,7 @@
   <!-- Title overlay (top safe zone) -->
   <div class="vets-title">
     <h1 data-action="click->nearby-vets#showAllVets" style="cursor: pointer;">Nearby Vets</h1>
+    <button onclick="fetch('/appointments/reset', { method: 'POST', headers: { 'X-CSRF-Token': document.querySelector('meta[name=csrf-token]').content } }).then(r => r.json()).then(d => alert(d.message || d.error))" style="margin-top: 10px; padding: 5px 10px; background: #ff6b6b; color: white; border: none; border-radius: 4px; cursor: pointer;">Reset Last Appointment</button>
   </div>
 
   <!-- Vet List Modal -->

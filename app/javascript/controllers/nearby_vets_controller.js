@@ -21,7 +21,9 @@ export default class extends Controller {
 
     // Check if intake exists by checking if appointment controller has an intake ID
     const appointmentController = this.application.getControllerForElementAndIdentifier(this.element, "appointment")
-    this.hasIntake = appointmentController && appointmentController.intakeIdValue
+    this.hasIntake = appointmentController && appointmentController.intakeIdValue && appointmentController.intakeIdValue !== ""
+
+    console.log("[nearby-vets] hasIntake:", this.hasIntake, "intakeIdValue:", appointmentController?.intakeIdValue)
 
     // Wait for Google Maps API to load
     await waitForGoogleMaps()
