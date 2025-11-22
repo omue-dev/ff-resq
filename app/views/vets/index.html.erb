@@ -1,4 +1,28 @@
-<h1>Nearby Vets</h1>
+<div
+  data-controller="nearby-vets"
+  class="map-wrapper"
+>
+  <!-- Fullscreen Map -->
+  <div
+    data-nearby-vets-target="map"
+    class="map-fullscreen"
+  ></div>
+
+  <!-- Title overlay (top safe zone) -->
+  <div class="vets-title">
+    <h1>Nearby Vets</h1>
+  </div>
+
+  <!-- Cards overlay (bottom) -->
+  <div class="vets-cards-overlay">
+    <div
+      data-nearby-vets-target="list"
+      class="vets-cards-container"
+    >
+      <!-- Stimulus will inject vet cards here -->
+    </div>
+  </div>
+</div>
 
 <% if @intake.present? %>
   <div data-controller="appointment" data-appointment-intake-id-value="<%= @intake.id %>">
@@ -45,24 +69,7 @@
   <p class="text-muted">Please create an intake first to make an appointment.</p>
 <% end %>
 
-<div
-  data-controller="nearby-vets"
-  class="map-wrapper mt-4"
->
-  <!-- Map -->
-  <div
-    data-nearby-vets-target="map"
-    style="height: 500px; width: 100%; border-radius: 10px;"
-  ></div>
 
-  <!-- Cards with the 5 closest vets -->
-  <div
-    data-nearby-vets-target="list"
-    class="mt-4 row row-cols-1 row-cols-md-2 g-3"
-  >
-    <!-- Stimulus will inject vet cards here -->
-  </div>
-</div>
 
 <!-- Load Google Maps JS SDK (no callback, Stimulus handles init) -->
 <script async

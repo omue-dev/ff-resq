@@ -1,0 +1,307 @@
+// =============================================================================
+// MAPS - Google Maps customization with glassmorphism
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Map wrapper container - Fullscreen layout
+// -----------------------------------------------------------------------------
+
+.map-wrapper {
+  // Layout
+  height: 100vh;
+  left: 0;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+}
+
+// -----------------------------------------------------------------------------
+// Fullscreen map
+// -----------------------------------------------------------------------------
+
+.map-fullscreen {
+  // Layout
+  height: 100%;
+  width: 100%;
+
+  // Visual
+  position: absolute;
+  z-index: $z-base;
+}
+
+// -----------------------------------------------------------------------------
+// Vets title overlay (top safe zone)
+// -----------------------------------------------------------------------------
+
+.vets-title {
+  // Layout
+  left: 50%;
+  position: absolute;
+  top: $space-xl;
+  transform: translateX(-50%);
+  z-index: $z-overlay;
+
+  h1 {
+    // Layout
+    margin: 0;
+    padding: $space-md $space-xl;
+
+    // Visual
+    @include glass(0.25);
+    border: $border-width-thin solid $glass-white-3;
+    border-radius: $radius-pill;
+    box-shadow: $shadow-md;
+    color: $white;
+
+    // Typography
+    font-size: $font-lg;
+    font-weight: $font-weight-bold;
+    text-align: center;
+    white-space: nowrap;
+
+    // Animation
+    transition: $transition-all-fast;
+
+    &:hover {
+      @include glass(0.35);
+      box-shadow: $shadow-lg;
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Cards overlay (bottom)
+// -----------------------------------------------------------------------------
+
+.vets-cards-overlay {
+  // Layout
+  bottom: 0;
+  left: 0;
+  max-height: 50vh;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  z-index: $z-overlay;
+
+  // Visual
+  @include glass-dark(0.8);
+  border-radius: $radius-xl $radius-xl 0 0;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.vets-cards-container {
+  // Layout
+  display: grid;
+  gap: $space-base;
+  grid-template-columns: 1fr;
+  max-height: 50vh;
+  overflow-y: auto;
+  padding: $space-xl;
+  pointer-events: auto;
+
+  // Behavior
+  scroll-behavior: smooth;
+
+  // Custom scrollbar
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $glass-white-05;
+    border-radius: $radius-sm;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $glass-white-2;
+    border-radius: $radius-sm;
+
+    &:hover {
+      background: $glass-white-3;
+    }
+  }
+
+  // Responsive grid
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Google Maps UI customization
+// -----------------------------------------------------------------------------
+
+.map-wrapper {
+  // Target the map container
+  [data-nearby-vets-target="map"] {
+    // Visual
+    border-radius: 0;
+    overflow: hidden;
+
+    // Hide "Open in Google Maps" links
+    a[href^="https://maps.google.com/maps"] {
+      display: none !important;
+    }
+
+    // -----------------------------------------------------------------------------
+    // Legal text and branding - Minimize but keep compliant
+    // -----------------------------------------------------------------------------
+
+    // Make legal text very small and transparent (but not zoom controls)
+    .gmnoprint:not(.gm-bundled-control) {
+      // Typography
+      font-size: $font-xs !important;
+
+      // Visual
+      opacity: 0.2;
+
+      // Animation
+      transition: $transition-opacity;
+
+      // Show on hover if user needs to access them
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+
+    // Bottom legal links container
+    .gm-style-cc {
+      // Typography
+      font-size: $font-xs !important;
+
+      // Visual
+      opacity: 0.2;
+
+      // Animation
+      transition: $transition-opacity;
+
+      // Behavior
+      pointer-events: auto;
+
+      // Show on hover
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+
+    // Hide specific background elements
+    div[style*="background-color: rgb(245, 245, 245)"] {
+      // Typography
+      font-size: $font-xs !important;
+
+      // Visual
+      opacity: 0.1 !important;
+
+      &:hover {
+        opacity: 0.6 !important;
+      }
+    }
+
+    // Keyboard shortcuts, map data, terms links
+    a[target="_blank"][rel="noopener"] {
+      // Typography
+      font-size: $font-xs !important;
+
+      // Visual
+      opacity: 0.2;
+
+      // Animation
+      transition: $transition-opacity;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+
+    // -----------------------------------------------------------------------------
+    // Zoom control - Keep fully visible with glassmorphism
+    // -----------------------------------------------------------------------------
+
+    .gm-bundled-control {
+      opacity: 1 !important;
+
+      // Style zoom buttons with glassmorphism
+      .gm-control-active {
+        @include glass(0.15);
+        border: $border-width-thin solid $glass-white-2 !important;
+        transition: $transition-all-fast;
+
+        &:hover {
+          @include glass(0.25);
+          border-color: $glass-white-3 !important;
+          box-shadow: $shadow-sm;
+          transform: scale(1.05);
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Vet cards - Glassmorphism style matching app design
+// -----------------------------------------------------------------------------
+
+.vet-card {
+  // Visual
+  @include glass(0.15);
+  border: $border-width-thin solid $glass-white-2;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+
+  // Animation
+  transition: $transition-all-fast;
+
+  &:hover {
+    @include glass(0.25);
+    border-color: $glass-white-3;
+    box-shadow: $shadow-lg;
+    transform: translateY(-4px);
+  }
+
+  .card-body {
+    // Layout
+    padding: $space-lg;
+
+    .card-title {
+      // Typography
+      color: $white;
+      font-size: $font-lg;
+      font-weight: $font-weight-bold;
+      margin-bottom: $space-md;
+    }
+
+    .card-text {
+      // Typography
+      color: $glass-white-8;
+      font-size: $font-sm;
+      line-height: $line-height-normal;
+      margin-bottom: $space-sm;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      strong {
+        color: $white;
+        font-weight: $font-weight-semibold;
+      }
+    }
+
+    // Rating stars styling
+    .card-text {
+      display: flex;
+      align-items: center;
+      gap: $space-xs;
+    }
+  }
+}
