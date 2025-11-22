@@ -5,6 +5,7 @@
 <div
   data-controller="nearby-vets appointment"
   <%= "data-nearby-vets-intake-id-value=\"#{@intake.id}\" data-appointment-intake-id-value=\"#{@intake.id}\"".html_safe if @intake&.id %>
+  data-nearby-vets-user-marker-icon-value="<%= asset_path('fox-avatar-min.png') %>"
   class="map-wrapper"
 >
   <!-- Fullscreen Map -->

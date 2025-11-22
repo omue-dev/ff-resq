@@ -45,14 +45,19 @@ export function waitForGoogleMaps() {
  * @param {Object} location - Location object with lat and lng properties
  * @param {number} location.lat - Latitude
  * @param {number} location.lng - Longitude
+ * @param {string} [iconUrl] - Optional custom icon URL (from Rails asset pipeline)
  * @returns {google.maps.Marker} The created marker instance
  */
-export function createUserMarker(map, location) {
+export function createUserMarker(map, location, iconUrl = null) {
+  const iconConfig = iconUrl
+    ? { ...getUserMarkerIcon(), url: iconUrl }
+    : getUserMarkerIcon()
+
   return new google.maps.Marker({
     map: map,
     position: location,
     title: MAPS_CONFIG.MARKERS.userMarkerTitle,
-    icon: getUserMarkerIcon()
+    icon: iconConfig
   })
 }
 

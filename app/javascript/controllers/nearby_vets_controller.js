@@ -13,7 +13,8 @@ import {
 export default class extends Controller {
   static targets = ["map", "listModal", "detailModal", "vetList"]
   static values = {
-    intakeId: Number
+    intakeId: Number,
+    userMarkerIcon: String
   }
 
   async connect() {
@@ -40,7 +41,7 @@ export default class extends Controller {
       this.map = createMap(this.mapTarget, userLocation)
 
       // Add user location marker
-      createUserMarker(this.map, userLocation)
+      createUserMarker(this.map, userLocation, this.userMarkerIconValue)
 
       // Search for nearby vets
       const places = await searchNearbyVets(userLocation)
