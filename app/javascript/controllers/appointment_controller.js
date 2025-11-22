@@ -7,7 +7,7 @@ import { Controller } from "@hotwired/stimulus"
  * - Displays appointment details in modal
  */
 export default class extends Controller {
-  static targets = ["button", "status", "modal", "notes", "resetButton"]
+  static targets = ["button", "status", "notes"]
   static values = {
     intakeId: Number,
     pollInterval: { type: Number, default: 2000 }
@@ -30,9 +30,16 @@ export default class extends Controller {
       return
     }
 
+    // Get the clicked button (could be multiple buttons on page)
+    const clickedButton = event.currentTarget
+    const parentActions = clickedButton.closest('.card-actions')
+    const statusElement = parentActions.querySelector('.appointment-status')
+    const notesElement = parentActions.querySelector('.appointment-response')
+
     // Disable button and show loading state
-    this.buttonTarget.disabled = true
-    this.statusTarget.textContent = "Initiating call..."
+    clickedButton.disabled = true
+    statusElement.textContent = "Initiating call..."
+    notesElement.style.display = 'none'
 
     try {
       const response = await fetch("/appointments", {
@@ -50,16 +57,19 @@ export default class extends Controller {
 
       if (data.success) {
         this.appointmentId = data.appointment_id
-        this.statusTarget.textContent = "AI agent is calling the vet..."
+        this.currentButton = clickedButton
+        this.currentStatus = statusElement
+        this.currentNotes = notesElement
+        statusElement.textContent = "AI agent is calling the vet..."
         this.startPolling()
       } else {
-        this.statusTarget.textContent = `Error: ${data.error}`
-        this.buttonTarget.disabled = false
+        statusElement.textContent = `Error: ${data.error}`
+        clickedButton.disabled = false
       }
     } catch (error) {
       console.error("Failed to create appointment:", error)
-      this.statusTarget.textContent = "Failed to initiate call. Please try again."
-      this.buttonTarget.disabled = false
+      statusElement.textContent = "Failed to initiate call. Please try again."
+      clickedButton.disabled = false
     }
   }
 
@@ -95,17 +105,19 @@ export default class extends Controller {
       console.log("Polling appointment:", data)
 
       if (data.confirmed) {
-        console.log("Appointment confirmed! Showing modal...")
-        // Appointment confirmed - show modal
-        this.showAppointmentModal(data)
+        console.log("Appointment confirmed! Showing response...")
+        // Appointment confirmed - show inline response
+        this.showAppointmentResponse(data)
         this.stopPolling()
-        this.statusTarget.textContent = "Appointment confirmed!"
-        this.buttonTarget.disabled = false
       } else if (data.status === "cancelled") {
         // Appointment cancelled
-        this.statusTarget.textContent = "Appointment was cancelled."
+        if (this.currentStatus) {
+          this.currentStatus.textContent = "Appointment was cancelled."
+        }
         this.stopPolling()
-        this.buttonTarget.disabled = false
+        if (this.currentButton) {
+          this.currentButton.disabled = false
+        }
       } else {
         // Still pending - continue polling
         if (this.polling) {
@@ -121,52 +133,22 @@ export default class extends Controller {
     }
   }
 
-  showAppointmentModal(data) {
-    // Display the vet's response directly
-    this.notesTarget.textContent = data.notes || "Appointment confirmed"
+  showAppointmentResponse(data) {
+    if (!this.currentNotes || !this.currentStatus || !this.currentButton) return
 
-    // Show modal
-    this.modalTarget.style.display = "block"
-    this.modalTarget.classList.add("show")
-  }
+    // Update status
+    this.currentStatus.textContent = "✓ Appointment confirmed!"
+    this.currentStatus.classList.add('success')
 
-  closeModal(event) {
-    event.preventDefault()
-    this.modalTarget.style.display = "none"
-    this.modalTarget.classList.remove("show")
-  }
+    // Show response
+    this.currentNotes.innerHTML = `
+      <p><strong>Vet's Response:</strong></p>
+      <p>${data.notes || "Appointment confirmed"}</p>
+    `
+    this.currentNotes.style.display = 'block'
 
-  async resetAppointment(event) {
-    event.preventDefault()
-
-    if (!confirm("Reset the last appointment to pending status for testing?")) {
-      return
-    }
-
-    this.statusTarget.textContent = "Resetting appointment..."
-
-    try {
-      const response = await fetch("/appointments/reset", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-Token": this.csrfToken
-        }
-      })
-
-      const data = await response.json()
-
-      if (data.success) {
-        this.statusTarget.textContent = `${data.message} - Ready to test!`
-        this.buttonTarget.disabled = false
-        this.appointmentId = data.appointment_id
-      } else {
-        this.statusTarget.textContent = `Error: ${data.error}`
-      }
-    } catch (error) {
-      console.error("Failed to reset appointment:", error)
-      this.statusTarget.textContent = "Failed to reset appointment."
-    }
+    // Re-enable button
+    this.currentButton.disabled = false
   }
 
   get csrfToken() {

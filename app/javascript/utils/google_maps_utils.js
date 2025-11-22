@@ -153,9 +153,11 @@ export function getUserLocation() {
  * @returns {google.maps.Map} The created map instance
  */
 export function createMap(mapElement, center, options = {}) {
-  return new google.maps.Map(mapElement, {
+  const map = new google.maps.Map(mapElement, {
     center: center,
     ...MAPS_CONFIG.MAP_OPTIONS,
     ...options
   })
+
+  return map
 }

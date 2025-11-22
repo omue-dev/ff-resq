@@ -139,7 +139,8 @@ export const MAPS_CONFIG = {
       "formattedAddress",
       "rating",
       "id",
-      "types"
+      "types",
+      "regularOpeningHours"
     ],
 
     /**
