@@ -14,7 +14,7 @@
     <span class="cta-arrow">←</span>
        Back
     <% end %>
-    <%= link_to vets_path, class: "header-button-dark" do %>
+    <%= link_to vets_path(intake_id: @intake&.id), class: "header-button-dark" do %>
       vets nearby
       <span class="cta-arrow">→</span>
     <% end %>

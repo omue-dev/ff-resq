@@ -13,21 +13,20 @@ import {
 export default class extends Controller {
   static targets = ["map", "listModal", "detailModal", "vetList"]
   static values = {
-    hasIntake: Boolean
+    intakeId: Number
   }
 
   async connect() {
     console.log("[nearby-vets] connected")
-
-    // Check if intake exists by checking if appointment controller has an intake ID
-    const appointmentController = this.application.getControllerForElementAndIdentifier(this.element, "appointment")
-    this.hasIntake = appointmentController && appointmentController.intakeIdValue && appointmentController.intakeIdValue !== ""
-
-    console.log("[nearby-vets] hasIntake:", this.hasIntake, "intakeIdValue:", appointmentController?.intakeIdValue)
+    console.log("[nearby-vets] intakeId:", this.intakeIdValue)
 
     // Wait for Google Maps API to load
     await waitForGoogleMaps()
     this.initMap()
+  }
+
+  get hasIntake() {
+    return this.hasIntakeIdValue && this.intakeIdValue > 0
   }
 
   async initMap() {
