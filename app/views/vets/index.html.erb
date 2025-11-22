@@ -1,67 +1,47 @@
-<h1>Nearby Vets</h1>
-
-<% if @intake.present? %>
-  <div data-controller="appointment" data-appointment-intake-id-value="<%= @intake.id %>">
-    <div class="mb-3">
-      <button
-        data-action="click->appointment#makeAppointment"
-        data-appointment-target="button"
-        class="btn btn-primary"
-      >
-        Make Appointment
-      </button>
-      <% if Rails.env.development? %>
-        <button
-          data-action="click->appointment#resetAppointment"
-          data-appointment-target="resetButton"
-          class="btn btn-warning ms-2"
-        >
-          Reset Appointment (Test)
-        </button>
-      <% end %>
-      <span data-appointment-target="status" class="ms-2"></span>
-    </div>
-
-    <!-- Appointment Modal -->
-    <div data-appointment-target="modal" class="modal" tabindex="-1" style="display: none;">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Appointment Confirmed</h5>
-            <button type="button" class="btn-close" data-action="click->appointment#closeModal"></button>
-          </div>
-          <div class="modal-body">
-            <p><strong>Vet's Response:</strong></p>
-            <p class="text-muted" data-appointment-target="notes"></p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-action="click->appointment#closeModal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-<% else %>
-  <p class="text-muted">Please create an intake first to make an appointment.</p>
-<% end %>
-
 <div
-  data-controller="nearby-vets"
-  class="map-wrapper mt-4"
+  data-controller="nearby-vets appointment"
+  data-appointment-intake-id-value="<%= @intake&.id || '' %>"
+  class="map-wrapper"
 >
-  <!-- Map -->
+  <!-- Fullscreen Map -->
   <div
     data-nearby-vets-target="map"
-    style="height: 500px; width: 100%; border-radius: 10px;"
+    class="map-fullscreen"
   ></div>
 
-  <!-- Cards with the 5 closest vets -->
-  <div
-    data-nearby-vets-target="list"
-    class="mt-4 row row-cols-1 row-cols-md-2 g-3"
-  >
-    <!-- Stimulus will inject vet cards here -->
+  <!-- Title overlay (top safe zone) -->
+  <div class="vets-title">
+    <h1 data-action="click->nearby-vets#showAllVets" style="cursor: pointer;">Nearby Vets</h1>
+    <button onclick="fetch('/appointments/reset', { method: 'POST', headers: { 'X-CSRF-Token': document.querySelector('meta[name=csrf-token]').content } }).then(r => r.json()).then(d => alert(d.message || d.error))" style="margin-top: 10px; padding: 5px 10px; background: #ff6b6b; color: white; border: none; border-radius: 4px; cursor: pointer;">Reset Last Appointment</button>
   </div>
+
+  <!-- Vet List Modal -->
+  <div
+    data-nearby-vets-target="listModal"
+    class="vet-modal"
+    style="display: none;"
+  >
+    <div class="vet-modal-content vet-list-modal">
+      <button
+        data-action="click->nearby-vets#closeListModal"
+        class="vet-modal-close"
+      >×</button>
+      <h2 class="vet-modal-title">Nearby Vets</h2>
+      <div data-nearby-vets-target="vetList" class="vet-cards-list"></div>
+    </div>
+  </div>
+
+  <!-- Vet Details Modal -->
+  <div
+    data-nearby-vets-target="detailModal"
+    class="vet-modal"
+    style="display: none;"
+  >
+    <div class="vet-modal-content">
+      <!-- Content will be dynamically populated with a vet card -->
+    </div>
+  </div>
+
 </div>
 
 <!-- Load Google Maps JS SDK (no callback, Stimulus handles init) -->

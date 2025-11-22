@@ -2,7 +2,7 @@ require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
   # Allow cloudflared tunnel URLs
-  config.hosts << "situations-crafts-moms-legend.trycloudflare.com"
+  config.hosts << "signed-promotion-story-smilies.trycloudflare.com"
 
   # Settings specified here will take precedence over those in config/application.rb.
 

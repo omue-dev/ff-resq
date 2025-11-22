@@ -1,0 +1,533 @@
+// =============================================================================
+// MAPS - Google Maps customization with glassmorphism
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Map wrapper container - Fullscreen layout
+// -----------------------------------------------------------------------------
+
+.map-wrapper {
+  // Layout
+  height: 100vh;
+  left: 0;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+}
+
+// -----------------------------------------------------------------------------
+// Fullscreen map - Full viewport height
+// -----------------------------------------------------------------------------
+
+.map-fullscreen {
+  // Layout
+  height: 100vh;
+  width: 100%;
+
+  // Visual
+  position: absolute;
+  z-index: $z-base;
+}
+
+// -----------------------------------------------------------------------------
+// Vets title overlay (top safe zone)
+// -----------------------------------------------------------------------------
+
+.vets-title {
+  // Layout
+  right: $space-sm;
+  position: absolute;
+  top: $space-sm;
+  transform: translateX(-50%);
+  z-index: $z-overlay;
+
+  h1 {
+    // Layout
+    margin: 0;
+    padding: $space-md $space-xl;
+
+    // Visual
+    @include glass(0.25);
+    border: $border-width-thin solid $glass-white-3;
+    border-radius: $radius-pill;
+    box-shadow: $shadow-md;
+    color: $white;
+
+    // Typography
+    font-size: $font-lg;
+    font-weight: $font-weight-bold;
+    text-align: center;
+    white-space: nowrap;
+
+    // Animation
+    transition: $transition-all-fast;
+
+    &:hover {
+      @include glass(0.35);
+      box-shadow: $shadow-lg;
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Vet Details Modal - Glassmorphism overlay
+// -----------------------------------------------------------------------------
+
+.vet-modal {
+  // Layout
+  align-items: center;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: $z-modal;
+
+  // Visual - Dark overlay backdrop
+  backdrop-filter: blur(4px);
+
+  // Animation
+  transition: $transition-opacity;
+
+  &[style*="display: none"] {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.vet-modal-content {
+  // Layout
+  margin: $space-xl;
+  max-width: 500px;
+  padding: $space-xl;
+  position: relative;
+  width: 100%;
+
+  // Visual - White glassmorphism
+  @include glass(0.25);
+  border: $border-width-thin solid $glass-white-3;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-xl;
+
+  // Animation
+  transform: translateY(0);
+  transition: $transition-all-fast;
+
+  &.vet-list-modal {
+    max-width: 600px;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  // When containing a single detail card, remove padding
+  .vet-card-detail {
+    margin: -$space-xl;
+  }
+}
+
+.vet-cards-list {
+  // Layout
+  display: flex;
+  flex-direction: column;
+  gap: $space-base;
+  overflow-y: auto;
+  padding-right: $space-sm;
+
+  // Custom scrollbar
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $glass-white-05;
+    border-radius: $radius-sm;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $glass-white-2;
+    border-radius: $radius-sm;
+
+    &:hover {
+      background: $glass-white-3;
+    }
+  }
+}
+
+.vet-card {
+  // Layout
+  padding: $space-lg;
+  width: 100%;
+
+  // Visual - Solid semi-opaque background for readability
+  background: rgba(14, 80, 80, 0.85);
+  border: $border-width-thin solid rgba(255, 255, 255, 0.3);
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+
+  // Animation
+  transition: $transition-all-fast;
+
+  &:hover {
+    background: rgba(14, 80, 80, 0.95);
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: $shadow-lg;
+    transform: translateX(4px);
+  }
+
+  .card-body {
+    padding: 0;
+  }
+
+  .card-title {
+    // Typography
+    color: $white;
+    font-size: $font-lg;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-tight;
+    margin-bottom: $space-sm;
+  }
+
+  .card-text {
+    // Typography
+    color: rgba(255, 255, 255, 0.95);
+    font-size: $font-base;
+    line-height: $line-height-relaxed;
+    margin-bottom: $space-sm;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    strong {
+      color: $white;
+      font-weight: $font-weight-bold;
+    }
+
+    &.opening-hours {
+      color: #6dd8b8ff;
+      font-size: $font-sm;
+    }
+  }
+
+  .card-actions {
+    // Layout
+    display: flex;
+    flex-direction: column;
+    gap: $space-sm;
+    margin-top: $space-base;
+    width: 100%;
+  }
+
+  .directions-btn,
+  .appointment-btn {
+    // Layout
+    align-items: center;
+    display: flex;
+    gap: $space-xs;
+    justify-content: center;
+    padding: $space-sm $space-base;
+    width: 100%;
+
+    // Visual
+    background: rgba(71, 185, 185, 0.9);
+    border: $border-width-thin solid rgba(255, 255, 255, 0.3);
+    border-radius: $radius-md;
+    box-shadow: $shadow-sm;
+    color: $white;
+    cursor: pointer;
+    text-decoration: none;
+
+    // Typography
+    font-size: $font-sm;
+    font-weight: $font-weight-semibold;
+
+    // Animation
+    transition: $transition-all-fast;
+
+    &:hover {
+      background: rgba(71, 185, 185, 1);
+      border-color: rgba(255, 255, 255, 0.5);
+      box-shadow: $shadow-md;
+      color: $white;
+      text-decoration: none;
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+
+    svg {
+      flex-shrink: 0;
+    }
+  }
+
+  .appointment-btn {
+    // Visual - Different color to distinguish from directions
+    background: rgba(109, 216, 184, 0.9);
+
+    &:hover {
+      background: rgba(109, 216, 184, 1);
+    }
+
+    &:disabled {
+      background: rgba(109, 216, 184, 0.5);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+
+  .appointment-status {
+    // Layout
+    margin-top: $space-sm;
+    padding: $space-sm;
+    text-align: center;
+
+    // Typography
+    color: rgba(255, 255, 255, 0.9);
+    font-size: $font-sm;
+    font-weight: $font-weight-semibold;
+
+    // Animation
+    transition: $transition-all-fast;
+
+    &.success {
+      color: #6dd8b8ff;
+    }
+  }
+
+  .appointment-response {
+    // Layout
+    margin-top: $space-sm;
+    padding: $space-base;
+
+    // Visual
+    background: rgba(109, 216, 184, 0.15);
+    border: $border-width-thin solid rgba(109, 216, 184, 0.3);
+    border-radius: $radius-md;
+
+    // Typography
+    color: rgba(255, 255, 255, 0.95);
+    font-size: $font-sm;
+    line-height: $line-height-relaxed;
+
+    // Animation
+    animation: slideIn 0.3s ease-out;
+
+    p {
+      margin: 0;
+      margin-bottom: $space-xs;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      strong {
+        color: #6dd8b8ff;
+        font-weight: $font-weight-bold;
+      }
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      max-height: 0;
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      max-height: 200px;
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+.vet-modal-close {
+  // Layout
+  height: 40px;
+  padding: 0;
+  position: absolute;
+  right: $space-base;
+  top: $space-base;
+  width: 40px;
+
+  // Visual
+  background: $glass-white-2;
+  border: $border-width-thin solid $glass-white-3;
+  border-radius: $radius-circle;
+  color: $white;
+  cursor: pointer;
+
+  // Typography
+  font-size: $font-xl;
+  font-weight: $font-weight-bold;
+  line-height: 1;
+
+  // Animation
+  transition: $transition-all-fast;
+
+  &:hover {
+    background: $glass-white-3;
+    box-shadow: $shadow-sm;
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.vet-modal-title {
+  // Typography
+  color: $white;
+  font-size: $font-xl;
+  font-weight: $font-weight-bold;
+  margin-bottom: $space-base;
+  margin-right: $space-3xl;
+}
+
+.vet-modal-text {
+  // Typography
+  color: $glass-white-8;
+  font-size: $font-base;
+  line-height: $line-height-relaxed;
+  margin-bottom: $space-sm;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  strong {
+    color: $white;
+    font-weight: $font-weight-semibold;
+  }
+
+  &.opening-hours-detail {
+    color: #6dd8b8ff;
+    font-size: $font-sm;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Google Maps UI customization
+// -----------------------------------------------------------------------------
+
+.map-wrapper {
+  // Target the map container
+  [data-nearby-vets-target="map"] {
+    // Visual
+    border-radius: 0;
+    overflow: hidden;
+
+    // Hide "Open in Google Maps" links
+    a[href^="https://maps.google.com/maps"] {
+      display: none !important;
+    }
+
+    // -----------------------------------------------------------------------------
+    // Legal text and branding - Minimize but keep compliant
+    // -----------------------------------------------------------------------------
+
+    // Make legal text very small and transparent (but not zoom controls)
+    .gmnoprint:not(.gm-bundled-control) {
+      // Typography
+      font-size: $font-xs !important;
+
+      // Visual
+      opacity: 0.2;
+
+      // Animation
+      transition: $transition-opacity;
+
+      // Show on hover if user needs to access them
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+
+    // Bottom legal links container
+    .gm-style-cc {
+      // Typography
+      font-size: $font-xs !important;
+
+      // Visual
+      opacity: 0.2;
+
+      // Animation
+      transition: $transition-opacity;
+
+      // Behavior
+      pointer-events: auto;
+
+      // Show on hover
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+
+    // Hide specific background elements
+    div[style*="background-color: rgb(245, 245, 245)"] {
+      // Typography
+      font-size: $font-xs !important;
+
+      // Visual
+      opacity: 0.1 !important;
+
+      &:hover {
+        opacity: 0.6 !important;
+      }
+    }
+
+    // Keyboard shortcuts, map data, terms links
+    a[target="_blank"][rel="noopener"] {
+      // Typography
+      font-size: $font-xs !important;
+
+      // Visual
+      opacity: 0.2;
+
+      // Animation
+      transition: $transition-opacity;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+
+    // -----------------------------------------------------------------------------
+    // Zoom control - Keep fully visible with glassmorphism
+    // -----------------------------------------------------------------------------
+
+    .gm-bundled-control {
+      // Position in visible area (top-right of 40vh map)
+      margin-top: $space-base !important;
+      margin-right: $space-base !important;
+      opacity: 1 !important;
+
+      // Style zoom buttons with glassmorphism
+      .gm-control-active {
+        @include glass(0.15);
+        border: $border-width-thin solid $glass-white-2 !important;
+        transition: $transition-all-fast;
+
+        &:hover {
+          @include glass(0.25);
+          border-color: $glass-white-3 !important;
+          box-shadow: $shadow-sm;
+          transform: scale(1.05);
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+    }
+  }
+}
