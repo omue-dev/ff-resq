@@ -2,7 +2,7 @@ module Api
   module V1
     class TwilioController < ApplicationController
       skip_before_action :verify_authenticity_token
-      before_action :verify_twilio_signature, unless: -> { Rails.env.development? && ENV["SKIP_TWILIO_VERIFICATION"] == "true" }
+      before_action :verify_twilio_signature, unless: -> { ENV["SKIP_TWILIO_VERIFICATION"] == "true" }
 
       # Webhook endpoint for Twilio to send appointment callback data
       def appointment_callback
