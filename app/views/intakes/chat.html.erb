@@ -14,7 +14,15 @@
     <span class="cta-arrow">←</span>
        Back
     <% end %>
-    <%= link_to vets_path(intake_id: @intake&.id), class: "header-button-dark" do %>
+    <%
+      # Highlight vet button for medium/high danger levels
+      danger_level = @result&.dig("danger")&.downcase
+      vet_button_class = ["header-button-dark"]
+      # Accept: medium, high, urgent, emergency
+      urgent_levels = %w[medium high urgent emergency]
+      vet_button_class << "vet-button-urgent" if urgent_levels.include?(danger_level)
+    %>
+    <%= link_to vets_path(intake_id: @intake&.id), class: vet_button_class.join(" ") do %>
       vets nearby
       <span class="cta-arrow">→</span>
     <% end %>

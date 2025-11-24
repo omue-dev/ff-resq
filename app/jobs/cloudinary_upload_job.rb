@@ -5,6 +5,11 @@ class CloudinaryUploadJob < ApplicationJob
   retry_on StandardError, wait: 5.seconds, attempts: 3
   retry_on Timeout::Error, wait: 10.seconds, attempts: 2
 
+  # Filter binary photo data from logs
+  def self.log_arguments?
+    false
+  end
+
   def perform(intake_id, photo_data, filename, content_type, pending_message_id = nil)
     intake = Intake.find(intake_id)
 

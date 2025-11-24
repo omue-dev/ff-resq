@@ -41,6 +41,9 @@ class GeminiClient
     http.read_timeout = READ_TIMEOUT
     http.ssl_timeout = OPEN_TIMEOUT
 
+    # Disable debug output to prevent logging base64 image data
+    http.set_debug_output(nil)
+
     request = Net::HTTP::Post.new(uri.path)
     headers.each { |key, value| request[key] = value }
     request.body = body.to_json
@@ -101,8 +104,6 @@ class GeminiClient
     end
 
     base64_data = Base64.strict_encode64(data)
-    Rails.logger.info "Image encoded size: #{base64_data.bytesize / 1024} KB"
-    base64_data
 
   rescue Net::OpenTimeout, Net::ReadTimeout => e
     Rails.logger.error "Image download timeout: #{e.message}"
