@@ -1,9 +1,37 @@
+# frozen_string_literal: true
+
+# Orchestrates appointment creation and Twilio AI agent calls
+#
+# This service handles the complete appointment workflow: creating appointment
+# records, initiating Twilio AI agent calls to veterinarians, and processing
+# webhook callbacks from Twilio.
+#
+# The service delegates specialized tasks to collaborator classes:
+# - {AppointmentServiceHelpers::EmergencyDescriptionBuilder} builds voice-friendly descriptions
+#
+# @example Create an appointment and initiate call
+#   service = AppointmentService.new(intake)
+#   appointment = service.create_appointment_call
+#
+# @example Process webhook callback
+#   appointment = AppointmentService.process_callback(params)
 class AppointmentService
+  # @param intake [Intake] The intake record to create appointment for
   def initialize(intake)
     @intake = intake
   end
 
   # Creates an appointment and triggers the Twilio AI agent call
+  #
+  # This method:
+  # 1. Builds emergency description from chat messages
+  # 2. Creates appointment record with pending status
+  # 3. Initiates Twilio Studio Flow execution
+  # 4. Updates appointment with Twilio response
+  #
+  # @return [Appointment] The created appointment record
+  # @raise [AppointmentServiceHelpers::TwilioConnectionError] On network/timeout errors
+  # @raise [AppointmentServiceHelpers::TwilioApiError] On Twilio API errors
   def create_appointment_call
     # Build emergency description from chat messages
     emergency_description = build_emergency_description
@@ -51,17 +79,33 @@ class AppointmentService
 
       Rails.logger.info "Twilio call initiated for intake #{@intake.id}, call SID: #{response['sid']}"
       appointment
-    rescue => e
-      Rails.logger.error "Failed to initiate Twilio call: #{e.message}"
+    rescue Timeout::Error, Net::OpenTimeout, Net::ReadTimeout => e
+      Rails.logger.error "Twilio connection timeout: #{e.message}"
       appointment.update!(
         status: "cancelled",
-        notes: "Failed to initiate call: #{e.message}"
+        notes: "Connection timeout: #{e.message}"
       )
-      raise e
+      raise AppointmentServiceHelpers::TwilioConnectionError, "Twilio API timeout: #{e.message}"
+    rescue StandardError => e
+      Rails.logger.error "Twilio API error: #{e.message}"
+      appointment.update!(
+        status: "cancelled",
+        notes: "API error: #{e.message}"
+      )
+      raise AppointmentServiceHelpers::TwilioApiError, "Twilio API error: #{e.message}"
     end
   end
 
   # Process the callback from Twilio webhook
+  #
+  # Finds the appointment by call_sid or intake_id and marks it as confirmed.
+  # Updates appointment notes with speech result from Twilio.
+  #
+  # @param params [Hash] Webhook parameters from Twilio
+  # @option params [String] :call_sid Twilio call SID
+  # @option params [String] :speech_result AI agent speech result
+  # @option params [String] :intake_id Related intake ID
+  # @return [Appointment, nil] Updated appointment or nil if not found
   def self.process_callback(params)
     call_sid = params[:call_sid].presence
     speech_result = params[:speech_result]
@@ -99,6 +143,13 @@ class AppointmentService
   end
 
   # Process voice status updates from Twilio
+  #
+  # Updates appointment record with call status from Twilio (ringing, in-progress, completed, etc.)
+  #
+  # @param params [Hash] Status update parameters from Twilio
+  # @option params [String] :CallSid Twilio call SID
+  # @option params [String] :CallStatus Call status (ringing, in-progress, completed, etc.)
+  # @return [Appointment, nil] Updated appointment or nil if not found
   def self.process_status_update(params)
     call_sid = params[:CallSid]
     call_status = params[:CallStatus]
@@ -118,31 +169,10 @@ class AppointmentService
 
   private
 
+  # Builds emergency description using the EmergencyDescriptionBuilder
+  #
+  # @return [String] Formatted emergency description
   def build_emergency_description
-    # Get the AI assistant's assessment from chat messages
-    messages = @intake.chat_messages.order(created_at: :asc)
-
-    # Find the AI's response which contains the urgency assessment
-    ai_assessment = messages.where(role: "assistant", pending: false).last&.content
-
-    if ai_assessment.present?
-      # Strip HTML tags and extract first sentence only for concise voice call
-      text_only = ActionView::Base.full_sanitizer.sanitize(ai_assessment)
-
-      # Extract just the first sentence (up to first period)
-      first_sentence = text_only.split(/\.(?=\s|$)/).first
-
-      # Ensure it ends with a period and isn't too long
-      description = first_sentence.strip
-      description += "." unless description.end_with?(".")
-      description.truncate(150)
-    elsif messages.any?
-      # Fallback to user description if AI hasn't responded yet
-      user_messages = messages.where(role: "user").pluck(:content).join(". ")
-      "A #{@intake.species} with #{user_messages.truncate(100)}"
-    else
-      # Last resort fallback
-      "A #{@intake.species} emergency"
-    end
+    AppointmentServiceHelpers::EmergencyDescriptionBuilder.new(@intake).build
   end
 end
