@@ -31,7 +31,7 @@ class AppointmentService
     begin
       twilio_client = TwilioClient.new
       twilio_number = ENV["TWILIO_PHONE_NUMBER"] # Caller ID (from)
-      vet_number = "+4915123612878" # Your phone number (to)
+      vet_number = ENV["VETS_PHONE_NUMBER"] # Vets phone number (to)
 
       response = twilio_client.initiate_execution(
         to: vet_number,

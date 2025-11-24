@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-# Explicitly require error classes to ensure they're loaded for rescue clauses
-require_relative "intake_ai/errors"
-
 # Orchestrates AI-powered processing of animal intake submissions
 #
 # This service coordinates the analysis of animal rescue intake forms using
