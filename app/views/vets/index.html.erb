@@ -14,17 +14,26 @@
     class="map-fullscreen"
   ></div>
 
+  <!-- Back button (top left) -->
+  <div class="vets-back-button">
+    <%= link_to chat_intake_path(@intake), class: "back-to-chat-btn" do %>
+      <span class="back-arrow">←</span>
+      <span>Back to Chat</span>
+    <% end %>
+  </div>
+
   <!-- Title overlay (top safe zone) -->
-  <div class="vets-title">
-    <h1 data-action="click->nearby-vets#showAllVets" style="cursor: pointer;">Nearby Vets</h1>
-    <button onclick="fetch('/appointments/reset', { method: 'POST', headers: { 'X-CSRF-Token': document.querySelector('meta[name=csrf-token]').content } }).then(r => r.json()).then(d => alert(d.message || d.error))" style="margin-top: 10px; padding: 5px 10px; background: #ff6b6b; color: white; border: none; border-radius: 4px; cursor: pointer;">Reset Last Appointment</button>
+  <div class="vets-title" data-controller="appointment-reset">
+    <h1 data-action="click->nearby-vets#showAllVets" class="clickable">Nearby Vets</h1>
+    <button data-action="click->appointment-reset#resetAppointment" class="reset-appointment-btn">
+      Reset Last Appointment
+    </button>
   </div>
 
   <!-- Vet List Modal -->
   <div
     data-nearby-vets-target="listModal"
-    class="vet-modal"
-    style="display: none;"
+    class="vet-modal hidden"
   >
     <div class="vet-modal-content vet-list-modal">
       <button
@@ -39,8 +48,7 @@
   <!-- Vet Details Modal -->
   <div
     data-nearby-vets-target="detailModal"
-    class="vet-modal"
-    style="display: none;"
+    class="vet-modal hidden"
   >
     <div class="vet-modal-content">
       <!-- Content will be dynamically populated with a vet card -->

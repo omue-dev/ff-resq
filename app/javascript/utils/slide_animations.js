@@ -2,35 +2,9 @@ import gsap from "gsap"
 import { ANIMATION_CONFIG } from "config/animation_constants"
 
 /**
- * Creates glassmorphism overlay element for curtain effect
+ * Initial page load animation with animal images (without curtain effect)
  */
-function createGlassOverlay(side) {
-  const overlay = document.createElement('div')
-  const glassStyle = `
-    position: absolute;
-    top: 0;
-    width: 50%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    z-index: 1000;
-  `
-  overlay.style.cssText = glassStyle + `${side}: 0;`
-  return overlay
-}
-
-/**
- * Curtain opening animation with animal images
- */
-export function curtainOpen(containerElement, slideCard, birdImg, foxImg) {
-  const leftSplit = createGlassOverlay('left')
-  const rightSplit = createGlassOverlay('right')
-
-  containerElement.appendChild(leftSplit)
-  containerElement.appendChild(rightSplit)
-
+export function curtainOpen(slideCard, birdImg, foxImg) {
   birdImg.style.display = 'block'
   foxImg.style.display = 'block'
 
@@ -38,14 +12,7 @@ export function curtainOpen(containerElement, slideCard, birdImg, foxImg) {
 
   const timeline = gsap.timeline()
 
-  timeline.to([leftSplit, rightSplit], {
-    scaleX: 0,
-    duration: ANIMATION_CONFIG.CURTAIN_OPEN.duration,
-    ease: ANIMATION_CONFIG.CURTAIN_OPEN.ease,
-    stagger: ANIMATION_CONFIG.CURTAIN_OPEN.stagger,
-    transformOrigin: (index) => index === 0 ? "left center" : "right center"
-  })
-
+  // Animate animals sliding up from bottom
   timeline.from([foxImg, birdImg], {
     scale: 0.5,
     y: '80%',
@@ -54,17 +21,13 @@ export function curtainOpen(containerElement, slideCard, birdImg, foxImg) {
     stagger: 0.2
   })
 
+  // Animate card scaling in
   timeline.to(slideCard, {
     scale: 1,
     opacity: 1,
     duration: 0.4,
     ease: ANIMATION_CONFIG.CARD_SLIDE.ease
   }, "-=0.4")
-
-  timeline.add(() => {
-    leftSplit.remove()
-    rightSplit.remove()
-  })
 
   return { birdImg, foxImg }
 }
@@ -119,8 +82,8 @@ export function slideCardTransition(slideCard, welcomeCard, formCard, foxImg, bi
  * Combines scale, blur, and fade for smooth entrance from form
  */
 export function performSlideIn(element) {
-  // First remove the inline style that was hiding the element
-  const inlineStyleTag = document.querySelector('style:has([id="chat-page-container"])')
+  // First remove the inline style tag that was hiding the element
+  const inlineStyleTag = document.getElementById('chat-slide-preload')
   if (inlineStyleTag) {
     inlineStyleTag.remove()
   }
@@ -129,10 +92,12 @@ export function performSlideIn(element) {
     {
       x: '100%',
       opacity: 1,
+      visibility: 'visible'
     },
     {
       x: '0',
       opacity: 1,
+      visibility: 'visible',
       duration: 0.3,
       ease: "power2.out",
     }

@@ -1,28 +1,19 @@
-<!-- Prevent flash by hiding element before render if animation is needed -->
+<!-- Critical CSS to prevent flash when sliding in -->
 <script>
   if (sessionStorage.getItem('chatShouldSlideIn') === 'true') {
-    document.write('<style>#chat-page-container { opacity: 0; }</style>');
+    document.write('<style id="chat-slide-preload">#chat-page-container { transform: translateX(100%); visibility: hidden; }</style>');
   }
 </script>
 
-<% should_slide = session.delete(:slide_transition) || false %>
-<div class="chat-page" data-controller="slide-transition chat-scroll" data-slide-transition-slide-in-value="<%= should_slide %>" id="chat-page-container">
+<div class="chat-page" data-controller="slide-transition chat-scroll" id="chat-page-container">
 
   <!-- Chat Header (Fixed) -->
   <div class="chat-page-header">
     <%= link_to new_intake_path, class: "header-button-dark" do %>
-    <span class="cta-arrow">←</span>
-       Back
+      <span class="cta-arrow">←</span>
+      Back
     <% end %>
-    <%
-      # Highlight vet button for medium/high danger levels
-      danger_level = @result&.dig("danger")&.downcase
-      vet_button_class = ["header-button-dark"]
-      # Accept: medium, high, urgent, emergency
-      urgent_levels = %w[medium high urgent emergency]
-      vet_button_class << "vet-button-urgent" if urgent_levels.include?(danger_level)
-    %>
-    <%= link_to vets_path(intake_id: @intake&.id), class: vet_button_class.join(" ") do %>
+    <%= link_to vets_path(intake_id: @intake&.id), class: vet_button_classes(@result) do %>
       vets nearby
       <span class="cta-arrow">→</span>
     <% end %>
