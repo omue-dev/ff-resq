@@ -15,12 +15,14 @@
   ></div>
 
   <!-- Back button (top left) -->
-  <div class="vets-back-button">
-    <%= link_to chat_intake_path(@intake), class: "back-to-chat-btn" do %>
-      <span class="back-arrow">←</span>
-      <span>Back to Chat</span>
-    <% end %>
-  </div>
+  <% if @intake.present? %>
+    <div class="vets-back-button">
+      <%= link_to chat_intake_path(@intake), class: "back-to-chat-btn" do %>
+        <span class="back-arrow">←</span>
+        <span>Back to Chat</span>
+      <% end %>
+    </div>
+  <% end %>
 
   <!-- Title overlay (top safe zone) -->
   <div class="vets-title" data-controller="appointment-reset">
