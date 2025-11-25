@@ -1,12 +1,36 @@
-class IntakesController < ApplicationController
-  require "json"
+# frozen_string_literal: true
 
-  # --- Shows the intake form ---
+# Handles animal intake submissions and chat conversations
+#
+# This controller manages the intake workflow: collecting emergency information,
+# uploading photos to Cloudinary, triggering AI analysis, and managing chat conversations.
+#
+# @see Intake
+# @see IntakeAiProcessor
+# @see CloudinaryUploadJob
+class IntakesController < ApplicationController
+  # Displays the new intake form
+  #
+  # @return [HTML] Renders the intake form view
   def new
     @intake = Intake.new
   end
 
-  # --- Handles form submission ---
+  # Creates a new intake record and initiates AI processing
+  #
+  # This method handles the complete intake workflow:
+  # 1. Validates and saves intake data
+  # 2. Creates initial user chat message
+  # 3. Uploads photo to Cloudinary (if provided)
+  # 4. Triggers AI analysis
+  # 5. Redirects to chat interface
+  #
+  # @param species [String] Animal species (dog/cat/etc)
+  # @param description [String] Emergency description
+  # @param photo [File] Optional photo upload
+  # @param foto_url [String] Optional external photo URL
+  # @param mock [Boolean] Mock mode flag for testing
+  # @return [HTML] Redirects to chat page or renders form with errors
   def create
     # Extract form data safely and normalize it
     data = intake_params
@@ -84,7 +108,14 @@ class IntakesController < ApplicationController
     redirect_to chat_intake_path(@intake)
   end
 
-  # Handles follow-up messages in existing conversation ---
+  # Handles follow-up messages in existing chat conversation
+  #
+  # Creates a new user message and triggers AI response generation.
+  # Supports both HTML and JSON responses for AJAX requests.
+  #
+  # @param id [Integer] The intake ID
+  # @param content [String] The user's message content
+  # @return [HTML/JSON] Redirects to chat or returns message HTML fragments
   def create_message
     # Find the existing conversation
     @intake = Intake.find(params[:id])
@@ -127,7 +158,14 @@ class IntakesController < ApplicationController
     end
   end
 
-  # --- Shows chat with AI response ---
+  # Displays the chat interface with AI conversation
+  #
+  # Shows all chat messages for an intake, including pending messages
+  # that are being processed by AI. The view uses Stimulus controllers
+  # to poll for updates on pending messages.
+  #
+  # @param id [Integer] The intake ID
+  # @return [HTML] Renders the chat view with messages
   def chat
     @intake = Intake.find(params[:id])
     @result = @intake.parsed_payload
@@ -139,7 +177,12 @@ class IntakesController < ApplicationController
     @error_message = @intake.parsed_payload.dig("error") rescue nil
   end
 
-  # mock_chat action to perform refresh on mock mode (delete in production)
+  # Displays chat interface in mock mode for testing (development only)
+  #
+  # This endpoint is intended for testing the chat UI with mock data
+  # and should be removed in production.
+  #
+  # @return [HTML] Renders chat view with mock flag enabled
   def mock_chat
     @mock = true
     render :chat

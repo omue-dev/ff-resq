@@ -1,7 +1,3 @@
-require "net/http"
-require "json"
-require "securerandom"
-
 class Intake < ApplicationRecord
   # --- Validations ---
   validates :species, presence: true

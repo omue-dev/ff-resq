@@ -89,6 +89,7 @@ export default class extends Controller {
     })
 
     // Show list modal
+    this.listModalTarget.classList.remove('hidden')
     this.listModalTarget.style.display = "flex"
   }
 
@@ -109,7 +110,7 @@ export default class extends Controller {
            <span>Make Appointment</span>
          </button>
          <div class="appointment-status" data-appointment-target="status"></div>
-         <div class="appointment-response" data-appointment-target="notes" style="display: none;"></div>`
+         <div class="appointment-response hidden" data-appointment-target="notes"></div>`
       : ''
 
     card.innerHTML = `
@@ -179,7 +180,7 @@ export default class extends Controller {
            <span>Make Appointment</span>
          </button>
          <div class="appointment-status" data-appointment-target="status"></div>
-         <div class="appointment-response" data-appointment-target="notes" style="display: none;"></div>`
+         <div class="appointment-response hidden" data-appointment-target="notes"></div>`
       : ''
 
     // Replace the entire modal content with a vet card
@@ -206,14 +207,17 @@ export default class extends Controller {
     `
 
     // Show detail modal
+    this.detailModalTarget.classList.remove('hidden')
     this.detailModalTarget.style.display = "flex"
   }
 
   closeListModal() {
+    this.listModalTarget.classList.add('hidden')
     this.listModalTarget.style.display = "none"
   }
 
   closeDetailModal() {
+    this.detailModalTarget.classList.add('hidden')
     this.detailModalTarget.style.display = "none"
   }
 

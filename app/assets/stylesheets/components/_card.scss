@@ -41,6 +41,10 @@
   min-height: $card-min-height;
   position: relative;
   width: 90%;
+
+  // Initial state: hidden until animation starts
+  opacity: 0;
+  transform: scale(0);
 }
 
 // -----------------------------------------------------------------------------

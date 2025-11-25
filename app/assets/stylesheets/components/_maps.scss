@@ -31,6 +31,64 @@
 }
 
 // -----------------------------------------------------------------------------
+// Back button (top left)
+// -----------------------------------------------------------------------------
+
+.vets-back-button {
+  // Layout
+  left: $space-sm;
+  position: absolute;
+  top: $space-sm;
+  z-index: $z-overlay;
+
+  .back-to-chat-btn {
+    // Layout
+    align-items: center;
+    display: inline-flex;
+    gap: $space-sm;
+    padding: $space-md $space-lg;
+
+    // Visual
+    @include glass-dark(0.46);
+    border: $border-width-thin solid $glass-black-4;
+    border-radius: $radius-md;
+    box-shadow: $shadow-md;
+    color: $white;
+    text-decoration: none;
+
+    // Typography
+    font-size: $font-base;
+    font-weight: $font-weight-semibold;
+
+    // Animation
+    transition: $transition-all-base;
+
+    .back-arrow {
+      display: inline-block;
+      font-size: $font-lg;
+      transition: transform $transition-base $ease-in-out;
+    }
+
+    &:hover {
+      background: $glass-black-8;
+      border-color: $glass-black-8;
+      box-shadow: $shadow-lg;
+      color: $white;
+      text-decoration: none;
+      transform: translateY(-2px);
+
+      .back-arrow {
+        transform: translateX(-4px);
+      }
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
 // Vets title overlay (top safe zone)
 // -----------------------------------------------------------------------------
 
@@ -63,10 +121,40 @@
     // Animation
     transition: $transition-all-fast;
 
+    &.clickable {
+      cursor: pointer;
+    }
+
     &:hover {
       @include glass(0.35);
       box-shadow: $shadow-lg;
       transform: translateY(-2px);
+    }
+  }
+
+  .reset-appointment-btn {
+    // Layout
+    margin-top: $space-sm;
+    padding: $space-xs $space-md;
+
+    // Visual
+    background: #ff6b6b;
+    border: 0;
+    border-radius: $radius-sm;
+    color: $white;
+    cursor: pointer;
+
+    // Animation
+    transition: $transition-all-fast;
+
+    &:hover {
+      background: #ff5252;
+      box-shadow: $shadow-sm;
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: scale(0.98);
     }
   }
 }

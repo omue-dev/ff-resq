@@ -13,12 +13,22 @@ export default class extends Controller {
   static targets = ["slideCard"]
 
   connect() {
-    if (this.initialLoadValue) {
-      this.handleCurtainOpen()
-    } else if (sessionStorage.getItem('chatShouldSlideIn') === 'true') {
+    // Check if we should animate slide-in BEFORE any rendering
+    const shouldSlideIn = sessionStorage.getItem('chatShouldSlideIn') === 'true'
+
+    if (shouldSlideIn) {
       sessionStorage.removeItem('chatShouldSlideIn')
-      // Opacity already set via inline style in chat.html.erb to prevent flash
-      requestAnimationFrame(() => this.handleSlideIn())
+      // Prevent flash by hiding element immediately
+      this.element.style.visibility = 'hidden'
+      this.element.style.transform = 'translateX(100%)'
+
+      // Wait for next frame to ensure styles are applied, then animate
+      requestAnimationFrame(() => {
+        this.element.style.visibility = 'visible'
+        this.handleSlideIn()
+      })
+    } else if (this.initialLoadValue) {
+      this.handleCurtainOpen()
     }
   }
 
@@ -29,7 +39,7 @@ export default class extends Controller {
     const birdImg = document.getElementById('bird-img')
     const foxImg = document.getElementById('fox-img')
 
-    const animals = curtainOpen(this.element, slideCard, birdImg, foxImg)
+    const animals = curtainOpen(slideCard, birdImg, foxImg)
     this.birdImg = animals.birdImg
     this.foxImg = animals.foxImg
   }

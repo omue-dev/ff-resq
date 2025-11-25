@@ -1,4 +1,4 @@
-<div class="container mt-5" data-controller="slide-transition" data-slide-transition-initial-load-value="true" style="background: transparent;">
+<div class="container mt-5" data-controller="slide-transition" data-slide-transition-initial-load-value="true">
 
   <!-- Slide Card Container -->
   <div class="slide-card" data-slide-transition-target="slideCard">
@@ -35,7 +35,7 @@
 
         <!-- --- Mock switch - Mobile Toggle --- -->
         <div class="mobile-toggle">
-          <%= f.label :mock, "Mock Data" %>
+          <%= f.label :mock, "Mock Data", for: "mockSwitch" %>
           <%= f.input :mock,
                       as: :boolean,
                       label: false,
@@ -72,7 +72,7 @@
                     } %>
 
         <!-- --- Photo upload - Mobile Camera Style --- -->
-        <div class="form-group">
+        <div class="form-group" data-controller="photo-upload">
           <label>Photo (optional)</label>
           <div class="mobile-photo-upload">
             <%= f.input :photo,
@@ -84,32 +84,25 @@
                           capture: "environment",
                           class: "d-none",
                           id: "photoInput",
-                          onchange: "
-                            const file = this.files[0];
-                            if (file) {
-                              document.getElementById('previewFileName').textContent = file.name;
-                              document.getElementById('previewFileSize').textContent = (file.size / 1024).toFixed(1) + ' KB';
-                              document.getElementById('filePreview').classList.add('active');
-                            }
-                          "
+                          data: {
+                            photo_upload_target: "input",
+                            action: "change->photo-upload#handleFileSelect"
+                          }
                         } %>
 
-            <div class="upload-area" onclick="document.getElementById('photoInput').click()">
+            <div class="upload-area" data-action="click->photo-upload#clearFile" onclick="document.getElementById('photoInput').click()">
               <div class="upload-icon">📷</div>
               <div class="upload-text">Tap to take photo</div>
               <div class="upload-hint">or choose from gallery</div>
             </div>
 
-            <div class="file-preview" id="filePreview">
+            <div class="file-preview" data-photo-upload-target="preview">
               <div class="preview-icon"><i class="fa-regular fa-image"></i></div>
               <div class="preview-info">
-                <div class="file-name" id="previewFileName"></div>
-                <div class="file-size" id="previewFileSize"></div>
+                <div class="file-name" data-photo-upload-target="fileName"></div>
+                <div class="file-size" data-photo-upload-target="fileSize"></div>
               </div>
-              <button type="button" class="remove-file" onclick="
-                document.getElementById('photoInput').value = '';
-                document.getElementById('filePreview').classList.remove('active');
-              " aria-label="Remove photo">×</button>
+              <button type="button" class="remove-file" data-action="click->photo-upload#clearFile" aria-label="Remove photo">×</button>
             </div>
           </div>
         </div>

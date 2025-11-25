@@ -39,7 +39,7 @@ export default class extends Controller {
     // Disable button and show loading state
     clickedButton.disabled = true
     statusElement.textContent = "Initiating call..."
-    notesElement.style.display = 'none'
+    notesElement.classList.add('hidden')
 
     try {
       const response = await fetch("/appointments", {
@@ -145,7 +145,7 @@ export default class extends Controller {
       <p><strong>Vet's Response:</strong></p>
       <p>${data.notes || "Appointment confirmed"}</p>
     `
-    this.currentNotes.style.display = 'block'
+    this.currentNotes.classList.remove('hidden')
 
     // Remove the button after confirmation
     this.currentButton.remove()

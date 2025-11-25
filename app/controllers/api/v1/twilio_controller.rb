@@ -1,10 +1,29 @@
+# frozen_string_literal: true
+
 module Api
   module V1
+    # Handles Twilio webhook callbacks for appointment workflow
+    #
+    # This controller receives webhooks from Twilio Studio Flow and processes
+    # appointment status updates and AI agent call results. It includes
+    # signature verification for security.
+    #
+    # @see AppointmentService
+    # @see Appointment
     class TwilioController < ApplicationController
       skip_before_action :verify_authenticity_token
       before_action :verify_twilio_signature, unless: -> { ENV["SKIP_TWILIO_VERIFICATION"] == "true" }
 
-      # Webhook endpoint for Twilio to send appointment callback data
+      # Processes appointment confirmation callbacks from Twilio AI agent
+      #
+      # This webhook is called by Twilio Studio Flow after the AI agent
+      # completes the call with the veterinarian. It updates the appointment
+      # status and stores the call results.
+      #
+      # @param call_sid [String] Twilio call SID
+      # @param speech_result [String] AI agent conversation result
+      # @param intake_id [Integer] Related intake ID
+      # @return [JSON] Success response with appointment ID or error
       def appointment_callback
         log_webhook_received("appointment_callback", callback_params)
 
@@ -20,7 +39,15 @@ module Api
         render json: { success: false, error: "Internal server error" }, status: :internal_server_error
       end
 
-      # Handle call status updates
+      # Processes call status updates from Twilio
+      #
+      # This webhook receives real-time status updates during the call
+      # lifecycle (ringing, in-progress, completed, failed, etc).
+      #
+      # @param CallSid [String] Twilio call SID
+      # @param CallStatus [String] Call status (ringing, in-progress, completed, etc)
+      # @param CallDuration [Integer] Call duration in seconds
+      # @return [JSON] Success response (always returns 200 to prevent Twilio retries)
       def voice_status
         log_webhook_received("voice_status", status_params)
 
