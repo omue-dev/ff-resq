@@ -16,18 +16,29 @@
 
 .bird-img {
   bottom: 0;
-  height: 90vw;
-  left: -15%;
+  height: 40vh;
+  left: -5%;
   position: fixed;
   z-index: $z-animals-bird;
 }
 
 .fox-img {
-  height: 46vh;
+  height: 40vh;
   position: fixed;
   bottom: 0;
-  right: -25%;
+  right: -15%;
   z-index: $z-animals;
+}
+
+.form-logo {
+  display: block;
+  margin: 0 auto $space-lg;
+  max-width: 350px;
+  width: 100%;
+}
+
+.form-headline{
+  text-shadow: 1px 1px 4px $glass-black-46;
 }
 
 // -----------------------------------------------------------------------------

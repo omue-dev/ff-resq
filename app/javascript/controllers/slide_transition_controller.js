@@ -30,6 +30,33 @@ export default class extends Controller {
     } else if (this.initialLoadValue) {
       this.handleCurtainOpen()
     }
+
+    // Add input listeners to remove validation errors when user types
+    this.setupValidationListeners()
+  }
+
+  setupValidationListeners() {
+    const form = this.element.querySelector('form')
+    if (!form) return
+
+    const speciesField = form.querySelector('#intake_species')
+    const descriptionField = form.querySelector('#intake_description')
+
+    if (speciesField) {
+      speciesField.addEventListener('input', () => {
+        if (speciesField.value.trim() !== '') {
+          speciesField.classList.remove('is-invalid')
+        }
+      })
+    }
+
+    if (descriptionField) {
+      descriptionField.addEventListener('input', () => {
+        if (descriptionField.value.trim() !== '') {
+          descriptionField.classList.remove('is-invalid')
+        }
+      })
+    }
   }
 
   handleCurtainOpen() {
@@ -61,6 +88,45 @@ export default class extends Controller {
   slideOut(event) {
     event.preventDefault()
     const form = event.target
+
+    // Get all input fields that should be validated
+    const speciesField = form.querySelector('#intake_species')
+    const descriptionField = form.querySelector('#intake_description')
+
+    let isValid = true
+    let firstInvalidField = null
+
+    // Validate species field
+    if (!speciesField || !speciesField.value || speciesField.value.trim() === '') {
+      isValid = false
+      if (speciesField) {
+        speciesField.classList.add('is-invalid')
+        firstInvalidField = speciesField
+      }
+    } else if (speciesField) {
+      speciesField.classList.remove('is-invalid')
+    }
+
+    // Validate description field
+    if (!descriptionField || !descriptionField.value || descriptionField.value.trim() === '') {
+      isValid = false
+      if (descriptionField) {
+        descriptionField.classList.add('is-invalid')
+        if (!firstInvalidField) {
+          firstInvalidField = descriptionField
+        }
+      }
+    } else if (descriptionField) {
+      descriptionField.classList.remove('is-invalid')
+    }
+
+    // If validation fails, focus first invalid field and stop
+    if (!isValid) {
+      if (firstInvalidField) {
+        firstInvalidField.focus()
+      }
+      return
+    }
 
     sessionStorage.setItem('chatShouldSlideIn', 'true')
 

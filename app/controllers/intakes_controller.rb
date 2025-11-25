@@ -29,7 +29,6 @@ class IntakesController < ApplicationController
   # @param description [String] Emergency description
   # @param photo [File] Optional photo upload
   # @param foto_url [String] Optional external photo URL
-  # @param mock [Boolean] Mock mode flag for testing
   # @return [HTML] Redirects to chat page or renders form with errors
   def create
     # Extract form data safely and normalize it
@@ -41,16 +40,6 @@ class IntakesController < ApplicationController
     # Store photo data for async upload
     photo_file = data[:photo]
     has_photo = photo_file.present?
-
-    # mock mode active?
-    mock_mode = ActiveModel::Type::Boolean.new.cast(data[:mock])
-
-    # use mock data in chat.html.erb (delete in production)
-    if mock_mode
-      session[:mock_mode] = true # Store in session
-      redirect_to mock_intakes_path # redirect to GET (enables refresh on mock mode)
-      return
-    end
 
     # store data in DB so the polling view can watch for updates ---
     @intake = Intake.new(
@@ -177,21 +166,10 @@ class IntakesController < ApplicationController
     @error_message = @intake.parsed_payload.dig("error") rescue nil
   end
 
-  # Displays chat interface in mock mode for testing (development only)
-  #
-  # This endpoint is intended for testing the chat UI with mock data
-  # and should be removed in production.
-  #
-  # @return [HTML] Renders chat view with mock flag enabled
-  def mock_chat
-    @mock = true
-    render :chat
-  end
-
   private
 
   def intake_params
-    params.require(:intake).permit(:species, :description, :photo, :foto_url, :mock)
+    params.require(:intake).permit(:species, :description, :photo, :foto_url)
   end
 
   def message_params

@@ -19,8 +19,8 @@
     <div class="form-card">
       <!-- Mobile Form Header -->
       <div class="mobile-form-header">
-        <h1>I'm here to help!</h1>
-        <p class="subtitle">Tell me about the animal</p>
+        <%= image_tag 'logo-form-v2-min.png', class: 'form-logo', alt: 'i am here to help' %>
+        <h2 class="form-headline">Tell me about the animal</h2>
       </div>
 
       <!-- Main intake form -->
@@ -32,21 +32,6 @@
                             controller: "mobile-form"
                           },
                           html: { multipart: true, class: "mobile-form", id: "intakeForm" } do |f| %>
-
-        <!-- --- Mock switch - Mobile Toggle --- -->
-        <div class="mobile-toggle">
-          <%= f.label :mock, "Mock Data", for: "mockSwitch" %>
-          <%= f.input :mock,
-                      as: :boolean,
-                      label: false,
-                      wrapper: false,
-                      input_html: {
-                        class: "form-check-input",
-                        role: "switch",
-                        checked: true,
-                        id: "mockSwitch"
-                      } %>
-        </div>
 
         <!-- --- Species field --- -->
         <%= f.input :species,
@@ -109,7 +94,10 @@
 
         <!-- --- Submit button --- -->
         <button type="submit" class="mobile-submit" id="submitBtn">
-          <span class="submit-text">Get instant help</span>
+          <span class="submit-text">
+            <i class="fa-solid fa-comments"></i>
+            Get instant help
+          </span>
         </button>
 
       <% end %>
