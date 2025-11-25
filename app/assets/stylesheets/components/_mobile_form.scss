@@ -132,19 +132,20 @@
     margin-bottom: $space-lg;
   }
 
-  // Labels
+   // Labels
   label {
     color: $glass-white-9;
     display: block;
     font-size: $font-sm;
     font-weight: $font-weight-semibold;
     letter-spacing: $letter-spacing-wide;
+    margin-left: $space-sm;
     margin-bottom: $space-sm;
   }
 
   // Required asterisk
   .required {
-    color: $gold;
+    color: $white;
     margin-left: 2px;
   }
 
@@ -176,13 +177,24 @@
 
     &:focus {
       @include glass(0.15);
-      border-color: $gold;
+      border-color: $white;
       box-shadow: 0 0 0 3px $glass-gold-2;
       outline: 0;
     }
 
     &:active {
       transform: scale(0.995);
+    }
+
+    // Validation states
+    &.is-invalid {
+      border-color: #e74c3c;
+      box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2);
+
+      &:focus {
+        border-color: #e74c3c;
+        box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.3);
+      }
     }
   }
 
@@ -191,75 +203,6 @@
     line-height: $line-height-normal;
     min-height: 120px;
     resize: vertical;
-  }
-
-  // -----------------------------------------------------------------------------
-  // Toggle switch - Mobile optimized
-  // -----------------------------------------------------------------------------
-
-  .mobile-toggle {
-    // Layout
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: $space-xl;
-    min-height: $avatar-md;
-    padding: $space-base;
-
-    // Visual
-    background: $glass-black-46;
-    border-radius: $radius-md;
-
-    label {
-      flex: 1;
-      font-size: $font-base;
-      margin: 0;
-    }
-
-    .form-check-input {
-      // Layout
-      cursor: pointer;
-      flex-shrink: 0;
-      height: 30px;
-      margin: 0;
-      position: relative;
-      width: 52px;
-
-      // Visual
-      background-color: $glass-black-46;
-      background-image: none;
-      border: $border-width-base solid $glass-white-3;
-      border-radius: $radius-lg;
-
-      &:checked {
-        background-color: $gold;
-        border-color: $gold;
-      }
-
-      &:focus {
-        box-shadow: 0 0 0 3px $glass-gold-3;
-        outline: 0;
-      }
-
-      // Toggle knob
-      &::after {
-        background: $white;
-        border-radius: $radius-circle;
-        box-shadow: $shadow-sm;
-        content: '';
-        height: 22px;
-        left: 3px;
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        transition: all $transition-base $ease-cubic;
-        width: 22px;
-      }
-
-      &:checked::after {
-        left: calc(100% - 25px);
-      }
-    }
   }
 
   // -----------------------------------------------------------------------------
@@ -276,7 +219,7 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      min-height: 120px;
+      min-height: 150px;
       padding: $space-2xl $space-base;
 
       // Visual
@@ -383,7 +326,7 @@
   .mobile-submit {
     // Layout
     cursor: pointer;
-    margin-top: $space-xl;
+    margin-top: $space-sm;
     min-height: $avatar-md;
     overflow: hidden;
     padding: $space-base;

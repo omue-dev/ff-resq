@@ -11,12 +11,6 @@ Rails.application.routes.draw do
 
   # Intake routes
   resources :intakes, only: [:new, :create] do
-    # helper route to enable refresh on chat page in mock mode
-    # delete in production
-    collection do
-      get 'mock', to: 'intakes#mock_chat'
-    end
-
     member do
       get 'chat', to: 'intakes#chat', as: :chat
       post 'messages', to: 'intakes#create_message', as: :message
