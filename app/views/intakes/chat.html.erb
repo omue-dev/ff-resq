@@ -9,13 +9,16 @@
 
   <!-- Chat Header (Fixed) -->
   <div class="chat-page-header">
-    <%= link_to new_intake_path, class: "header-button-dark" do %>
-      <span class="cta-arrow">←</span>
-      Back
-    <% end %>
+    <div class="chat-branding">
+      <div class="avatar-square">
+        <%= image_tag 'fox-avatar-min.png', alt: 'resQ AI', class: 'avatar-img' %>
+      </div>
+      <span class="chat-brand-text">AI Assistant</span>
+    </div>
     <%= link_to vets_path(intake_id: @intake&.id), class: vet_button_classes(@result) do %>
-      vets nearby
-      <span class="cta-arrow">→</span>
+      <div class="medical-icon">
+        <%= content_tag :i, "", class: "fa-solid fa-briefcase-medical" %>
+      </div> Find Vets Nearby
     <% end %>
   </div>
 

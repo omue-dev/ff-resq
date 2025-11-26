@@ -49,7 +49,7 @@
       <%= simple_format(message.content) %>
     </div>
     <div class="message-avatar user-avatar">
-      <%= content_tag :i, "", class: "fa-solid fa-user" %>
+      <%= content_tag :i, "", class: "fa-solid fa-circle-user" %>
     </div>
 
     <% if message.is_a?(ChatMessage) && message.persisted? && message.pending? %>
