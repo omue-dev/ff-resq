@@ -35,81 +35,73 @@
   gap: $space-2xl;
   justify-content: space-between;
   padding: $space-base;
+  // Visual
+  @include glass(0.1, $glass-blur-strong);
+  border-bottom: $border-width-thin solid $glass-white-2;
+
+  .chat-branding {
+    // Layout
+    align-items: center;
+    display: flex;
+    gap: $space-md;
+
+    .chat-brand-text {
+      // Typography
+      color: $white;
+      font-size: $font-base;
+      font-weight: $font-weight-semibold;
+    }
+  }
 
   .header-button-dark {
     // Layout
     align-items: center;
     display: inline-flex;
-    gap: $space-sm;
+    gap: $space-md;
     padding: $space-md $space-lg;
 
     // Visual
-    @include glass-dark(0.46);
-    border: $border-width-thin solid $glass-black-4;
-    border-radius: $radius-md;
-    color: $white;
+    background: $white;
+    border: 0;
+    border-radius: $radius-pill;
+    color: $text-dark;
+    box-shadow: $shadow-md;
 
     // Typography
-    font-size: $font-base;
+    font-size: $font-sm;
     font-weight: $font-weight-semibold;
     text-decoration: none;
 
     // Animation
     transition: $transition-all-base;
 
-    .cta-arrow {
-      display: inline-block;
+    .medical-icon {
       font-size: $font-lg;
-      transition: transform $transition-base $ease-in-out;
     }
 
     &:hover {
-      background: $glass-black-8;
-      border-color: $glass-black-8;
-      box-shadow: $shadow-md;
+      background: $glass-white-9;
+      box-shadow: $shadow-lg;
       transform: translateY(-2px);
     }
 
     &:active {
       transform: translateY(0);
+      box-shadow: $shadow-md;
     }
 
-    // First button (back to form) - arrow slides left
-    &:first-child:hover .cta-arrow {
-      transform: translateX(-4px);
-    }
-
-    // Second button (show vets) - arrow slides right
-    &:last-child:hover .cta-arrow {
-      transform: translateX(4px);
-    }
-
-    // Highlight state for urgent vet attention (medium/high danger)
+    // Urgent state - simple red background
     &.vet-button-urgent {
-      // Visual
-      background: linear-gradient(135deg, rgba(255, 87, 87, 0.3), rgba(255, 122, 69, 0.3));
-      border-color: rgba(255, 87, 87, 0.5);
-      box-shadow: 0 0 20px rgba(255, 87, 87, 0.4), $shadow-sm;
+      background: $green-dark;
+      color: $white;
 
-      // Animation - gentle pulse
-      animation: urgent-pulse 2s ease-in-out infinite;
+      .medical-icon {
+        color: $white;
+      }
 
       &:hover {
-        background: linear-gradient(135deg, rgba(255, 87, 87, 0.5), rgba(255, 122, 69, 0.5));
-        border-color: rgba(255, 87, 87, 0.7);
-        box-shadow: 0 0 25px rgba(255, 87, 87, 0.6), $shadow-lg;
+        background: darken($red, 8%);
       }
-    }
-  }
-
-  @keyframes urgent-pulse {
-    0%,
-    100% {
-      box-shadow: 0 0 20px rgba(255, 87, 87, 0.4), $shadow-sm;
-    }
-
-    50% {
-      box-shadow: 0 0 30px rgba(255, 87, 87, 0.6), $shadow-md;
     }
   }
 
@@ -227,7 +219,6 @@
 
 .user-avatar {
   @include glass(0.25);
-  color: $white;
 }
 
 .avatar-img {
