@@ -2,7 +2,7 @@ require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
   # Allow cloudflared tunnel URLs
-  config.hosts << "signed-promotion-story-smilies.trycloudflare.com"
+  config.hosts << "situations-crafts-moms-legend.trycloudflare.com"
 
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -64,17 +64,6 @@ Rails.application.configure do
 
   # Suppress logger output for asset requests.
   config.assets.quiet = true
-
-  # Disable asset caching in development
-  config.assets.digest = false
-  config.assets.debug = true
-
-  # Prevent browser caching of assets (safe for production)
-  config.public_file_server.headers = {
-    'Cache-Control' => 'no-cache, no-store, must-revalidate',
-    'Pragma' => 'no-cache',
-    'Expires' => '0'
-  } unless Rails.root.join("tmp/caching-dev.txt").exist?
 
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
