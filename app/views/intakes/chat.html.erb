@@ -1,7 +1,7 @@
 <!-- Critical CSS to prevent flash when sliding in -->
 <script>
   if (sessionStorage.getItem('chatShouldSlideIn') === 'true') {
-    document.write('<style id="chat-slide-preload">#chat-page-container { transform: translateX(100%); visibility: hidden; }</style>');
+    document.write('<style id="chat-slide-preload">#chat-page-container { opacity: 0; }</style>');
   }
 </script>
 

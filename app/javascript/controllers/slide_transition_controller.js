@@ -13,22 +13,12 @@ export default class extends Controller {
   static targets = ["slideCard"]
 
   connect() {
-    // Check if we should animate slide-in BEFORE any rendering
-    const shouldSlideIn = sessionStorage.getItem('chatShouldSlideIn') === 'true'
-
-    if (shouldSlideIn) {
-      sessionStorage.removeItem('chatShouldSlideIn')
-      // Prevent flash by hiding element immediately
-      this.element.style.visibility = 'hidden'
-      this.element.style.transform = 'translateX(100%)'
-
-      // Wait for next frame to ensure styles are applied, then animate
-      requestAnimationFrame(() => {
-        this.element.style.visibility = 'visible'
-        this.handleSlideIn()
-      })
-    } else if (this.initialLoadValue) {
+    if (this.initialLoadValue) {
       this.handleCurtainOpen()
+    } else if (sessionStorage.getItem('chatShouldSlideIn') === 'true') {
+      sessionStorage.removeItem('chatShouldSlideIn')
+      // Opacity already set via inline style in chat.html.erb to prevent flash
+      requestAnimationFrame(() => this.handleSlideIn())
     }
 
     // Add input listeners to remove validation errors when user types
@@ -130,10 +120,10 @@ export default class extends Controller {
 
     sessionStorage.setItem('chatShouldSlideIn', 'true')
 
-    // Submit form immediately, animation plays while server processes
-    form.submit()
-
-    // Play slide out animation (purely visual)
-    performSlideOut(this.element)
+    // Play slide out animation FIRST
+    performSlideOut(this.element, () => {
+      // THEN submit form after animation completes
+      form.submit()
+    })
   }
 }

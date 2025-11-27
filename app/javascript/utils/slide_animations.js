@@ -1,16 +1,40 @@
 import gsap from "gsap"
 import { ANIMATION_CONFIG } from "config/animation_constants"
 
+function ensureBackgroundLayer() {
+  const layer = document.getElementById('background-layer')
+  if (!layer) return null
+
+  gsap.set(layer, {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    x: 0,
+    y: 0,
+    autoAlpha: 1
+  })
+
+  return layer
+}
+
 /**
  * Initial page load animation with animal images (without curtain effect)
  */
 export function curtainOpen(slideCard, birdImg, foxImg) {
+  const backgroundLayer = ensureBackgroundLayer()
+
   birdImg.style.display = 'block'
   foxImg.style.display = 'block'
 
   gsap.set(slideCard, { scale: 0 })
 
   const timeline = gsap.timeline()
+
+  if (backgroundLayer) {
+    timeline.set(backgroundLayer, { autoAlpha: 1 }, 0)
+  }
 
   // Animate animals sliding up from bottom
   timeline.from([foxImg, birdImg], {
@@ -36,6 +60,8 @@ export function curtainOpen(slideCard, birdImg, foxImg) {
  * Slide transition between welcome and form screens with animal animations
  */
 export function slideCardTransition(slideCard, welcomeCard, formCard, foxImg, birdImg, onComplete) {
+  const backgroundLayer = ensureBackgroundLayer()
+
   gsap.set(formCard, { x: '100%', visibility: 'hidden', opacity: 0 })
 
   const timeline = gsap.timeline({
@@ -44,6 +70,10 @@ export function slideCardTransition(slideCard, welcomeCard, formCard, foxImg, bi
       if (onComplete) onComplete()
     }
   })
+
+  if (backgroundLayer) {
+    timeline.set(backgroundLayer, { autoAlpha: 1 }, 0)
+  }
 
   timeline.to(foxImg, {
     y: '20%',
@@ -82,26 +112,30 @@ export function slideCardTransition(slideCard, welcomeCard, formCard, foxImg, bi
  * Combines scale, blur, and fade for smooth entrance from form
  */
 export function performSlideIn(element) {
-  // First remove the inline style tag that was hiding the element
-  const inlineStyleTag = document.getElementById('chat-slide-preload')
+  const backgroundLayer = ensureBackgroundLayer()
+
+  // First remove the inline style that was hiding the element
+  const inlineStyleTag = document.querySelector('style:has([id="chat-page-container"])')
   if (inlineStyleTag) {
     inlineStyleTag.remove()
   }
 
   gsap.fromTo(element,
     {
-      x: '100%',
-      opacity: 1,
-      visibility: 'visible'
+      x: '60%',
+      opacity: 1
     },
     {
       x: '0',
       opacity: 1,
-      visibility: 'visible',
       duration: 0.3,
-      ease: "power2.out",
+      ease: "power2.in"
     }
   )
+
+  if (backgroundLayer) {
+    gsap.set(backgroundLayer, { autoAlpha: 1 })
+  }
 }
 
 /**
@@ -109,16 +143,22 @@ export function performSlideIn(element) {
  * Combines scale, blur, and fade for smooth transition to chat
  */
 export function performSlideOut(element, callback) {
+  const backgroundLayer = ensureBackgroundLayer()
+
   const timeline = gsap.timeline({
     onComplete: () => {
       if (callback) callback()
     }
   })
 
-  // Zoom out and blur effect
+  if (backgroundLayer) {
+    timeline.set(backgroundLayer, { autoAlpha: 1 }, 0)
+  }
+
   timeline.to(element, {
-    x: '-100%',
+    x: '-50%',
     duration: 0.3,
+    opacity: 0,
     ease: "power2.Out"
   })
 
