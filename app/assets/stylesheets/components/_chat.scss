@@ -24,10 +24,10 @@
 }
 
 // -----------------------------------------------------------------------------
-// Fixed header
+// Fixed header (reusable across pages)
 // -----------------------------------------------------------------------------
 
-.chat-page-header {
+.page-header {
   // Layout
   align-items: center;
   display: flex;

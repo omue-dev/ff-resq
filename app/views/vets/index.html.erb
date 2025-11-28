@@ -1,60 +1,45 @@
+<!-- Critical CSS to prevent flash when sliding in -->
+<script>
+  if (sessionStorage.getItem('vetsShouldSlideIn') === 'true') {
+    document.write('<style id="vets-slide-preload">#vets-page-container { transform: translateX(100%); visibility: hidden; }</style>');
+  }
+</script>
+
 <% content_for :head do %>
   <meta name="turbo-cache-control" content="no-cache">
 <% end %>
 
-<div
-  data-controller="nearby-vets appointment"
-  <%= "data-nearby-vets-intake-id-value=\"#{@intake.id}\" data-appointment-intake-id-value=\"#{@intake.id}\"".html_safe if @intake&.id %>
-  data-nearby-vets-user-marker-icon-value="<%= asset_path('fox-avatar-min.png') %>"
-  class="map-wrapper"
->
-  <!-- Fullscreen Map -->
-  <div
-    data-nearby-vets-target="map"
-    class="map-fullscreen"
-  ></div>
+<div class="vets-page" data-controller="slide-transition chat-scroll" id="vets-page-container">
 
-  <!-- Back button (top left) -->
-  <% if @intake.present? %>
-    <div class="vets-back-button">
-      <%= link_to chat_intake_path(@intake), class: "back-to-chat-btn" do %>
+  <div
+    data-controller="nearby-vets appointment"
+    <%= "data-nearby-vets-intake-id-value=\"#{@intake.id}\" data-appointment-intake-id-value=\"#{@intake.id}\"".html_safe if @intake&.id %>
+    data-nearby-vets-user-marker-icon-value="<%= asset_path('fox-avatar-min.png') %>"
+    class="map-wrapper"
+  >
+    <!-- Filter Overlay -->
+    <div class="filter-overlay">
+      <% if @intake.present? %>
+      <%= link_to chat_intake_path(@intake),
+        class: "back-to-chat-btn",
+        data: { action: "click->slide-transition#slideBackToChat" } do %>
         <span class="back-arrow">←</span>
-        <span>Back to Chat</span>
+        <span>Back</span>
       <% end %>
+    <% end %>
     </div>
-  <% end %>
 
-  <!-- Title overlay (top safe zone) -->
-  <div class="vets-title" data-controller="appointment-reset">
-    <h1 data-action="click->nearby-vets#showAllVets" class="clickable">Nearby Vets</h1>
-    <button data-action="click->appointment-reset#resetAppointment" class="reset-appointment-btn">
-      Reset Last Appointment
-    </button>
-  </div>
+    <!-- Fullscreen Map -->
+    <div
+      data-nearby-vets-target="map"
+      class="map-fullscreen"
+    ></div>
 
-  <!-- Vet List Modal -->
-  <div
-    data-nearby-vets-target="listModal"
-    class="vet-modal hidden"
-  >
-    <div class="vet-modal-content vet-list-modal">
-      <button
-        data-action="click->nearby-vets#closeListModal"
-        class="vet-modal-close"
-      >×</button>
-      <h2 class="vet-modal-title">Nearby Vets</h2>
-      <div data-nearby-vets-target="vetList" class="vet-cards-list"></div>
+    <!-- Horizontal Locations List -->
+    <div class="locations-horizontal-container">
+      <div data-nearby-vets-target="horizontalList" class="locations-horizontal-scroll"></div>
     </div>
-  </div>
 
-  <!-- Vet Details Modal -->
-  <div
-    data-nearby-vets-target="detailModal"
-    class="vet-modal hidden"
-  >
-    <div class="vet-modal-content">
-      <!-- Content will be dynamically populated with a vet card -->
-    </div>
   </div>
 
 </div>

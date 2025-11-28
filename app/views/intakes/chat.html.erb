@@ -8,14 +8,18 @@
 <div class="chat-page" data-controller="slide-transition chat-scroll" id="chat-page-container">
 
   <!-- Chat Header (Fixed) -->
-  <div class="chat-page-header">
+  <div class="page-header">
     <div class="chat-branding">
       <div class="avatar-square">
+        <%= link_to root_path do %>
         <%= image_tag 'fox-avatar-min.png', alt: 'resQ AI', class: 'avatar-img' %>
+        <% end %>
       </div>
       <span class="chat-brand-text">AI Assistant</span>
     </div>
-    <%= link_to vets_path(intake_id: @intake&.id), class: vet_button_classes(@result) do %>
+    <%= link_to vets_path(intake_id: @intake&.id),
+      class: vet_button_classes(@result),
+      data: {action: "click->slide-transition#slideToVets"}  do %>
       <div class="medical-icon">
         <%= content_tag :i, "", class: "fa-solid fa-briefcase-medical" %>
       </div> Find Vets Nearby

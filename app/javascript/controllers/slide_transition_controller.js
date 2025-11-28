@@ -1,8 +1,10 @@
 import { Controller } from "@hotwired/stimulus"
-import { curtainOpen, slideCardTransition, performSlideIn, performSlideOut } from "utils/slide_animations"
+import { animateWelcomePageEntrance, slideCardTransition, slideInFromRight, slideOutToLeft } from "utils/slide_animations"
 
 /**
- * Handles slide transitions between welcome and form screens
+ * Stimulus controller for managing page slide transitions
+ * Handles animations between welcome, form, chat, and vets pages
+ * Uses sessionStorage flags to coordinate animations across page navigations
  */
 export default class extends Controller {
   static values = {
@@ -12,29 +14,54 @@ export default class extends Controller {
 
   static targets = ["slideCard"]
 
+  /**
+   * Stimulus lifecycle method - called when controller connects to DOM
+   */
   connect() {
-    // Check if we should animate slide-in BEFORE any rendering
-    const shouldSlideIn = sessionStorage.getItem('chatShouldSlideIn') === 'true'
+    this.setupSlideIn()
+  }
+
+  /**
+   * Initialize slide-in animations based on sessionStorage flags
+   * Checks for chatShouldSlideIn or vetsShouldSlideIn flags
+   * If found: triggers slide-in from right animation
+   * If initialLoad: triggers welcome page entrance animation
+   * Also sets up form validation listeners
+   */
+  setupSlideIn() {
+    const element = this.element
+
+    // Check for any slide-in flag
+    const shouldSlideIn = sessionStorage.getItem('chatShouldSlideIn') === 'true' ||
+                        sessionStorage.getItem('vetsShouldSlideIn') === 'true'
 
     if (shouldSlideIn) {
+      // Clean up all flags
       sessionStorage.removeItem('chatShouldSlideIn')
-      // Prevent flash by hiding element immediately
-      this.element.style.visibility = 'hidden'
-      this.element.style.transform = 'translateX(100%)'
+      sessionStorage.removeItem('vetsShouldSlideIn')
 
-      // Wait for next frame to ensure styles are applied, then animate
+      // Hide element off-screen
+      element.style.visibility = 'hidden'
+      element.style.transform = 'translateX(100%)'
+
       requestAnimationFrame(() => {
-        this.element.style.visibility = 'visible'
-        this.handleSlideIn()
+        element.style.visibility = 'visible'
+        this.handleSlideInFromRight()
       })
     } else if (this.initialLoadValue) {
-      this.handleCurtainOpen()
+      // Initial load - play welcome page entrance animation
+      this.handleWelcomePageEntrance()
     }
 
     // Add input listeners to remove validation errors when user types
     this.setupValidationListeners()
   }
 
+  /**
+   * Set up input event listeners for form validation
+   * Removes 'is-invalid' class when user starts typing in species or description fields
+   * Provides real-time validation feedback
+   */
   setupValidationListeners() {
     const form = this.element.querySelector('form')
     if (!form) return
@@ -59,33 +86,58 @@ export default class extends Controller {
     }
   }
 
-  handleCurtainOpen() {
-    const slideCard = this.hasSlideCardTarget ? this.slideCardTarget : this.element.querySelector('.slide-card')
-    if (!slideCard) return
+  /**
+   * Handle welcome page entrance animation
+   * Triggers animals (bird, fox) sliding up from bottom + card scaling in
+   * Used on: Initial page load on welcome page (new.html.erb)
+   * Stores animal references for later use in form transition
+   */
+  handleWelcomePageEntrance() {
+    const welcomeCard = this.hasSlideCardTarget ? this.slideCardTarget : this.element.querySelector('.slide-card')
+    if (!welcomeCard) return
 
     const birdImg = document.getElementById('bird-img')
     const foxImg = document.getElementById('fox-img')
 
-    const animals = curtainOpen(slideCard, birdImg, foxImg)
+    const animals = animateWelcomePageEntrance(welcomeCard, birdImg, foxImg)
     this.birdImg = animals.birdImg
     this.foxImg = animals.foxImg
   }
 
+  /**
+   * Transition from welcome card to form card
+   * Animates animals out, welcome card slides up, form card slides in from right
+   * Triggered by: Click on "Get Started" button on welcome page
+   * Used on: new.html.erb (welcome page)
+   */
   transitionToForm() {
     if (!this.hasSlideCardTarget) return
 
-    const slideCard = this.slideCardTarget
-    const welcomeCard = slideCard.querySelector('.welcome-card')
-    const formCard = slideCard.querySelector('.form-card')
+    const cardContainer = this.slideCardTarget
+    const welcomeCard = cardContainer.querySelector('.welcome-card')
+    const formCard = cardContainer.querySelector('.form-card')
 
-    slideCardTransition(slideCard, welcomeCard, formCard, this.foxImg, this.birdImg)
+    slideCardTransition(cardContainer, welcomeCard, formCard, this.foxImg, this.birdImg)
   }
 
-  handleSlideIn() {
-    performSlideIn(this.element)
+  /**
+   * Handle slide-in from right animation
+   * Animates element from off-screen right (100%) to center (0%)
+   * Used on: Chat page, Vets page when navigating from another page
+   */
+  handleSlideInFromRight() {
+    slideInFromRight(this.element)
   }
 
-  slideOut(event) {
+  /**
+   * Validate form, slide out to left, and submit
+   * Validates species and description fields
+   * If valid: sets chatShouldSlideIn flag, submits form, plays slide-out animation
+   * If invalid: adds 'is-invalid' class and focuses first invalid field
+   * Triggered by: Form submission on new.html.erb
+   * Navigation: Form page -> Chat page
+   */
+  slideOutToLeftAndSubmit(event) {
     event.preventDefault()
     const form = event.target
 
@@ -134,6 +186,50 @@ export default class extends Controller {
     form.submit()
 
     // Play slide out animation (purely visual)
-    performSlideOut(this.element)
+    slideOutToLeft(this.element)
+  }
+
+  /**
+   * Slide out to left and navigate to vets page
+   * Sets vetsShouldSlideIn flag for next page animation
+   * Plays slide-out animation, then navigates after 300ms
+   * Triggered by: Click on "Find vets nearby" button
+   * Navigation: Chat page -> Vets page
+   */
+  slideToVets(event) {
+    event.preventDefault()
+    const link = event.currentTarget
+    const url = link.href
+
+    sessionStorage.setItem('vetsShouldSlideIn', 'true')
+
+    // Navigate to vets page after animation
+    slideOutToLeft(this.element)
+
+    setTimeout(() => {
+      window.location.href = url
+    }, 300)
+  }
+
+  /**
+   * Slide out to left and navigate back to chat page
+   * Sets chatShouldSlideIn flag for next page animation
+   * Plays slide-out animation, then navigates after 300ms
+   * Triggered by: Click on "Back to Chat" button
+   * Navigation: Vets page -> Chat page
+   */
+  slideBackToChat(event) {
+    event.preventDefault()
+    const link = event.currentTarget
+    const url = link.href
+
+    sessionStorage.setItem('chatShouldSlideIn', 'true')
+
+    // Slide out to the left
+    slideOutToLeft(this.element)
+
+    setTimeout(() => {
+      window.location.href = url
+    }, 300)
   }
 }

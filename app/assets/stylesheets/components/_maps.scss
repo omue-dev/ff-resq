@@ -31,60 +31,86 @@
 }
 
 // -----------------------------------------------------------------------------
-// Back button (top left)
+// Sticky header for vets page
 // -----------------------------------------------------------------------------
 
-.vets-back-button {
-  // Layout
-  left: $space-sm;
-  position: absolute;
-  top: $space-sm;
+.vets-page .page-header {
+  position: sticky;
+  top: 0;
   z-index: $z-overlay;
+  min-height: 80px;// Above the map
+}
 
-  .back-to-chat-btn {
-    // Layout
-    align-items: center;
-    display: inline-flex;
-    gap: $space-sm;
-    padding: $space-md $space-lg;
+// -----------------------------------------------------------------------------
+// Header buttons (back button and show vets button)
+// -----------------------------------------------------------------------------
 
-    // Visual
-    @include glass-dark(0.46);
-    border: $border-width-thin solid $glass-black-4;
-    border-radius: $radius-md;
-    box-shadow: $shadow-md;
+.back-to-chat-btn,
+.show-vets-btn {
+  // Layout
+  align-items: center;
+  display: inline-flex;
+  gap: $space-sm;
+  padding: $space-md $space-lg;
+
+  // Visual
+  @include glass-dark(0.46);
+  border: $border-width-thin solid $glass-black-4;
+  border-radius: $radius-md;
+  box-shadow: $shadow-md;
+  color: $white;
+  text-decoration: none;
+  cursor: pointer;
+
+  // Typography
+  font-size: $font-base;
+  font-weight: $font-weight-semibold;
+
+  // Animation
+  transition: $transition-all-base;
+
+  .back-arrow,
+  .medical-icon {
+    display: inline-block;
+    font-size: $font-lg;
+    transition: transform $transition-base $ease-in-out;
+  }
+
+@keyframes callPulse {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+@keyframes callSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes callSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+  &:hover {
+    background: $glass-black-8;
+    border-color: $glass-black-8;
+    box-shadow: $shadow-lg;
     color: $white;
     text-decoration: none;
-
-    // Typography
-    font-size: $font-base;
-    font-weight: $font-weight-semibold;
-
-    // Animation
-    transition: $transition-all-base;
+    transform: translateY(-2px);
 
     .back-arrow {
-      display: inline-block;
-      font-size: $font-lg;
-      transition: transform $transition-base $ease-in-out;
+      transform: translateX(-4px);
     }
 
-    &:hover {
-      background: $glass-black-8;
-      border-color: $glass-black-8;
-      box-shadow: $shadow-lg;
-      color: $white;
-      text-decoration: none;
-      transform: translateY(-2px);
-
-      .back-arrow {
-        transform: translateX(-4px);
-      }
+    .medical-icon {
+      transform: scale(1.1);
     }
+  }
 
-    &:active {
-      transform: translateY(0);
-    }
+  &:active {
+    transform: translateY(0);
   }
 }
 
@@ -249,36 +275,87 @@
 
 .vet-card {
   // Layout
-  padding: $space-lg;
+  padding: $space-xl;
   width: 100%;
 
   // Visual - Solid semi-opaque background for readability
-  background: rgba(14, 80, 80, 0.85);
+  background: rgba(14, 80, 80, 0.92);
   border: $border-width-thin solid rgba(255, 255, 255, 0.3);
-  border-radius: $radius-lg;
-  box-shadow: $shadow-md;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-lg;
 
   // Animation
   transition: $transition-all-fast;
+  cursor: pointer;
 
   &:hover {
-    background: rgba(14, 80, 80, 0.95);
-    border-color: rgba(255, 255, 255, 0.5);
-    box-shadow: $shadow-lg;
-    transform: translateX(4px);
+    background: rgba(14, 80, 80, 0.98);
+    border-color: rgba(109, 216, 184, 0.6);
+    box-shadow: $shadow-xl;
+    transform: translateY(-2px);
   }
 
   .card-body {
     padding: 0;
   }
 
+  .card-header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: $space-base;
+    margin-bottom: $space-base;
+    padding-bottom: $space-sm;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
   .card-title {
     // Typography
     color: $white;
-    font-size: $font-lg;
+    font-size: $font-xl;
     font-weight: $font-weight-bold;
     line-height: $line-height-tight;
-    margin-bottom: $space-sm;
+    margin: 0;
+    flex: 1;
+  }
+
+  .card-rating {
+    // Layout
+    padding: $space-xs $space-sm;
+    margin: 0;
+
+    // Visual
+    background: rgba(109, 216, 184, 0.2);
+    border: 1px solid rgba(109, 216, 184, 0.4);
+    border-radius: $radius-md;
+
+    // Typography
+    color: #6dd8b8ff;
+    font-size: $font-sm;
+    font-weight: $font-weight-semibold;
+    white-space: nowrap;
+  }
+
+  .card-address {
+    // Typography
+    color: rgba(255, 255, 255, 0.9);
+    font-size: $font-sm;
+    line-height: $line-height-relaxed;
+    margin-bottom: $space-base;
+
+    // Visual
+    display: flex;
+    align-items: flex-start;
+    gap: $space-xs;
+
+    &:before {
+      content: "📍";
+      flex-shrink: 0;
+    }
+  }
+
+  .card-hours {
+    margin-bottom: $space-base;
   }
 
   .card-text {
@@ -388,6 +465,31 @@
     &.success {
       color: #6dd8b8ff;
     }
+
+    &.calling {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: rgba(255, 255, 255, 0.95);
+
+      &::before {
+        content: "";
+        width: 14px;
+        height: 14px;
+        border: 2px solid rgba(255, 255, 255, 0.6);
+        border-top-color: #47b9b9ff;
+        border-radius: 50%;
+        animation: callSpin 0.9s linear infinite;
+        display: inline-block;
+      }
+
+      &::after {
+        content: "📞";
+        animation: callPulse 1.4s infinite ease-in-out;
+        display: inline-block;
+      }
+    }
   }
 
   .appointment-response {
@@ -435,6 +537,78 @@
       transform: translateY(0);
     }
   }
+
+  // Opening Hours Styling
+  .opening-hours-full {
+    // Layout
+    padding: $space-base;
+    margin-top: $space-sm;
+
+    // Visual
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(109, 216, 184, 0.3);
+    border-radius: $radius-md;
+    backdrop-filter: blur(4px);
+  }
+
+  .hours-row {
+    // Layout
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    column-gap: $space-sm;
+    row-gap: 4px;
+    align-items: flex-start;
+    padding: $space-xs 0;
+
+    // Visual
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &.hours-today {
+      // Visual
+      background: rgba(109, 216, 184, 0.15);
+      padding: $space-xs $space-sm;
+      margin: 0 (-$space-sm);
+      border-radius: $radius-sm;
+      border-bottom: none;
+
+      .hours-day,
+      .hours-time {
+        color: #6dd8b8ff;
+        font-weight: $font-weight-bold;
+      }
+    }
+  }
+
+  .hours-day {
+    // Typography
+    color: rgba(255, 255, 255, 0.85);
+    font-size: $font-sm;
+    font-weight: $font-weight-medium;
+    min-width: 0;
+  }
+
+  .hours-time {
+    // Typography
+    color: rgba(255, 255, 255, 0.95);
+    font-size: $font-sm;
+    text-align: left;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 8px;
+    width: 100%;
+
+    .hours-slot {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: $radius-sm;
+      padding: 2px 6px;
+      display: inline-block;
+      white-space: nowrap;
+    }
+  }
 }
 
 .vet-modal-close {
@@ -479,6 +653,384 @@
   font-weight: $font-weight-bold;
   margin-bottom: $space-base;
   margin-right: $space-3xl;
+}
+
+// -----------------------------------------------------------------------------
+// Horizontal Location Cards - Google Maps Style
+// -----------------------------------------------------------------------------
+
+.locations-horizontal-container {
+  // Layout
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  z-index: 9999; // keep above map overlays/infowindows
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+
+  // Visual
+  background: transparent;
+  pointer-events: auto; // allow interaction with children
+  opacity: 1 !important; // ensure visible even if stale styles are cached
+}
+
+.filter-overlay {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  gap: 8px;
+  z-index: 10000;
+  pointer-events: auto;
+
+  .filter-chip {
+    border: none;
+    border-radius: 999px;
+    padding: 6px 10px;
+    background: rgba(0, 0, 0, 0.45);
+    color: $white;
+    font-size: $font-xs;
+    cursor: pointer;
+    transition: $transition-all-fast;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    &.active {
+      background: #47b9b9ff;
+      color: $white;
+      box-shadow: $shadow-sm;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $white;
+      outline-offset: 2px;
+    }
+  }
+}
+
+.locations-horizontal-scroll {
+  // Layout
+  display: flex;
+  gap: $space-sm;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: $space-xs;
+  pointer-events: auto; // But not through the scroll area
+  opacity: 1 !important; // guard against stale opacity
+  width: 100%;
+
+  &.expanded {
+    overflow-x: hidden;
+  }
+  max-width:100%;
+  scroll-snap-type: x mandatory;
+  // Custom scrollbar
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $glass-white-3;
+    border-radius: $radius-sm;
+
+    &:hover {
+      background: $glass-white-8;
+    }
+  }
+
+  // Smooth scrolling
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.location-card-horizontal {
+  // Layout
+  position: relative;
+  flex: 0 0 90%;
+  padding: $space-xl $space-base $space-sm;
+  min-height: 100px;
+
+  // Visual
+  background: $white;
+  border-radius: $radius-lg;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+
+  scroll-snap-align: center;
+
+  // Animation
+  transition: $transition-all-fast;
+
+  &:hover,
+  &.active {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    transform: translateY(-4px);
+  }
+
+  &.active {
+    border: 2px solid #47b9b9ff;
+  }
+
+  &:focus-visible {
+    outline: 3px solid #47b9b9ff;
+    outline-offset: 2px;
+  }
+
+  // Category-specific accent colors
+  &.category-vets {
+    border-left: 4px solid #47b9b9ff;
+  }
+
+  &.category-shelters {
+    border-left: 4px solid #6dd8b8ff;
+  }
+
+  &.category-rescue {
+    border-left: 4px solid #ffa500;
+  }
+}
+
+.location-card-content {
+  display: flex;
+  gap: $space-sm;
+  align-items: flex-start;
+}
+
+.location-card-expand-btn {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30%;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: grab;
+  padding: 0;
+  box-shadow: none;
+  z-index: 2;
+
+  .expand-handle {
+    display: block;
+    width: 100%;
+    height: 4px;
+    background: #c0c0c0;
+    border-radius: 999px;
+    transition: background $transition-fast $ease-in-out, transform $transition-fast $ease-in-out;
+  }
+
+  &:hover .expand-handle {
+    background: #a0a0a0;
+    transform: translateY(-1px);
+  }
+
+  &.expanded .expand-handle {
+    background: #47b9b9ff;
+  }
+}
+
+  .location-card-expanded {
+    margin-top: $space-sm;
+    padding: $space-sm;
+    background: linear-gradient(135deg, rgba(71, 185, 185, 0.08), rgba(13, 92, 92, 0.08));
+    border: 1px solid $glass-white-2;
+  border-radius: $radius-md;
+  color: #0e1b1b;
+  box-shadow: $shadow-sm;
+
+  .card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: $space-xs;
+    margin-top: $space-sm;
+  }
+
+  .appointment-status{
+    margin-top: $space-xs;
+    padding: $space-xs;
+    text-align: left;
+    font-size: $font-xs;
+
+    &.calling {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+
+      &::before {
+        content: "";
+        width: 12px;
+        height: 12px;
+        border: 2px solid rgba(0, 27, 27, 0.3);
+        border-top-color: #0e1b1b;
+        border-radius: 50%;
+        animation: callSpin 0.9s linear infinite;
+        display: inline-block;
+      }
+
+      &::after {
+        content: "📞";
+        animation: callPulse 1.4s infinite ease-in-out;
+        display: inline-block;
+      }
+    }
+  }
+
+  .location-card-hours {
+    margin-bottom: $space-sm;
+
+    .opening-hours-full {
+      display: grid;
+      gap: 4px;
+
+      .hours-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: $font-xs;
+        padding: 6px 8px;
+        border-radius: $radius-sm;
+        background: rgba(255, 255, 255, 0.6);
+        color: #0e1b1b;
+
+        &.hours-today {
+          background: rgba(71, 185, 185, 0.18);
+          font-weight: $font-weight-semibold;
+        }
+
+        .hours-day {
+          font-weight: $font-weight-semibold;
+        }
+      }
+    }
+  }
+
+  .directions-btn,
+  .appointment-btn {
+    width: 100%;
+    margin-top: $space-xs;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(71, 185, 185, 0.9);
+    color: $white;
+    border: none;
+    box-shadow: $shadow-sm;
+    text-decoration: none;
+    border-radius: $radius-md;
+    padding: $space-sm $space-base;
+    font-weight: $font-weight-semibold;
+
+    &:hover {
+      background: rgba(71, 185, 185, 1);
+      color: $white;
+      text-decoration: none;
+    }
+
+    &:focus-visible {
+      outline: 3px solid rgba(255, 255, 255, 0.7);
+      outline-offset: 2px;
+    }
+  }
+}
+
+.location-card-icon {
+  // Layout
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  // Visual
+  background: rgba(71, 185, 185, 0.1);
+  border-radius: $radius-circle;
+  color: #47b9b9ff;
+  font-size: $font-lg;
+}
+
+.location-card-info {
+  flex: 1;
+  min-width: 0; // Allow text truncation
+}
+
+.location-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: $space-xs;
+  margin-bottom: $space-xs;
+}
+
+.location-card-title {
+  // Typography
+  color: #2E2E2E;
+  font-size: $font-base;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-tight;
+  margin: 0;
+
+  // Truncation
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.location-card-rating {
+  // Typography
+  color: #2E2E2E;
+  font-size: $font-sm;
+  font-weight: $font-weight-semibold;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.location-card-category {
+  // Typography
+  color: #47b9b9ff;
+  font-size: $font-xs;
+  font-weight: $font-weight-medium;
+  margin: 0 0 $space-xs 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.location-card-address {
+  // Typography
+  color: #666;
+  font-size: $font-xs;
+  line-height: $line-height-relaxed;
+  margin: 0;
+
+  // Truncation (2 lines max)
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.location-card-distance {
+  color: #0E5050;
+  font-size: $font-xs;
+  font-weight: $font-weight-semibold;
+  margin: $space-xs 0 0 0;
+}
+
+.location-card-today {
+  color: #0E5050;
+  font-size: $font-xs;
+  margin: 2px 0 0 0;
 }
 
 .vet-modal-text {
@@ -617,5 +1169,36 @@
         }
       }
     }
+  }
+
+  // Custom InfoWindow styling
+  .gm-style-iw, .gm-style-iw-c {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  .gm-style-iw-tc,
+  .gm-style-iw-tc::after {
+    top: -4px !important;
+  }
+
+  .map-infowindow {
+    @include glass(0.1, $glass-blur-strong);
+    border-radius: $radius-md;
+    padding: 10px 12px;
+    color: $white;
+    border: $border-width-thin solid $glass-white-2;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+  }
+
+  .map-infowindow-title {
+    font-weight: $font-weight-bold;
+    font-size: $font-sm;
+    margin-bottom: 4px;
+  }
+
+  .map-infowindow-distance {
+    font-size: $font-xs;
+    color: $glass-white-8;
   }
 }
