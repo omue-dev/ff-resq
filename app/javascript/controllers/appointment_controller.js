@@ -55,7 +55,7 @@ export default class extends Controller {
   async makeAppointment(event) {
     event.preventDefault()
 
-    const isProd = typeof process !== 'undefined' && process.env && process.env.RAILS_ENV === 'production'
+    const isProd = document.querySelector('meta[name="rails-env"]')?.content === 'production'
 
     if (!this.intakeIdValue && isProd) {
       alert("No intake found. Please create an intake first.")
