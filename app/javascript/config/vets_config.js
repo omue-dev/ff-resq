@@ -27,6 +27,26 @@ export const SVG_ICONS = {
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M5 12h14M12 5l7 7-7 7"/>
     </svg>
+  `,
+
+  /**
+   * Map pin icon for "Get Directions" buttons.
+   * @type {string}
+   */
+  directions:`
+    <svg width="25" height="25" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+      <!-- Car body -->
+      <path d="M3 10l2-5h14l2 5v7a2 2 0 0 1-2 2h-1a1 1 0 0 1-1-1v-1H7v1a1 1 0 0 1-1 1H5a2 2 0 0 1-2-2v-7z" />
+
+      <!-- Windshield -->
+      <path d="M5 5h14" />
+
+      <!-- Headlights -->
+      <circle cx="7" cy="13" r="1" />
+      <circle cx="17" cy="13" r="1" />
+    </svg>
   `
 }
 

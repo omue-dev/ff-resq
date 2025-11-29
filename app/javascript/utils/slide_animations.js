@@ -1,17 +1,41 @@
 import gsap from "gsap"
 import { ANIMATION_CONFIG } from "config/animation_constants"
 
+function ensureBackgroundLayer() {
+  const layer = document.getElementById('background-layer')
+  if (!layer) return null
+
+  gsap.set(layer, {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    x: 0,
+    y: 0,
+    autoAlpha: 1
+  })
+
+  return layer
+}
+
 /**
  * Welcome page entrance animation.
  * Animates animals (bird, fox) sliding up from bottom + welcome card scaling in.
  */
 export function animateWelcomePageEntrance(welcomeCard, birdImg, foxImg) {
+  const backgroundLayer = ensureBackgroundLayer()
+
   birdImg.style.display = 'block'
   foxImg.style.display = 'block'
 
   gsap.set(welcomeCard, { scale: 0 })
 
   const timeline = gsap.timeline()
+
+  if (backgroundLayer) {
+    timeline.set(backgroundLayer, { autoAlpha: 1 }, 0)
+  }
 
   // Animate animals sliding up from bottom
   timeline.from([foxImg, birdImg], {
@@ -36,6 +60,8 @@ export function animateWelcomePageEntrance(welcomeCard, birdImg, foxImg) {
  * Slide transition between welcome and form screens with animal animations.
  */
 export function slideCardTransition(cardContainer, welcomeCard, formCard, foxImg, birdImg, onComplete) {
+  const backgroundLayer = ensureBackgroundLayer()
+
   gsap.set(formCard, { x: '100%', visibility: 'hidden', opacity: 0 })
 
   const timeline = gsap.timeline({
@@ -44,6 +70,10 @@ export function slideCardTransition(cardContainer, welcomeCard, formCard, foxImg
       if (onComplete) onComplete()
     }
   })
+
+  if (backgroundLayer) {
+  timeline.set(backgroundLayer, { autoAlpha: 1 }, 0)
+  }
 
   timeline.to(foxImg, {
     y: '20%',
@@ -78,15 +108,8 @@ export function slideCardTransition(cardContainer, welcomeCard, formCard, foxImg
  * Slide in from right animation for chat/vets pages.
  */
 export function slideInFromRight(element) {
-  // Remove preload styles hiding the element
-  const preloadChat = document.getElementById('chat-slide-preload')
-  if (preloadChat) preloadChat.remove()
-  const preloadVets = document.getElementById('vets-slide-preload')
-  if (preloadVets) preloadVets.remove()
+  const backgroundLayer = ensureBackgroundLayer()
 
-  element.style.visibility = 'visible'
-  element.style.opacity = 1
-  element.style.transform = 'translateX(100%)'
 
   gsap.to(element, {
     x: '0%',
@@ -96,17 +119,28 @@ export function slideInFromRight(element) {
     ease: "power2.out",
     clearProps: 'transform'
   })
+
+  if (backgroundLayer) {
+    gsap.set(backgroundLayer, { autoAlpha: 1 })
+  }
+
 }
 
 /**
  * Slide out to left animation.
  */
 export function slideOutToLeft(element, callback) {
+  const backgroundLayer = ensureBackgroundLayer()
+
   const timeline = gsap.timeline({
     onComplete: () => {
       if (callback) callback()
     }
   })
+
+  if (backgroundLayer) {
+    timeline.set(backgroundLayer, { autoAlpha: 1 }, 0)
+  }
 
   timeline.to(element, {
     x: '-100%',

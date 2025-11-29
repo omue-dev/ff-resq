@@ -13,7 +13,7 @@
 export function simulateDevAppointment(statusElement, notesElement) {
   return setTimeout(() => {
     if (statusElement) {
-      statusElement.textContent = "APPOINTMENT APPROVED"
+      statusElement.textContent = "✅ Appointment confirmed!"
       statusElement.classList.remove('calling')
       statusElement.classList.add('success')
       statusElement.classList.remove('hidden')
