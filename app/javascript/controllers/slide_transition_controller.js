@@ -27,27 +27,12 @@ export default class extends Controller {
    * Entry point: decide which entrance animation to play and wire validation.
    */
   connect() {
-    this.setupSlideIn()
-  }
-
-  /**
-   * Run entrance animation based on stored flags and set up validation listeners.
-   * Prefers navigation flags (chat/vets) over initial welcome animation.
-   */
-  setupSlideIn() {
-    const element = this.element
-
-    const shouldSlideIn = this.shouldSlideInFromRight()
-
-    if (shouldSlideIn) {
-      this.clearSlideFlags()
-      this.hideOffscreen(element)
-      requestAnimationFrame(() => {
-        element.style.visibility = 'visible'
-        this.handleSlideInFromRight()
-      })
-    } else if (this.initialLoadValue) {
-      this.handleWelcomePageEntrance()
+    if (this.initialLoadValue) {
+      this.handleCurtainOpen()
+    } else if (sessionStorage.getItem('chatShouldSlideIn') === 'true') {
+      sessionStorage.removeItem('chatShouldSlideIn')
+      // Opacity already set via inline style in chat.html.erb to prevent flash
+      requestAnimationFrame(() => this.handleSlideIn())
     }
 
     this.setupValidationListeners()
@@ -190,43 +175,11 @@ export default class extends Controller {
     }
 
     sessionStorage.setItem('chatShouldSlideIn', 'true')
-    form.submit()
-    slideOutToLeft(this.element)
-  }
 
-  /**
-   * Slide out and navigate to vets page, setting return animation flag.
-   * @param {Event} event - click event from navigation link
-   * @returns {void}
-   */
-  slideToVets(event) {
-    event.preventDefault()
-    const link = event.currentTarget
-    const url = link.href
-
-    sessionStorage.setItem('vetsShouldSlideIn', 'true')
-    slideOutToLeft(this.element)
-
-    setTimeout(() => {
-      window.location.href = url
-    }, 300)
-  }
-
-  /**
-   * Slide out and navigate back to chat page, setting return animation flag.
-   * @param {Event} event - click event from navigation link
-   * @returns {void}
-   */
-  slideBackToChat(event) {
-    event.preventDefault()
-    const link = event.currentTarget
-    const url = link.href
-
-    sessionStorage.setItem('chatShouldSlideIn', 'true')
-    slideOutToLeft(this.element)
-
-    setTimeout(() => {
-      window.location.href = url
-    }, 300)
+    // Play slide out animation FIRST
+    performSlideOut(this.element, () => {
+      // THEN submit form after animation completes
+      form.submit()
+    })
   }
 }

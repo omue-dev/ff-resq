@@ -93,8 +93,11 @@ class IntakesController < ApplicationController
     # Don't set session flag - we use sessionStorage from JavaScript instead
     # session[:slide_transition] = true
 
-    # GET /intakes/:id/chat > chat_intake
-    redirect_to chat_intake_path(@intake)
+    load_chat_data
+
+    respond_to do |format|
+      format.html { render :chat, status: :ok }
+    end
   end
 
   # Handles follow-up messages in existing chat conversation
@@ -157,6 +160,10 @@ class IntakesController < ApplicationController
   # @return [HTML] Renders the chat view with messages
   def chat
     @intake = Intake.find(params[:id])
+    load_chat_data
+  end
+
+  def load_chat_data
     @result = @intake.parsed_payload
     # The view loops over these records and injects poll controllers for pending ones.
     @chat_messages = @intake.chat_messages.order(:created_at)
