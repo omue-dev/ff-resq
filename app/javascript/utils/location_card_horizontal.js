@@ -9,6 +9,7 @@ import {
   getOpeningStatus
 } from "utils/vet_card_utils"
 import { distanceInMeters, formatDistanceLabel } from "utils/distance_utils"
+import { createDirectionsButton } from "./vet_card_utils"
 
 /**
  * Creates a horizontal location card in Google Maps style.
@@ -32,6 +33,7 @@ export function createHorizontalLocationCard(place, onCardClick, onCardHover, ha
   card.setAttribute("aria-label", `${place.displayName} auswählen`)
 
   const ratingText = formatRating(place)
+  const titleText = truncateTitle(place.displayName)
   const address = getFormattedAddress(place)
   const distanceText = userLocation ? formatDistance(userLocation, place.location) : null
   const todayHours = getOpeningStatus(place)
@@ -49,7 +51,7 @@ export function createHorizontalLocationCard(place, onCardClick, onCardHover, ha
       </div>
       <div class="location-card-info">
         <div class="location-card-header">
-          <h3 class="location-card-title">${place.displayName}</h3>
+          <h3 class="location-card-title" title="${place.displayName}">${titleText}</h3>
           <span class="location-card-rating">${ratingText}</span>
         </div>
         <p class="location-card-category">${categoryLabel}</p>
@@ -64,8 +66,7 @@ export function createHorizontalLocationCard(place, onCardClick, onCardHover, ha
     </div>
     <div class="location-card-expanded hidden">
       ${openingHours ? `<div class="location-card-hours">${openingHours}</div>` : ''}
-      <div class="card-actions">
-        <a href="${directionsUrl}" target="_blank" class="directions-btn" onclick="event.stopPropagation()">Get Directions</a>
+        ${createDirectionsButton(directionsUrl)}
         ${createAppointmentSection(hasIntake, true)}
       </div>
     </div>
@@ -114,6 +115,11 @@ function formatDistance(origin, destination) {
   const meters = distanceInMeters(origin, destination)
   const label = formatDistanceLabel(meters, { suffix: " km entfernt" })
   return label
+}
+
+function truncateTitle(name, maxLength = 25) {
+  if (!name || name.length <= maxLength) return name || ''
+  return `${name.slice(0, maxLength)}...`
 }
 
 /**

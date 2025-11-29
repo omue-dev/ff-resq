@@ -197,7 +197,7 @@ export default class extends Controller {
   showAppointmentResponse(data) {
     if (!this.currentNotes || !this.currentStatus || !this.currentButton) return
 
-    this.currentStatus.textContent = "✓ Appointment confirmed!"
+    this.currentStatus.textContent = "✅ Appointment confirmed!"
     this.currentStatus.classList.add('success')
 
     this.currentNotes.innerHTML = `

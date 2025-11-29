@@ -16,14 +16,14 @@
 
 .bird-img {
   bottom: 0;
-  height: 40vh;
-  left: -5%;
+  height: 30vh;
+  left: -10%;
   position: fixed;
   z-index: $z-animals-bird;
 }
 
 .fox-img {
-  height: 40vh;
+  height: 30vh;
   position: fixed;
   bottom: 0;
   right: -15%;
@@ -233,5 +233,23 @@
     .welcome-subtitle {
       font-size: $font-base;
     }
+  }
+
+  .bird-img {
+    height: 25vh;
+    left:0;
+  }
+
+  .fox-img {
+    height: 25vh;
+    right: 0;
+  }
+
+  .form-headline {
+    font-size:20px;
+  }
+
+  .mobile-form .mobile-photo-upload .upload-area  {
+    padding: 0!important;
   }
 }

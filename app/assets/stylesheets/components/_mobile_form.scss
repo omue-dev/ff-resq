@@ -159,7 +159,7 @@
     width: 100%;
 
     // Visual
-    @include glass(0.1);
+    @include glass-dark(0.8);
     border: $border-width-base solid $glass-black-46;
     border-radius: $radius-md;
     color: $white;
@@ -176,7 +176,7 @@
     }
 
     &:focus {
-      @include glass(0.15);
+      @include glass-dark(0.8);
       border-color: $white;
       box-shadow: 0 0 0 3px $glass-gold-2;
       outline: 0;
