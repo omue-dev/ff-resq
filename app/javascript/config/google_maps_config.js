@@ -1,15 +1,12 @@
 // app/javascript/config/google_maps_config.js
 
 /**
- * Google Maps Configuration
- *
- * Centralized configuration for Google Maps styling and search parameters.
- * Used by map-related controllers and utilities.
+ * Google Maps configuration and helpers.
+ * Centralizes map styling, search parameters, and marker icon definitions.
  */
 
 /**
- * Custom map styling configuration
- * Dark theme with teal/green accents matching the application design
+ * Custom map styling configuration (dark teal theme to match UI).
  */
 export const MAP_STYLES = [
     {
@@ -62,8 +59,10 @@ export const MAP_STYLES = [
   ]
 
 /**
- * Custom marker icon configuration - User location
- * Uses the fox avatar image
+ * Custom marker icon configuration - User location.
+ * Uses the fox avatar image.
+ *
+ * @returns {google.maps.Icon}
  */
 export function getUserMarkerIcon() {
   return {
@@ -74,8 +73,9 @@ export function getUserMarkerIcon() {
 }
 
 /**
- * Custom marker icon configuration - Vet locations
- * Clean, professional marker pin with medical cross
+ * Custom marker icon configuration
+ *
+ * @returns {google.maps.Icon}
  */
 export function getVetMarkerIcon() {
   const svg = `
@@ -86,14 +86,6 @@ export function getVetMarkerIcon() {
 
       <!-- White circle background -->
       <circle cx="16" cy="16" r="10" fill="#FFFFFF"/>
-
-      <!-- Medical cross icon -->
-      <g transform="translate(16, 16)">
-        <!-- Vertical bar -->
-        <rect x="-2" y="-7" width="4" height="14" fill="#47b9b9ff" rx="1"/>
-        <!-- Horizontal bar -->
-        <rect x="-7" y="-2" width="14" height="4" fill="#47b9b9ff" rx="1"/>
-      </g>
     </svg>
   `
 
@@ -105,8 +97,10 @@ export function getVetMarkerIcon() {
 }
 
 /**
- * Active/selected marker icon configuration - Vet locations
- * Slightly different color to highlight the selected card/marker
+ * Active/selected marker icon configuration
+ * Slightly different color to highlight the selected card/marker.
+ *
+ * @returns {google.maps.Icon}
  */
 export function getActiveVetMarkerIcon() {
   const svg = `
@@ -114,10 +108,6 @@ export function getActiveVetMarkerIcon() {
       <path d="M16 0C7.163 0 0 7.163 0 16c0 11 16 32 16 32s16-21 16-32C32 7.163 24.837 0 16 0z"
             fill="#ffb347"/>
       <circle cx="16" cy="16" r="10" fill="#FFFFFF"/>
-      <g transform="translate(16, 16)">
-        <rect x="-2" y="-7" width="4" height="14" fill="#ffb347" rx="1"/>
-        <rect x="-7" y="-2" width="14" height="4" fill="#ffb347" rx="1"/>
-      </g>
     </svg>
   `
 
@@ -129,11 +119,11 @@ export function getActiveVetMarkerIcon() {
 }
 
 /**
- * Main Google Maps configuration object
+ * Main Google Maps configuration object.
  */
 export const MAPS_CONFIG = {
   /**
-   * Default map display options
+   * Default map display options.
    */
   MAP_OPTIONS: {
     zoom: 12,
@@ -153,11 +143,11 @@ export const MAPS_CONFIG = {
   },
 
   /**
-   * Animal services search configuration
+   * Animal services search configuration.
    */
   ANIMAL_SERVICES_SEARCH: {
     /**
-     * Fields to retrieve from Places API for each location
+     * Fields to retrieve from Places API for each location.
      */
     fields: [
       "displayName",
@@ -170,17 +160,17 @@ export const MAPS_CONFIG = {
     ],
 
     /**
-   * Search radius in meters (20km)
-   */
-  radius: 8000,
+     * Search radius in meters (8km).
+     */
+    radius: 8000,
 
     /**
-     * Maximum number of results to return per category
+     * Maximum number of results to return per category.
      */
     maxResultCount: 10,
 
     /**
-     * Place type configurations for different animal services
+     * Place type configurations for different animal services.
      */
     categories: {
       vets: {
@@ -206,13 +196,13 @@ export const MAPS_CONFIG = {
     },
 
     /**
-     * Rank results by distance from user location
+     * Rank results by distance from user location.
      */
     rankPreference: "DISTANCE" // Will be mapped to google.maps.places.SearchNearbyRankPreference.DISTANCE
   },
 
   /**
-   * Legacy VET_SEARCH config (kept for backwards compatibility)
+   * Legacy VET_SEARCH config (kept for backwards compatibility).
    */
   VET_SEARCH: {
     fields: [
@@ -231,7 +221,7 @@ export const MAPS_CONFIG = {
   },
 
   /**
-   * Marker configuration
+   * Marker configuration.
    */
   MARKERS: {
     userMarkerTitle: "You are here",

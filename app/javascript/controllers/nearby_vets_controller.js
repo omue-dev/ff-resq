@@ -7,10 +7,9 @@ import {
   createMap,
   createUserMarker,
   createVetMarker,
-  searchNearbyVets,
   searchAllAnimalServices
 } from "../utils/google_maps_utils"
-import { createVetCard } from "../utils/vet_card_utils"
+import { distanceInMeters } from "../utils/distance_utils"
 import {
   createHorizontalLocationCard,
   setCardActive,
@@ -19,19 +18,13 @@ import {
 import { getVetMarkerIcon, getActiveVetMarkerIcon } from "../config/google_maps_config"
 
 /**
- * Nearby Vets Stimulus Controller
- *
- * Manages the display and interaction of nearby veterinary locations.
- * Integrates Google Maps API to show vet locations on a map and provides
- * a list/detail view interface for browsing and selecting vets.
- *
- * Features:
- * - Displays user location and nearby vets on an interactive map
- * - Shows list of nearby vets with ratings and opening hours
- * - Provides detailed view modal for individual vet locations
- * - Integrates with appointment system when user has an active intake
- * - Generates Google Maps directions links
- *
+ * NearbyVetsController
+ * --------------------
+ * Orchestrates the Google Maps vets experience:
+ * - acquires user location and renders the map
+ * - fetches vets/shelters/rescue places and shows markers + cards
+ * - syncs horizontal card selection with active markers and map bounds
+ * - manages category filtering and basic UX (hover, scroll sync)
  */
 export default class extends Controller {
   /**
@@ -59,7 +52,7 @@ export default class extends Controller {
    */
   initialize() {
     this.allPlaces = []
-    this.markers = new Map() // Map of place.id -> marker
+    this.markers = new Map() // Map of place.id -> marker instances
     this.activeCategory = 'all'
     this.activeCard = null
     this.activePlaceId = null
@@ -95,14 +88,6 @@ export default class extends Controller {
 
   /**
    * Initializes the Google Map with user location and nearby animal services
-   * Performs the following:
-   * 1. Gets user's current geolocation
-   * 2. Creates map centered on user location
-   * 3. Adds user location marker
-   * 4. Searches for all animal service locations (vets, shelters, rescue)
-   * 5. Adds markers with click handlers
-   * 6. Renders horizontal location cards
-   * 7. Updates category counts
    *
    * @async
    * @returns {Promise<void>}
@@ -146,7 +131,7 @@ export default class extends Controller {
       this.allPlaces.forEach((place) => {
         const marker = createVetMarker(this.map, {
           ...place,
-          markerTitle: place.distanceText ? `${place.displayName} • ${place.distanceText}` : place.displayName
+          markerTitle: this.markerTitleFor(place)
         })
 
         // Store marker reference
@@ -187,6 +172,7 @@ export default class extends Controller {
 
   /**
    * Collapse all horizontal cards
+   * @returns {void}
    */
   collapseAllCards() {
     const cards = this.horizontalListTarget?.querySelectorAll('.location-card-horizontal') || []
@@ -196,6 +182,7 @@ export default class extends Controller {
   /**
    * Renders the horizontal scrolling list of location cards
    * @param {Array} places - Array of place objects to render
+   * @returns {void}
    */
   renderHorizontalList(places) {
     this.horizontalListTarget.innerHTML = ""
@@ -232,6 +219,7 @@ export default class extends Controller {
    * Expands/collapses a horizontal card by place id
    * @param {Object} place - Place whose card to expand/collapse
    * @param {boolean} expanded - Whether to expand (true) or collapse (false)
+   * @returns {void}
    */
   expandCard(place, expanded = true) {
     const card = this.horizontalListTarget.querySelector(`[data-place-id="${place.id}"]`)
@@ -246,6 +234,7 @@ export default class extends Controller {
   /**
    * Locks/unlocks horizontal scroll when a card is expanded
    * @param {boolean} locked - true to lock scroll (expanded), false to unlock
+   * @returns {void}
    */
   setHorizontalScrollLock(locked) {
     if (!this.horizontalListTarget) return
@@ -254,6 +243,7 @@ export default class extends Controller {
 
   /**
    * Sets up scroll listener to sync active marker when cards snap into view
+   * @returns {void}
    */
   setupHorizontalScrollListener() {
     if (!this.horizontalListTarget) return
@@ -269,6 +259,7 @@ export default class extends Controller {
 
   /**
    * Picks the card nearest the container center and marks it active
+   * @returns {void}
    */
   syncActiveCardWithScroll() {
     if (!this.horizontalListTarget) return
@@ -299,6 +290,7 @@ export default class extends Controller {
   /**
    * Activates a card and its marker based on a DOM element (no scroll)
    * @param {HTMLElement} card - The card element to activate
+    * @returns {void}
    */
   setActiveCardFromElement(card) {
     if (!card) return
@@ -319,6 +311,7 @@ export default class extends Controller {
   /**
    * Updates marker icons to reflect active card selection
    * @param {string|null} placeId - ID of the place to mark as active (or null to clear)
+    * @returns {void}
    */
   updateActiveMarker(placeId) {
     if (this.activePlaceId === placeId) return
@@ -366,6 +359,7 @@ export default class extends Controller {
   /**
    * Highlights a card in the horizontal list
    * @param {Object} place - Place to highlight
+    * @returns {void}
    */
   highlightCard(place) {
     // Remove previous active card
@@ -390,6 +384,7 @@ export default class extends Controller {
    * Highlights a marker on the map
    * @param {Object} place - Place whose marker to highlight
    * @param {boolean} highlight - Whether to highlight or unhighlight
+    * @returns {void}
    */
   highlightMarker(place, highlight) {
     const marker = this.markers.get(place.id)
@@ -405,6 +400,7 @@ export default class extends Controller {
   /**
    * Updates marker visibility based on active category
    * @param {string} category - Active category filter
+    * @returns {void}
    */
   updateMarkersVisibility(category) {
     this.allPlaces.forEach((place) => {
@@ -421,21 +417,15 @@ export default class extends Controller {
 
   /**
    * Filters locations by category and updates markers/list
+    * @param {Event} event - click event from category chip
+    * @returns {void}
    */
   filterByCategory(event) {
     const category = event.currentTarget.dataset.category
     this.activeCategory = category
 
-    // Update chip styling
-    document.querySelectorAll('.filter-chip').forEach(chip => {
-      chip.classList.toggle('active', chip.dataset.category === category)
-    })
-
-    // Filter places
-    let filteredPlaces = this.allPlaces
-    if (category !== 'all') {
-      filteredPlaces = this.allPlaces.filter(place => place.category === category)
-    }
+    this.toggleFilterChips(category)
+    const filteredPlaces = this.filteredPlacesForCategory(category)
 
     this.renderHorizontalList(filteredPlaces)
     this.updateMarkersVisibility(category)
@@ -473,6 +463,8 @@ export default class extends Controller {
 
   /**
    * Attempt to get location; if denied, prompt for manual lat,lng
+   * @returns {Promise<{lat:number, lng:number}>} resolved location
+   * @throws {Error} when location cannot be determined
    */
   async getLocationWithFallback() {
     try {
@@ -492,10 +484,12 @@ export default class extends Controller {
 
   /**
    * Adds distance fields to place
+   * @param {Object} place - place object with location data
+   * @returns {Object} place with distanceMeters and distanceText when possible
    */
   addDistance(place) {
     if (!this.userLocation || !place?.location) return place
-    const meters = this.computeDistanceMeters(this.userLocation, place.location)
+    const meters = distanceInMeters(this.userLocation, place.location)
     const km = meters / 1000
     const rounded = km >= 10 ? km.toFixed(0) : km.toFixed(1)
     return {
@@ -505,18 +499,36 @@ export default class extends Controller {
     }
   }
 
-  computeDistanceMeters(origin, destination) {
-    const toRad = (deg) => (deg * Math.PI) / 180
-    const originLat = typeof origin.lat === 'function' ? origin.lat() : origin.lat
-    const originLng = typeof origin.lng === 'function' ? origin.lng() : origin.lng
-    const destLat = typeof destination.lat === 'function' ? destination.lat() : destination.lat
-    const destLng = typeof destination.lng === 'function' ? destination.lng() : destination.lng
-    if ([originLat, originLng, destLat, destLng].some(v => typeof v !== 'number')) return Infinity
-    const R = 6371000
-    const dLat = toRad(destLat - originLat)
-    const dLng = toRad(destLng - originLng)
-    const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(originLat)) * Math.cos(toRad(destLat)) * Math.sin(dLng / 2) ** 2
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-    return R * c
+  /**
+   * Build a consistent marker title for the given place.
+   * @param {Object} place
+   * @returns {string}
+   */
+  markerTitleFor(place) {
+    if (!place) return ''
+    if (place.distanceText) return `${place.displayName} • ${place.distanceText}`
+    return place.displayName || ''
   }
+
+  /**
+   * Compute and return filtered places for the active category.
+   * @param {string} category
+   * @returns {Array}
+   */
+  filteredPlacesForCategory(category) {
+    if (category === 'all') return this.allPlaces
+    return this.allPlaces.filter(place => place.category === category)
+  }
+
+  /**
+   * Toggle filter chip active state based on selected category.
+   * @param {string} category
+   * @returns {void}
+   */
+  toggleFilterChips(category) {
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+      chip.classList.toggle('active', chip.dataset.category === category)
+    })
+  }
+
 }

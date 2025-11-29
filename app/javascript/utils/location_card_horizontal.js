@@ -8,14 +8,19 @@ import {
   createAppointmentSection,
   getOpeningStatus
 } from "./vet_card_utils"
+import { distanceInMeters, formatDistanceLabel } from "./distance_utils"
 
 /**
- * Creates a horizontal location card in Google Maps style
- * Compact card for horizontal scrolling list
+ * Creates a horizontal location card in Google Maps style.
+ * Compact cards used for the horizontal scrolling list in Nearby Vets.
  *
  * @param {Object} place - Place object from Google Places API
  * @param {Function} onCardClick - Click handler for the card
  * @param {Function} onCardHover - Hover handler for highlighting marker
+ * @param {boolean} hasIntake - Whether the user has an active intake
+ * @param {Function} onExpandChange - Callback when expansion toggles
+ * @param {Object|null} userLocation - User lat/lng for distance display
+ * @param {boolean} isNearest - Whether this place is the nearest
  * @returns {HTMLElement} Horizontal card DOM element
  */
 export function createHorizontalLocationCard(place, onCardClick, onCardHover, hasIntake = false, onExpandChange = () => {}, userLocation = null, isNearest = false) {
@@ -31,7 +36,6 @@ export function createHorizontalLocationCard(place, onCardClick, onCardHover, ha
   const distanceText = userLocation ? formatDistance(userLocation, place.location) : null
   const todayHours = getOpeningStatus(place)
 
-  // Get category info
   const categoryLabel = place.categoryLabel || 'Vet'
   const categoryClass = place.category || 'vets'
 
@@ -67,15 +71,12 @@ export function createHorizontalLocationCard(place, onCardClick, onCardHover, ha
     </div>
   `
 
-  // Add category-specific class for styling
   card.classList.add(`category-${categoryClass}`)
 
   const expandSection = card.querySelector('.location-card-expanded')
   const expandButton = card.querySelector('.location-card-expand-btn')
 
-  // Toggle expand/collapse
   if (expandButton && expandSection) {
-    // default hidden
     expandSection.style.display = 'none'
 
     expandButton.addEventListener('click', (event) => {
@@ -86,13 +87,11 @@ export function createHorizontalLocationCard(place, onCardClick, onCardHover, ha
     })
   }
 
-  // Click handler
   card.addEventListener("click", (e) => {
     if (e.target.closest('.location-card-expand-btn') || e.target.closest('.directions-btn')) return
     onCardClick(place)
   })
 
-  // Hover handler for marker highlighting
   card.addEventListener("mouseenter", () => {
     onCardHover(place, true)
   })
@@ -113,32 +112,12 @@ export function createHorizontalLocationCard(place, onCardClick, onCardHover, ha
 
 function formatDistance(origin, destination) {
   const meters = distanceInMeters(origin, destination)
-  if (!isFinite(meters)) return null
-  const km = meters / 1000
-  const rounded = km >= 10 ? km.toFixed(0) : km.toFixed(1)
-  return `${rounded} km entfernt`
-}
-
-function distanceInMeters(origin, destination) {
-  if (!origin || !destination) return Infinity
-  const toRad = (deg) => (deg * Math.PI) / 180
-  const originLat = typeof origin.lat === 'function' ? origin.lat() : origin.lat
-  const originLng = typeof origin.lng === 'function' ? origin.lng() : origin.lng
-  const destLat = typeof destination.lat === 'function' ? destination.lat() : destination.lat
-  const destLng = typeof destination.lng === 'function' ? destination.lng() : destination.lng
-
-  if ([originLat, originLng, destLat, destLng].some((v) => typeof v !== 'number')) return Infinity
-
-  const R = 6371000
-  const dLat = toRad(destLat - originLat)
-  const dLng = toRad(destLng - originLng)
-  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(originLat)) * Math.cos(toRad(destLat)) * Math.sin(dLng / 2) ** 2
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-  return R * c
+  const label = formatDistanceLabel(meters, { suffix: " km entfernt" })
+  return label
 }
 
 /**
- * Updates card's active state
+ * Updates card's active state.
  * @param {HTMLElement} card - Card element
  * @param {boolean} isActive - Whether card should be active
  */
@@ -151,7 +130,7 @@ export function setCardActive(card, isActive) {
 }
 
 /**
- * Programmatically expands/collapses a card
+ * Programmatically expands/collapses a card.
  * @param {HTMLElement} card - Card element
  * @param {boolean} expanded - Whether card should be expanded
  */

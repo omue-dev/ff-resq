@@ -46,7 +46,8 @@ module IntakeAi
     def parse
       text = extract_text_from_response
       cleaned_text = strip_markdown_code_blocks(text)
-      parsed_data = parse_json(cleaned_text)
+      json_string = extract_json_string(cleaned_text)
+      parsed_data = parse_json(json_string, cleaned_text)
 
       validate_required_fields!(parsed_data)
 
@@ -89,16 +90,49 @@ module IntakeAi
     # Parses JSON string into a Ruby hash
     #
     # @param json_string [String] The JSON string to parse
+    # @param cleaned_text [String] The original cleaned text (used for logging/fallback)
     # @return [Hash] Parsed JSON data
     # @raise [IntakeAi::ParseError] If JSON is invalid
-    def parse_json(json_string)
+    def parse_json(json_string, cleaned_text)
       JSON.parse(json_string)
     rescue JSON::ParserError => e
+      # Attempt to salvage JSON if the model prepended/appended non-JSON text
+      fallback = extract_braced_content(cleaned_text)
+      if fallback && fallback != json_string
+        Rails.logger.warn "IntakeAi::ResponseParser - Retrying parse with extracted braces substring"
+        return JSON.parse(fallback)
+      end
+
       Rails.logger.error "IntakeAi::ResponseParser - JSON parse error: #{e.message}"
       Rails.logger.error "Raw text: #{extract_text_from_response}"
       Rails.logger.error "Cleaned text: #{json_string}"
 
       raise IntakeAi::ParseError, "Invalid JSON in AI response: #{e.message}"
+    end
+
+    # Attempts to extract a JSON object from free-form text by locating the first
+    # opening brace and the last closing brace.
+    #
+    # @param text [String]
+    # @return [String, nil] substring containing a potential JSON object
+    def extract_braced_content(text)
+      start_idx = text.index("{")
+      end_idx = text.rindex("}")
+      return if start_idx.nil? || end_idx.nil? || end_idx <= start_idx
+
+      text[start_idx..end_idx].strip
+    end
+
+    # Determines the best candidate JSON substring from cleaned text, allowing for
+    # leading/trailing natural language the model might include.
+    #
+    # @param cleaned_text [String]
+    # @return [String]
+    def extract_json_string(cleaned_text)
+      stripped = cleaned_text.to_s.strip
+      return stripped if stripped.start_with?("{") && stripped.end_with?("}")
+
+      extract_braced_content(stripped) || stripped
     end
 
     # Validates that all required fields are present in the response

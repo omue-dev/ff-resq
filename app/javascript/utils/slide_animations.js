@@ -2,9 +2,8 @@ import gsap from "gsap"
 import { ANIMATION_CONFIG } from "config/animation_constants"
 
 /**
- * Welcome page entrance animation
- * Animates animals (bird, fox) sliding up from bottom + welcome card scaling in
- * Used for: Initial page load on welcome page (new.html.erb)
+ * Welcome page entrance animation.
+ * Shows the animals and scales in the welcome card.
  */
 export function animateWelcomePageEntrance(welcomeCard, birdImg, foxImg) {
   birdImg.style.display = 'block'
@@ -14,7 +13,7 @@ export function animateWelcomePageEntrance(welcomeCard, birdImg, foxImg) {
 
   const timeline = gsap.timeline()
 
-  // Animate animals sliding up from bottom
+  // Animals slide up, then card scales in
   timeline.from([foxImg, birdImg], {
     scale: 0.5,
     y: '80%',
@@ -22,9 +21,7 @@ export function animateWelcomePageEntrance(welcomeCard, birdImg, foxImg) {
     ease: ANIMATION_CONFIG.ANIMAL_ANIMATION.ease,
     stagger: 0.2
   })
-
-  // Animate card scaling in
-  timeline.to(welcomeCard, {
+  .to(welcomeCard, {
     scale: 1,
     opacity: 1,
     duration: 0.4,
@@ -35,7 +32,7 @@ export function animateWelcomePageEntrance(welcomeCard, birdImg, foxImg) {
 }
 
 /**
- * Slide transition between welcome and form screens with animal animations
+ * Slide transition between welcome and form screens with animal exit.
  */
 export function slideCardTransition(cardContainer, welcomeCard, formCard, foxImg, birdImg, onComplete) {
   gsap.set(formCard, { x: '100%', visibility: 'hidden', opacity: 0 })
@@ -55,23 +52,20 @@ export function slideCardTransition(cardContainer, welcomeCard, formCard, foxImg
     duration: 0.5,
     ease: "power2.in"
   })
-
-  timeline.to(birdImg, {
+  .to(birdImg, {
     x: '-100%',
     duration: 0.3,
     scale: 2,
     opacity: 0,
     ease: "power2.in"
   }, "<")
-
-  timeline.to(welcomeCard, {
+  .to(welcomeCard, {
     y: '-120%',
     duration: 0.5,
     ease: ANIMATION_CONFIG.CARD_SLIDE.ease
   }, "-=0.8")
-
-  timeline.set(formCard, { visibility: 'visible', opacity: 0 })
-  timeline.to(formCard, {
+  .set(formCard, { visibility: 'visible', opacity: 0 })
+  .to(formCard, {
     opacity: 1,
     x: '0%',
     duration: 0.3,
@@ -80,18 +74,15 @@ export function slideCardTransition(cardContainer, welcomeCard, formCard, foxImg
 }
 
 /**
- * Slide in from right animation
- * Animates element from off-screen right (100%) to center (0%)
- * Used for: Chat page slide-in, Vets page slide-in
+ * Slide in from the right (for chat/vets pages).
  */
 export function slideInFromRight(element) {
-  // First remove any inline style tag that was hiding the element
+  // Remove preload styles that hide slide-in pages
   const preloadChat = document.getElementById('chat-slide-preload')
   if (preloadChat) preloadChat.remove()
   const preloadVets = document.getElementById('vets-slide-preload')
   if (preloadVets) preloadVets.remove()
 
-  // Ensure element is visible and positioned off-screen to the right
   element.style.visibility = 'visible'
   element.style.opacity = 1
   element.style.transform = 'translateX(100%)'
@@ -102,14 +93,12 @@ export function slideInFromRight(element) {
     visibility: 'visible',
     duration: 0.3,
     ease: "power2.out",
-    clearProps: 'transform' // remove transform after animation so fixed children use viewport
+    clearProps: 'transform'
   })
 }
 
 /**
- * Slide out to left animation
- * Animates element from center (0%) to off-screen left (-100%)
- * Used for: Form submission, Chat->Vets transition, Vets->Chat transition
+ * Slide out to the left and optionally run a callback.
  */
 export function slideOutToLeft(element, callback) {
   const timeline = gsap.timeline({

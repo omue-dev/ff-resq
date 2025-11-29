@@ -1,20 +1,28 @@
 import { Controller } from "@hotwired/stimulus"
 
 /**
- * Automatically scrolls the chat container to the bottom when new messages are added.
- * Ensures users always see the latest message in the conversation.
+ * ChatScrollController
+ * --------------------
+ * Keeps the chat viewport pinned to the latest message by observing DOM changes
+ * and scrolling to the bottom on load and when new nodes appear.
+ *
+ * Targets:
+ * - container: the scrollable chat messages element.
  */
 export default class extends Controller {
   static targets = ["container"]
 
+  /**
+   * Scroll on load and start observing for new messages.
+   */
   connect() {
-    // Scroll to bottom on initial load
     this.scrollToBottom()
-
-    // Watch for new messages being added to the container
     this.setupMessageObserver()
   }
 
+  /**
+   * Clean up the MutationObserver.
+   */
   disconnect() {
     if (this.observer) {
       this.observer.disconnect()
@@ -22,8 +30,7 @@ export default class extends Controller {
   }
 
   /**
-   * Scrolls the chat container to the bottom to show the latest message.
-   * Uses requestAnimationFrame to ensure smooth scrolling after DOM updates.
+   * Scroll the container to the bottom after the next frame.
    */
   scrollToBottom() {
     if (this.hasContainerTarget) {
@@ -34,8 +41,7 @@ export default class extends Controller {
   }
 
   /**
-   * Sets up a MutationObserver to watch for new messages being added.
-   * Automatically scrolls to bottom when the DOM tree changes (new messages).
+   * Observe chat DOM mutations and scroll when new content is added.
    */
   setupMessageObserver() {
     if (!this.hasContainerTarget) return
@@ -44,10 +50,9 @@ export default class extends Controller {
       this.scrollToBottom()
     })
 
-    // Watch for child elements being added (childList) anywhere in the tree (subtree)
     this.observer.observe(this.containerTarget, {
-      childList: true,  // Detect when child nodes are added or removed
-      subtree: true     // Watch the entire tree, not just direct children
+      childList: true,
+      subtree: true
     })
   }
 }

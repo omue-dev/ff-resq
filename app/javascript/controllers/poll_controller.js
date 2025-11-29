@@ -3,10 +3,16 @@ import { ANIMATION_CONFIG } from "config/animation_constants"
 import { revealMessageBubble, animateThinkingDots } from "utils/message_animations"
 
 /**
- * Stimulus controller for polling server for AI message updates
- * Polls backend at regular intervals to check for completed AI responses
- * Animates thinking dots while waiting, then reveals completed messages with animation
- * Used for: Chat page AI message streaming/polling (chat.html.erb)
+ * PollController
+ * --------------
+ * Polls the server for AI message completion and updates the DOM with the latest
+ * HTML fragment. Plays thinking dots while pending and reveals completed
+ * messages with animation once ready.
+ *
+ * Values:
+ * - url (String): endpoint to poll for the message fragment.
+ * - target (String): DOM id of the element to replace with server HTML.
+ * - interval (Number): polling interval in ms (defaults to 1000).
  */
 export default class extends Controller {
   static values = {
@@ -16,8 +22,7 @@ export default class extends Controller {
   }
 
   /**
-   * Stimulus lifecycle method - called when controller connects to DOM
-   * Starts thinking dots animation and schedules first poll
+   * Start thinking animation and schedule initial poll.
    */
   connect() {
     animateThinkingDots()
@@ -25,27 +30,25 @@ export default class extends Controller {
   }
 
   /**
-   * Stimulus lifecycle method - called when controller disconnects from DOM
-   * Cleans up timeout to prevent memory leaks
+   * Clear any pending poll timeouts.
    */
   disconnect() {
     if (this.timeout) clearTimeout(this.timeout)
   }
 
   /**
-   * Schedule next poll with optional custom delay
-   * @param {number} delay - Milliseconds to wait before polling (defaults to intervalValue)
+   * Schedule the next poll.
+   * @param {number} delay - ms until next poll (default: intervalValue)
    */
   schedulePoll(delay = this.intervalValue) {
     this.timeout = setTimeout(() => this.poll(), delay)
   }
 
   /**
-   * Poll server for updated message content
-   * Fetches HTML from server, checks if still pending, updates DOM
-   * If message still pending: schedules another poll
-   * If message complete: reveals message with animation
-   * On error: retries with exponential backoff
+   * Fetch updated message HTML and either continue polling or reveal.
+   * On error, retry with backoff.
+   *
+   * @returns {Promise<void>}
    */
   async poll() {
     try {
@@ -73,9 +76,7 @@ export default class extends Controller {
   }
 
   /**
-   * Reveal all completed AI messages with animation
-   * Finds all .ai-message elements with data-message attribute
-   * Triggers reveal animation for each message bubble
+   * Reveal all completed AI messages with animation.
    */
   revealCompletedMessages() {
     document.querySelectorAll(".ai-message[data-message]").forEach(revealMessageBubble)

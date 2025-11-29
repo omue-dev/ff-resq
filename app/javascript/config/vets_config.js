@@ -1,19 +1,16 @@
 // app/javascript/config/vets_config.js
 
 /**
- * Veterinary UI Configuration
- *
- * Centralized configuration for UI elements, SVG icons, and display constants
- * specific to veterinary location features.
- * Used by nearby_vets_controller and related utilities.
+ * Veterinary UI configuration.
+ * Icons and display constants shared by vets-related components.
  */
 
 /**
- * SVG icon definitions for reusable UI components
+ * SVG icon definitions for reusable UI components.
  */
 export const SVG_ICONS = {
   /**
-   * Calendar icon for appointment scheduling
+   * Calendar icon for appointment scheduling.
    * @type {string}
    */
   calendar: `
@@ -23,7 +20,7 @@ export const SVG_ICONS = {
   `,
 
   /**
-   * Arrow right icon for navigation and directions
+   * Arrow right icon for navigation and directions.
    * @type {string}
    */
   arrowRight: `
@@ -34,30 +31,30 @@ export const SVG_ICONS = {
 }
 
 /**
- * Configuration for veterinary location display
+ * Configuration for veterinary location display.
  */
 export const VET_DISPLAY_CONFIG = {
   /**
-   * Default text when rating is unavailable
+   * Default text when rating is unavailable.
    * @type {string}
    */
   noRatingText: "No rating",
 
   /**
-   * Default text when address is unavailable
+   * Default text when address is unavailable.
    * @type {string}
    */
   noAddressText: "Address not available",
 
   /**
-   * Star emoji for rating display
+   * Star emoji for rating display.
    * @type {string}
    */
   ratingIcon: "⭐",
 
   /**
-   * Day name to index mapping for opening hours
-   * Converts JavaScript Date.getDay() (Sunday=0) to weekday array index (Monday=0)
+   * Day name to index mapping for opening hours.
+   * Converts JavaScript Date.getDay() (Sunday=0) to weekday array index (Monday=0).
    * @type {Object}
    */
   dayIndexMapping: {
@@ -71,7 +68,7 @@ export const VET_DISPLAY_CONFIG = {
   },
 
   /**
-   * Google Maps directions URL template
+   * Google Maps directions URL template.
    * @type {string}
    */
   directionsUrlTemplate: "https://www.google.com/maps/dir/?api=1&destination="
