@@ -20,7 +20,8 @@ function ensureBackgroundLayer() {
 }
 
 /**
- * Initial page load animation with animal images (without curtain effect)
+ * Welcome page entrance animation.
+ * Shows the animals and scales in the welcome card.
  */
 export function curtainOpen(slideCard, birdImg, foxImg) {
   const backgroundLayer = ensureBackgroundLayer()
@@ -28,7 +29,7 @@ export function curtainOpen(slideCard, birdImg, foxImg) {
   birdImg.style.display = 'block'
   foxImg.style.display = 'block'
 
-  gsap.set(slideCard, { scale: 0 })
+  gsap.set(welcomeCard, { scale: 0 })
 
   const timeline = gsap.timeline()
 
@@ -44,9 +45,7 @@ export function curtainOpen(slideCard, birdImg, foxImg) {
     ease: ANIMATION_CONFIG.ANIMAL_ANIMATION.ease,
     stagger: 0.2
   })
-
-  // Animate card scaling in
-  timeline.to(slideCard, {
+  .to(welcomeCard, {
     scale: 1,
     opacity: 1,
     duration: 0.4,
@@ -57,7 +56,7 @@ export function curtainOpen(slideCard, birdImg, foxImg) {
 }
 
 /**
- * Slide transition between welcome and form screens with animal animations
+ * Slide transition between welcome and form screens with animal exit.
  */
 export function slideCardTransition(slideCard, welcomeCard, formCard, foxImg, birdImg, onComplete) {
   const backgroundLayer = ensureBackgroundLayer()
@@ -66,7 +65,7 @@ export function slideCardTransition(slideCard, welcomeCard, formCard, foxImg, bi
 
   const timeline = gsap.timeline({
     onComplete: () => {
-      slideCard.classList.add("show-form")
+      cardContainer.classList.add("show-form")
       if (onComplete) onComplete()
     }
   })
@@ -83,23 +82,20 @@ export function slideCardTransition(slideCard, welcomeCard, formCard, foxImg, bi
     duration: 0.5,
     ease: "power2.in"
   })
-
-  timeline.to(birdImg, {
+  .to(birdImg, {
     x: '-100%',
     duration: 0.3,
     scale: 2,
     opacity: 0,
     ease: "power2.in"
   }, "<")
-
-  timeline.to(welcomeCard, {
+  .to(welcomeCard, {
     y: '-120%',
     duration: 0.5,
     ease: ANIMATION_CONFIG.CARD_SLIDE.ease
   }, "-=0.8")
-
-  timeline.set(formCard, { visibility: 'visible', opacity: 0 })
-  timeline.to(formCard, {
+  .set(formCard, { visibility: 'visible', opacity: 0 })
+  .to(formCard, {
     opacity: 1,
     x: '0%',
     duration: 0.3,
@@ -108,8 +104,7 @@ export function slideCardTransition(slideCard, welcomeCard, formCard, foxImg, bi
 }
 
 /**
- * Slide in animation for chat page
- * Combines scale, blur, and fade for smooth entrance from form
+ * Slide in from the right (for chat/vets pages).
  */
 export function performSlideIn(element) {
   const backgroundLayer = ensureBackgroundLayer()
@@ -139,8 +134,7 @@ export function performSlideIn(element) {
 }
 
 /**
- * Slide out animation for form submission
- * Combines scale, blur, and fade for smooth transition to chat
+ * Slide out to the left and optionally run a callback.
  */
 export function performSlideOut(element, callback) {
   const backgroundLayer = ensureBackgroundLayer()

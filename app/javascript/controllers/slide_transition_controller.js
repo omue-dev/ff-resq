@@ -1,8 +1,19 @@
 import { Controller } from "@hotwired/stimulus"
-import { curtainOpen, slideCardTransition, performSlideIn, performSlideOut } from "utils/slide_animations"
+import { animateWelcomePageEntrance, slideCardTransition, slideInFromRight, slideOutToLeft } from "utils/slide_animations"
 
 /**
- * Handles slide transitions between welcome and form screens
+ * SlideTransitionController
+ * -------------------------
+ * Coordinates page/card slide animations across welcome, form, chat, and vets.
+ * Uses sessionStorage flags to trigger entrance animations after navigation and
+ * runs simple form validation before sliding away.
+ *
+ * Values:
+ * - slideIn (Boolean): unused externally but reserved for future use.
+ * - initialLoad (Boolean): plays welcome entrance when true.
+ *
+ * Targets:
+ * - slideCard: container holding welcome + form cards.
  */
 export default class extends Controller {
   static values = {
@@ -12,6 +23,9 @@ export default class extends Controller {
 
   static targets = ["slideCard"]
 
+  /**
+   * Entry point: decide which entrance animation to play and wire validation.
+   */
   connect() {
     if (this.initialLoadValue) {
       this.handleCurtainOpen()
@@ -21,10 +35,41 @@ export default class extends Controller {
       requestAnimationFrame(() => this.handleSlideIn())
     }
 
-    // Add input listeners to remove validation errors when user types
     this.setupValidationListeners()
   }
 
+  /**
+   * Determine if any slide-in flag is set in sessionStorage.
+   * @returns {boolean}
+   */
+  shouldSlideInFromRight() {
+    return sessionStorage.getItem('chatShouldSlideIn') === 'true' ||
+           sessionStorage.getItem('vetsShouldSlideIn') === 'true'
+  }
+
+  /**
+   * Remove slide-in flags after consuming them.
+   * @returns {void}
+   */
+  clearSlideFlags() {
+    sessionStorage.removeItem('chatShouldSlideIn')
+    sessionStorage.removeItem('vetsShouldSlideIn')
+  }
+
+  /**
+   * Position element off-screen to prepare for slide-in.
+   * @param {HTMLElement} element
+   * @returns {void}
+   */
+  hideOffscreen(element) {
+    element.style.visibility = 'hidden'
+    element.style.transform = 'translateX(100%)'
+  }
+
+  /**
+   * Set up input listeners to clear validation errors on input.
+   * @returns {void}
+   */
   setupValidationListeners() {
     const form = this.element.querySelector('form')
     if (!form) return
@@ -49,55 +94,69 @@ export default class extends Controller {
     }
   }
 
-  handleCurtainOpen() {
-    const slideCard = this.hasSlideCardTarget ? this.slideCardTarget : this.element.querySelector('.slide-card')
-    if (!slideCard) return
+  /**
+   * Play welcome entrance animation and store animal refs for transitions.
+   * @returns {void}
+   */
+  handleWelcomePageEntrance() {
+    const welcomeCard = this.hasSlideCardTarget ? this.slideCardTarget : this.element.querySelector('.slide-card')
+    if (!welcomeCard) return
 
     const birdImg = document.getElementById('bird-img')
     const foxImg = document.getElementById('fox-img')
 
-    const animals = curtainOpen(slideCard, birdImg, foxImg)
+    const animals = animateWelcomePageEntrance(welcomeCard, birdImg, foxImg)
     this.birdImg = animals.birdImg
     this.foxImg = animals.foxImg
   }
 
+  /**
+   * Transition from welcome card to form card.
+   * @returns {void}
+   */
   transitionToForm() {
     if (!this.hasSlideCardTarget) return
 
-    const slideCard = this.slideCardTarget
-    const welcomeCard = slideCard.querySelector('.welcome-card')
-    const formCard = slideCard.querySelector('.form-card')
+    const cardContainer = this.slideCardTarget
+    const welcomeCard = cardContainer.querySelector('.welcome-card')
+    const formCard = cardContainer.querySelector('.form-card')
 
-    slideCardTransition(slideCard, welcomeCard, formCard, this.foxImg, this.birdImg)
+    slideCardTransition(cardContainer, welcomeCard, formCard, this.foxImg, this.birdImg)
   }
 
-  handleSlideIn() {
-    performSlideIn(this.element)
+  /**
+   * Slide element in from the right.
+   * @returns {void}
+   */
+  handleSlideInFromRight() {
+    slideInFromRight(this.element)
   }
 
-  slideOut(event) {
+  /**
+   * Validate form inputs, set navigation flag, submit, and play slide-out.
+   * @param {Event} event - form submit event
+   * @returns {void}
+   */
+  slideOutToLeftAndSubmit(event) {
     event.preventDefault()
     const form = event.target
 
-    // Get all input fields that should be validated
     const speciesField = form.querySelector('#intake_species')
     const descriptionField = form.querySelector('#intake_description')
 
     let isValid = true
     let firstInvalidField = null
 
-    // Validate species field
     if (!speciesField || !speciesField.value || speciesField.value.trim() === '') {
       isValid = false
       if (speciesField) {
         speciesField.classList.add('is-invalid')
         firstInvalidField = speciesField
       }
-    } else if (speciesField) {
+    } else {
       speciesField.classList.remove('is-invalid')
     }
 
-    // Validate description field
     if (!descriptionField || !descriptionField.value || descriptionField.value.trim() === '') {
       isValid = false
       if (descriptionField) {
@@ -106,15 +165,12 @@ export default class extends Controller {
           firstInvalidField = descriptionField
         }
       }
-    } else if (descriptionField) {
+    } else {
       descriptionField.classList.remove('is-invalid')
     }
 
-    // If validation fails, focus first invalid field and stop
     if (!isValid) {
-      if (firstInvalidField) {
-        firstInvalidField.focus()
-      }
+      if (firstInvalidField) firstInvalidField.focus()
       return
     }
 

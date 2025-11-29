@@ -1,20 +1,28 @@
 import { Controller } from "@hotwired/stimulus"
 
 /**
- * Handles photo upload preview and file management
- * - Displays file name and size when photo is selected
- * - Shows preview UI with file information
- * - Allows clearing selected photo
+ * PhotoUploadController
+ * ---------------------
+ * Manages photo selection UX: shows file name/size, toggles preview state,
+ * and allows clearing the selection.
+ *
+ * Targets:
+ * - input: file input element.
+ * - preview: container that is shown/hidden when a file is selected.
+ * - fileName: text node to display the selected file name.
+ * - fileSize: text node to display the selected file size in KB.
  */
 export default class extends Controller {
   static targets = ["input", "preview", "fileName", "fileSize"]
 
   /**
-   * Handles file selection and displays preview information
+   * Handle file selection and display preview metadata.
+   *
+   * @param {Event} event - change event from the file input
+   * @returns {void}
    */
   handleFileSelect(event) {
     const file = event.target.files[0]
-
     if (file) {
       this.showPreview(file)
     } else {
@@ -23,30 +31,28 @@ export default class extends Controller {
   }
 
   /**
-   * Displays the preview UI with file information
+   * Display the preview UI with file information.
    *
-   * @param {File} file - The selected file
+   * @param {File} file - selected file
+   * @returns {void}
    */
   showPreview(file) {
     if (!this.hasPreviewTarget) return
 
-    // Update file name
     if (this.hasFileNameTarget) {
       this.fileNameTarget.textContent = file.name
     }
 
-    // Update file size (convert to KB)
     if (this.hasFileSizeTarget) {
-      const sizeInKB = (file.size / 1024).toFixed(1)
-      this.fileSizeTarget.textContent = `${sizeInKB} KB`
+      this.fileSizeTarget.textContent = this.formatFileSizeKB(file.size)
     }
 
-    // Show preview container
     this.previewTarget.classList.add('active')
   }
 
   /**
-   * Hides the preview UI
+   * Hide the preview UI.
+   * @returns {void}
    */
   hidePreview() {
     if (!this.hasPreviewTarget) return
@@ -54,12 +60,23 @@ export default class extends Controller {
   }
 
   /**
-   * Clears the selected file and hides preview
+   * Clear the selected file and hide preview.
+   * @returns {void}
    */
   clearFile() {
     if (this.hasInputTarget) {
       this.inputTarget.value = ''
     }
     this.hidePreview()
+  }
+
+  /**
+   * Format file size in KB with one decimal.
+   *
+   * @param {number} bytes - file size in bytes
+   * @returns {string} formatted size label (e.g., "12.3 KB")
+   */
+  formatFileSizeKB(bytes) {
+    return `${(bytes / 1024).toFixed(1)} KB`
   }
 }

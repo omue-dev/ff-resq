@@ -1,15 +1,12 @@
 // app/javascript/config/google_maps_config.js
 
 /**
- * Google Maps Configuration
- *
- * Centralized configuration for Google Maps styling and search parameters.
- * Used by map-related controllers and utilities.
+ * Google Maps configuration and helpers.
+ * Centralizes map styling, search parameters, and marker icon definitions.
  */
 
 /**
- * Custom map styling configuration
- * Dark theme with teal/green accents matching the application design
+ * Custom map styling configuration (dark teal theme to match UI).
  */
 export const MAP_STYLES = [
     {
@@ -62,8 +59,10 @@ export const MAP_STYLES = [
   ]
 
 /**
- * Custom marker icon configuration - User location
- * Uses the fox avatar image
+ * Custom marker icon configuration - User location.
+ * Uses the fox avatar image.
+ *
+ * @returns {google.maps.Icon}
  */
 export function getUserMarkerIcon() {
   return {
@@ -74,8 +73,9 @@ export function getUserMarkerIcon() {
 }
 
 /**
- * Custom marker icon configuration - Vet locations
- * Clean, professional marker pin with medical cross
+ * Custom marker icon configuration
+ *
+ * @returns {google.maps.Icon}
  */
 export function getVetMarkerIcon() {
   const svg = `
@@ -86,14 +86,6 @@ export function getVetMarkerIcon() {
 
       <!-- White circle background -->
       <circle cx="16" cy="16" r="10" fill="#FFFFFF"/>
-
-      <!-- Medical cross icon -->
-      <g transform="translate(16, 16)">
-        <!-- Vertical bar -->
-        <rect x="-2" y="-7" width="4" height="14" fill="#47b9b9ff" rx="1"/>
-        <!-- Horizontal bar -->
-        <rect x="-7" y="-2" width="14" height="4" fill="#47b9b9ff" rx="1"/>
-      </g>
     </svg>
   `
 
@@ -105,19 +97,43 @@ export function getVetMarkerIcon() {
 }
 
 /**
- * Main Google Maps configuration object
+ * Active/selected marker icon configuration
+ * Slightly different color to highlight the selected card/marker.
+ *
+ * @returns {google.maps.Icon}
+ */
+export function getActiveVetMarkerIcon() {
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="48" viewBox="0 0 32 48">
+      <path d="M16 0C7.163 0 0 7.163 0 16c0 11 16 32 16 32s16-21 16-32C32 7.163 24.837 0 16 0z"
+            fill="#ffb347"/>
+      <circle cx="16" cy="16" r="10" fill="#FFFFFF"/>
+    </svg>
+  `
+
+  return {
+    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
+    scaledSize: new google.maps.Size(32, 48),
+    anchor: new google.maps.Point(16, 48),
+  }
+}
+
+/**
+ * Main Google Maps configuration object.
  */
 export const MAPS_CONFIG = {
   /**
-   * Default map display options
+   * Default map display options.
    */
   MAP_OPTIONS: {
-    zoom: 13,
-    styles: MAP_STYLES,
+    zoom: 12,
+    // NOTE: Using inline styles instead of Map ID because Google Maps doesn't support
+    // custom dark styles with Map IDs (data-driven styles limitation)
+    styles: MAP_STYLES, // Custom dark teal theme
     // Disable all default UI controls
     disableDefaultUI: true,
     // Optional: Enable only specific controls you want
-    zoomControl: true,
+    zoomControl: false,
     // Remove Google branding and legal text
     mapTypeControl: false,
     scaleControl: false,
@@ -127,11 +143,11 @@ export const MAPS_CONFIG = {
   },
 
   /**
-   * Veterinary care search configuration
+   * Animal services search configuration.
    */
-  VET_SEARCH: {
+  ANIMAL_SERVICES_SEARCH: {
     /**
-     * Fields to retrieve from Places API for each veterinary location
+     * Fields to retrieve from Places API for each location.
      */
     fields: [
       "displayName",
@@ -144,28 +160,68 @@ export const MAPS_CONFIG = {
     ],
 
     /**
-     * Search radius in meters (5km)
+     * Search radius in meters (8km).
      */
-    radius: 5000,
+    radius: 8000,
 
     /**
-     * Maximum number of results to return
+     * Maximum number of results to return per category.
      */
-    maxResultCount: 5,
+    maxResultCount: 10,
 
     /**
-     * Place types to search for
+     * Place type configurations for different animal services.
      */
-    includedTypes: ["veterinary_care"],
+    categories: {
+      vets: {
+        includedTypes: ["veterinary_care"],
+        icon: "medical",
+        label: "Vets",
+        color: "#47b9b9ff"
+      },
+      shelters: {
+        // Use text query since animal_shelter is not a supported type
+        textQuery: "animal shelter",
+        icon: "home",
+        label: "Shelters",
+        color: "#6dd8b8ff"
+      },
+      rescue: {
+        // Google doesn't have a specific type, so we'll use keyword search
+        textQuery: "animal rescue organization",
+        icon: "paw",
+        label: "Rescue",
+        color: "#ffa500"
+      }
+    },
 
     /**
-     * Rank results by distance from user location
+     * Rank results by distance from user location.
      */
     rankPreference: "DISTANCE" // Will be mapped to google.maps.places.SearchNearbyRankPreference.DISTANCE
   },
 
   /**
-   * Marker configuration
+   * Legacy VET_SEARCH config (kept for backwards compatibility).
+   */
+  VET_SEARCH: {
+    fields: [
+      "displayName",
+      "location",
+      "formattedAddress",
+      "rating",
+      "id",
+      "types",
+      "regularOpeningHours"
+    ],
+    radius: 10000,
+    maxResultCount: 5,
+    includedTypes: ["veterinary_care"],
+    rankPreference: "DISTANCE"
+  },
+
+  /**
+   * Marker configuration.
    */
   MARKERS: {
     userMarkerTitle: "You are here",

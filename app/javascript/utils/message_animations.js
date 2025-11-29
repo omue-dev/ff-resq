@@ -2,7 +2,11 @@ import gsap from "gsap"
 import { ANIMATION_CONFIG } from "config/animation_constants"
 
 /**
- * Reveals a message bubble with blur-fade animation
+ * Reveal a message bubble by fading and un-blurring the text.
+ * Removes the "thinking" placeholder first if present.
+ *
+ * @param {HTMLElement} bubble - message wrapper with data-message and .ai-text
+ * @returns {void}
  */
 export function revealMessageBubble(bubble) {
   const content = bubble.dataset.message
@@ -17,6 +21,7 @@ export function revealMessageBubble(bubble) {
   const timeline = gsap.timeline()
   const config = ANIMATION_CONFIG.MESSAGE_REVEAL
 
+  // Start with the text hidden, blurred, and slightly offset
   gsap.set(aiText, {
     opacity: 0,
     y: config.yOffset,
@@ -25,6 +30,7 @@ export function revealMessageBubble(bubble) {
   })
 
   if (thinking) {
+    // Fade out/remove the thinking state, then reveal the AI text
     timeline.to(thinking, {
       opacity: 0,
       y: 10,
@@ -53,7 +59,10 @@ export function revealMessageBubble(bubble) {
 }
 
 /**
- * Animates thinking dots with bouncing effect
+ * Animate "thinking" dots with a simple bounce.
+ *
+ * @param {Document|HTMLElement} container - scope to find .typing-dots circles
+ * @returns {void}
  */
 export function animateThinkingDots(container = document) {
   const dots = container.querySelectorAll(".typing-dots circle")
@@ -75,7 +84,10 @@ export function animateThinkingDots(container = document) {
 }
 
 /**
- * Slides in a user message from right to left
+ * Slide a user message in from the right.
+ *
+ * @param {HTMLElement} messageRow
+ * @returns {void}
  */
 export function slideInUserMessage(messageRow) {
   const config = ANIMATION_CONFIG.MESSAGE_SLIDE_IN.user
@@ -94,7 +106,10 @@ export function slideInUserMessage(messageRow) {
 }
 
 /**
- * Slides in an AI message from left to right
+ * Slide an AI message in from the left.
+ *
+ * @param {HTMLElement} messageRow
+ * @returns {void}
  */
 export function slideInAIMessage(messageRow) {
   const config = ANIMATION_CONFIG.MESSAGE_SLIDE_IN.ai

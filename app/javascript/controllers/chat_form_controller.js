@@ -2,11 +2,25 @@ import { Controller } from "@hotwired/stimulus"
 import { slideInUserMessage, slideInAIMessage, animateThinkingDots } from "utils/message_animations"
 
 /**
- * Handles AJAX form submission for chat messages with slide-in animations
+ * ChatFormController
+ * ------------------
+ * Handles chat message submission over AJAX and plays entry animations for
+ * user and AI messages. Keeps the form responsive by disabling/enabling
+ * inputs during requests and rendering server-provided HTML partials inline.
+ *
+ * Targets:
+ * - input: text field for chat content.
+ * - submit: submit button for the form.
  */
 export default class extends Controller {
   static targets = ["input", "submit"]
 
+  /**
+   * Submit the chat form via fetch, render returned message HTML, and animate.
+   *
+   * @param {Event} event - form submit event
+   * @returns {Promise<void>}
+   */
   async submitMessage(event) {
     event.preventDefault()
 
@@ -44,6 +58,11 @@ export default class extends Controller {
     }
   }
 
+  /**
+   * Append and animate the user's message bubble.
+   *
+   * @param {string} html - server-rendered HTML for the user message
+   */
   appendUserMessage(html) {
     const container = document.getElementById("chat_messages")
     if (!container) return
@@ -56,6 +75,11 @@ export default class extends Controller {
     }
   }
 
+  /**
+   * Append and animate the AI's message bubble, including thinking dots.
+   *
+   * @param {string} html - server-rendered HTML for the AI message
+   */
   appendAIMessage(html) {
     const container = document.getElementById("chat_messages")
     if (!container) return
@@ -73,20 +97,33 @@ export default class extends Controller {
     }
   }
 
+  /**
+   * Disable form inputs during an in-flight request.
+   */
   disableForm() {
     if (this.hasInputTarget) this.inputTarget.disabled = true
     if (this.hasSubmitTarget) this.submitTarget.disabled = true
   }
 
+  /**
+   * Re-enable form inputs after a request completes.
+   */
   enableForm() {
     if (this.hasInputTarget) this.inputTarget.disabled = false
     if (this.hasSubmitTarget) this.submitTarget.disabled = false
   }
 
+  /**
+   * Clear the text input.
+   */
   clearForm() {
     if (this.hasInputTarget) this.inputTarget.value = ""
   }
 
+  /**
+   * Read CSRF token from meta tag for authenticated POSTs.
+   * @returns {string}
+   */
   getCSRFToken() {
     const meta = document.querySelector('meta[name="csrf-token"]')
     return meta ? meta.content : ""
