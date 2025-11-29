@@ -47,6 +47,13 @@ module IntakeAi
       text = extract_text_from_response
       cleaned_text = strip_markdown_code_blocks(text)
       json_string = extract_json_string(cleaned_text)
+
+      # If we can't even find a JSON object, fall back to a safe payload
+      unless json_string&.include?("{") && json_string&.include?("}")
+        Rails.logger.warn "IntakeAi::ResponseParser - No JSON object found in response, returning fallback payload"
+        return fallback_response(cleaned_text, "No JSON object found")
+      end
+
       parsed_data = parse_json(json_string, cleaned_text)
 
       validate_required_fields!(parsed_data)
@@ -107,7 +114,8 @@ module IntakeAi
       Rails.logger.error "Raw text: #{extract_text_from_response}"
       Rails.logger.error "Cleaned text: #{json_string}"
 
-      raise IntakeAi::ParseError, "Invalid JSON in AI response: #{e.message}"
+      Rails.logger.warn "IntakeAi::ResponseParser - Using fallback payload due to parse error"
+      fallback_response(cleaned_text, e.message)
     end
 
     # Attempts to extract a JSON object from free-form text by locating the first
@@ -133,6 +141,24 @@ module IntakeAi
       return stripped if stripped.start_with?("{") && stripped.end_with?("}")
 
       extract_braced_content(stripped) || stripped
+    end
+
+    # Build a safe fallback payload that satisfies required fields
+    #
+    # @param cleaned_text [String] The text we received from the model
+    # @param reason [String] Why we're falling back
+    # @return [Hash] payload with required keys filled with defaults
+    def fallback_response(cleaned_text, reason)
+      {
+        "species" => "unknown",
+        "condition" => "unknown",
+        "injury" => "unknown",
+        "handling" => "",
+        "danger" => "unknown",
+        "error" => "Invalid JSON in AI response: #{reason}",
+        "user_message" => DEFAULT_FALLBACK_MESSAGE,
+        "raw_text" => cleaned_text
+      }
     end
 
     # Validates that all required fields are present in the response
