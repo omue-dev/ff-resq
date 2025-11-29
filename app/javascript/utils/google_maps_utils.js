@@ -1,6 +1,6 @@
 // app/javascript/utils/google_maps_utils.js
 
-import { MAPS_CONFIG, getUserMarkerIcon, getVetMarkerIcon } from "../config/google_maps_config"
+import { MAPS_CONFIG, getUserMarkerIcon, getVetMarkerIcon } from "config/google_maps_config"
 
 // Fallback list of fields to request from Google Places when config is missing/invalid
 const DEFAULT_PLACE_FIELDS = [

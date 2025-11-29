@@ -1,6 +1,6 @@
 // app/javascript/utils/vet_card_utils.js
 
-import { SVG_ICONS, VET_DISPLAY_CONFIG } from "../config/vets_config"
+import { SVG_ICONS, VET_DISPLAY_CONFIG } from "config/vets_config"
 
 /**
  * Veterinary Card Utility Functions

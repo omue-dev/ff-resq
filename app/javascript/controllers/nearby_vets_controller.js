@@ -8,13 +8,13 @@ import {
   createUserMarker,
   createVetMarker,
   searchAllAnimalServices
-} from "../utils/google_maps_utils"
-import { distanceInMeters } from "../utils/distance_utils"
+} from "utils/google_maps_utils"
+import { distanceInMeters } from "utils/distance_utils"
 import {
   createHorizontalLocationCard,
   setCardActive,
   setCardExpanded
-} from "../utils/location_card_horizontal"
+} from "utils/location_card_horizontal"
 import { getVetMarkerIcon, getActiveVetMarkerIcon } from "../config/google_maps_config"
 
 /**

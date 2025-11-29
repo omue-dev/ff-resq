@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { simulateDevAppointment } from "../utils/appointment_dev_helpers"
+import { simulateDevAppointment } from "utils/appointment_dev_helpers"
 
 /**
  * AppointmentController

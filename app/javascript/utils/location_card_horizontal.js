@@ -7,7 +7,7 @@ import {
   getAllOpeningHours,
   createAppointmentSection,
   getOpeningStatus
-} from "./vet_card_utils"
+} from "utils/vet_card_utils"
 import { distanceInMeters, formatDistanceLabel } from "./distance_utils"
 
 /**
