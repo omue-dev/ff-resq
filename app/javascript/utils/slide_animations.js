@@ -110,6 +110,15 @@ export function slideCardTransition(cardContainer, welcomeCard, formCard, foxImg
 export function slideInFromRight(element) {
   const backgroundLayer = ensureBackgroundLayer()
 
+  // Remove preload styles hiding the element
+  const preloadChat = document.getElementById('chat-slide-preload')
+  if (preloadChat) preloadChat.remove()
+  const preloadVets = document.getElementById('vets-slide-preload')
+  if (preloadVets) preloadVets.remove()
+
+  element.style.visibility = 'visible'
+  element.style.opacity = 1
+  element.style.transform = 'translateX(100%)'
 
   gsap.to(element, {
     x: '0%',
