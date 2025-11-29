@@ -15,7 +15,7 @@ import {
   setCardActive,
   setCardExpanded
 } from "utils/location_card_horizontal"
-import { getVetMarkerIcon, getActiveVetMarkerIcon } from "../config/google_maps_config"
+import { getVetMarkerIcon, getActiveVetMarkerIcon } from "config/google_maps_config"
 
 /**
  * NearbyVetsController
