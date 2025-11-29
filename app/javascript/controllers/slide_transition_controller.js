@@ -28,11 +28,11 @@ export default class extends Controller {
    */
   connect() {
     if (this.initialLoadValue) {
-      this.handleCurtainOpen()
-    } else if (sessionStorage.getItem('chatShouldSlideIn') === 'true') {
-      sessionStorage.removeItem('chatShouldSlideIn')
-      // Opacity already set via inline style in chat.html.erb to prevent flash
-      requestAnimationFrame(() => this.handleSlideIn())
+      this.handleWelcomePageEntrance()
+    } else if (this.shouldSlideInFromRight()) {
+      this.clearSlideFlags()
+      // Opacity already set via inline style to prevent flash
+      requestAnimationFrame(() => this.handleSlideInFromRight())
     }
 
     this.setupValidationListeners()
@@ -133,6 +133,38 @@ export default class extends Controller {
   }
 
   /**
+   * Slide out to left and navigate to vets page.
+   * @param {Event} event
+   * @returns {void}
+   */
+  slideToVets(event) {
+    event.preventDefault()
+    const link = event.currentTarget
+    const url = link.href
+
+    sessionStorage.setItem('vetsShouldSlideIn', 'true')
+    slideOutToLeft(this.element, () => {
+      window.location.href = url
+    })
+  }
+
+  /**
+   * Slide out to left and navigate back to chat page.
+   * @param {Event} event
+   * @returns {void}
+   */
+  slideBackToChat(event) {
+    event.preventDefault()
+    const link = event.currentTarget
+    const url = link.href
+
+    sessionStorage.setItem('chatShouldSlideIn', 'true')
+    slideOutToLeft(this.element, () => {
+      window.location.href = url
+    })
+  }
+
+  /**
    * Validate form inputs, set navigation flag, submit, and play slide-out.
    * @param {Event} event - form submit event
    * @returns {void}
@@ -175,11 +207,6 @@ export default class extends Controller {
     }
 
     sessionStorage.setItem('chatShouldSlideIn', 'true')
-
-    // Play slide out animation FIRST
-    performSlideOut(this.element, () => {
-      // THEN submit form after animation completes
-      form.submit()
-    })
+    slideOutToLeft(this.element, () => form.submit())
   }
 }
