@@ -464,6 +464,13 @@
 
     &.success {
       color: #6dd8b8ff;
+
+      // Remove spinner/phone when confirmed
+      &::before,
+      &::after {
+        content: none;
+        animation: none;
+      }
     }
 
     &.calling {
