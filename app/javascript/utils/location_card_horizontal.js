@@ -9,7 +9,7 @@ import {
   getOpeningStatus
 } from "utils/vet_card_utils"
 import { distanceInMeters, formatDistanceLabel } from "utils/distance_utils"
-import { createDirectionsButton } from "./vet_card_utils"
+import { createDirectionsButton } from "utils/vet_card_utils"
 
 /**
  * Creates a horizontal location card in Google Maps style.
