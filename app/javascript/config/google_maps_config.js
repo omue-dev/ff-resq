@@ -15,7 +15,8 @@ export const MAP_STYLES = [
     },
     {
       elementType: "labels.text.fill",
-      stylers: [{ color: "#6dd8b8ff" }] // fox-cream text
+      // Google Maps style colors must be #RRGGBB (no alpha channel)
+      stylers: [{ color: "#6dd8b8" }] // fox-cream text
     },
     {
       elementType: "labels.text.stroke",
@@ -23,7 +24,7 @@ export const MAP_STYLES = [
     },
     {
       featureType: "water",
-      stylers: [{ color: "#1A7A75" }] // brighter teal glow
+      stylers: [{ color: "#30b3ff" }] // brighter teal glow
     },
     {
       featureType: "poi",
@@ -31,17 +32,17 @@ export const MAP_STYLES = [
     },
     {
       featureType: "landscape",
-      stylers: [{ color: "#0C3F40" }]
+      stylers: [{ color: "#00595F" }]
     },
     {
       featureType: "road",
       elementType: "geometry",
-      stylers: [{ color: "#2E2E2E" }] // charcoal from logo outline
+      stylers: [{ color: "#2C2C29" }] // charcoal from logo outline
     },
     {
       featureType: "road",
       elementType: "labels.text.fill",
-      stylers: [{ color: "#bcdbe0ff" }] // fox orange accents
+      stylers: [{ color: "#bcdbe0" }] // fox orange accents
     },
     {
       featureType: "road",
@@ -82,7 +83,7 @@ export function getVetMarkerIcon() {
     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="48" viewBox="0 0 32 48">
       <!-- Clean pin shape -->
       <path d="M16 0C7.163 0 0 7.163 0 16c0 11 16 32 16 32s16-21 16-32C32 7.163 24.837 0 16 0z"
-            fill="#47b9b9ff"/>
+            fill="$card-border"/>
 
       <!-- White circle background -->
       <circle cx="16" cy="16" r="10" fill="#FFFFFF"/>
@@ -177,7 +178,7 @@ export const MAPS_CONFIG = {
         includedTypes: ["veterinary_care"],
         icon: "medical",
         label: "Vets",
-        color: "#47b9b9ff"
+        color: "$card-border"
       },
       shelters: {
         // Use text query since animal_shelter is not a supported type

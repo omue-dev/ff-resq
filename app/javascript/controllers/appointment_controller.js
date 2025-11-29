@@ -69,7 +69,7 @@ export default class extends Controller {
 
     // Show calling state (both dev/prod)
     if (statusElement) {
-      statusElement.textContent = "AI is calling the vet..."
+      statusElement.textContent = "AI is calling the vet... (wait approx. 15-30 seconds)"
       statusElement.classList.remove('success')
       statusElement.classList.add('calling')
       statusElement.classList.remove('hidden')
