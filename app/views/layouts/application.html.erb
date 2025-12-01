@@ -17,7 +17,7 @@
     <%= yield :head %>
   </head>
 
-  <body>
+  <body data-ai-appointment="<%= ENV['AI_APPOINTMENT'] %>">
     <div id="background-layer"
          data-turbo-permanent
          style="background-image: url('<%= asset_path('ffresq-background-forest-dark-min.png') %>');"

@@ -18,9 +18,6 @@ import { SVG_ICONS, VET_DISPLAY_CONFIG } from "config/vets_config"
  * @param {string[]} [place.regularOpeningHours.weekdayDescriptions] - Array of opening hours by day
  * @returns {string|null} Formatted opening hours string for today, or null if unavailable
  *
- * @example
- * const status = getOpeningStatus(place)
- * // Returns: "<strong>Today:</strong> 9:00 AM – 5:00 PM"
  */
 export function getOpeningStatus(place) {
   if (place.regularOpeningHours?.weekdayDescriptions) {
@@ -134,7 +131,8 @@ export function getFormattedAddress(place) {
  * @returns {string} HTML string for appointment section or empty string
  */
 export function createAppointmentSection(hasIntake, stopPropagation = false) {
-  if (!hasIntake) return ''
+  const aiAppointmentEnabled = document.body?.dataset.aiAppointment === 'true'
+  if (!hasIntake || !aiAppointmentEnabled) return ''
 
   const onclickAttr = stopPropagation ? ' onclick="event.stopPropagation()"' : ''
 
