@@ -1,15 +1,4 @@
-<!-- Critical CSS to prevent flash when sliding in -->
-<script>
-  if (sessionStorage.getItem('vetsShouldSlideIn') === 'true') {
-    document.write('<style id="vets-slide-preload">#vets-page-container { transform: translateX(100%); visibility: hidden; }</style>');
-  }
-</script>
-
-<% content_for :head do %>
-  <meta name="turbo-cache-control" content="no-cache">
-<% end %>
-
-<div class="vets-page" data-controller="slide-transition chat-scroll" id="vets-page-container">
+<div class="vets-page vets-entrance-pending" data-controller="vets-entrance chat-scroll" id="vets-page-container">
 
   <div
     data-controller="nearby-vets appointment"
@@ -17,34 +6,48 @@
     data-nearby-vets-user-marker-icon-value="<%= asset_path('fox-avatar-min.png') %>"
     class="map-wrapper"
   >
-    <!-- Filter Overlay -->
-    <div class="filter-overlay">
-      <% if @intake.present? %>
-      <%= link_to chat_intake_path(@intake),
-        class: "back-to-chat-btn",
-        data: { action: "click->slide-transition#slideBackToChat" } do %>
-        <span class="back-arrow">←</span>
-        <span>Back</span>
+    <div class="vets-loader" data-vets-entrance-target="loader">
+      <div class="vets-loader-spinner"></div>
+      <div class="vets-loader-text">Finding vets</div>
+    </div>
+
+    <div class="vets-content" data-vets-entrance-target="content">
+      <!-- Filter Overlay -->
+      <div class="filter-overlay">
+        <% if @intake.present? %>
+        <%= link_to chat_intake_path(@intake),
+          class: "back-to-chat-btn" do %>
+          <span class="back-arrow">←</span>
+          <span>Back</span>
+        <% end %>
       <% end %>
-    <% end %>
+      </div>
+
+      <!-- Fullscreen Map -->
+      <div
+        data-nearby-vets-target="map"
+        class="map-fullscreen"
+      ></div>
+
+      <!-- Horizontal Locations List -->
+      <div class="locations-horizontal-container">
+        <div data-nearby-vets-target="horizontalList" class="locations-horizontal-scroll"></div>
+      </div>
     </div>
-
-    <!-- Fullscreen Map -->
-    <div
-      data-nearby-vets-target="map"
-      class="map-fullscreen"
-    ></div>
-
-    <!-- Horizontal Locations List -->
-    <div class="locations-horizontal-container">
-      <div data-nearby-vets-target="horizontalList" class="locations-horizontal-scroll"></div>
-    </div>
-
   </div>
 
 </div>
 
-<!-- Load Google Maps JS SDK (no callback, Stimulus handles init) -->
-<script async
-  src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&libraries=places,marker&loading=async">
+<!-- Load Google Maps JS SDK once (Stimulus waits for it) -->
+<script>
+  (function loadGoogleMapsOnce() {
+    if (window.google && window.google.maps) return;
+    if (document.getElementById('google-maps-sdk')) return;
+
+    const script = document.createElement('script');
+    script.id = 'google-maps-sdk';
+    script.async = true;
+    script.src = "https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&libraries=places,marker&loading=async";
+    document.head.appendChild(script);
+  })();
 </script>

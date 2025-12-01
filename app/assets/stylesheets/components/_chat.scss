@@ -23,6 +23,17 @@
   transition: opacity 0.5s $ease-in-out;
 }
 
+// Initial hidden state for entrance animation
+.page-entrance-pending {
+  .page-header,
+  .chat-messages-container,
+  .chat-input-fixed,
+  .chat-input-form {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
 // -----------------------------------------------------------------------------
 // Fixed header (reusable across pages)
 // -----------------------------------------------------------------------------

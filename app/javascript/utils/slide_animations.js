@@ -105,57 +105,41 @@ export function slideCardTransition(cardContainer, welcomeCard, formCard, foxImg
 }
 
 /**
- * Slide in from right animation for chat/vets pages.
+ * Chat entrance animation: quick fade/slide for header, messages, and input.
  */
-export function slideInFromRight(element) {
-  const backgroundLayer = ensureBackgroundLayer()
+export function animateChatEntrance(elements) {
+  if (!elements || elements.length === 0) return
 
-  // Remove preload styles hiding the element
-  const preloadChat = document.getElementById('chat-slide-preload')
-  if (preloadChat) preloadChat.remove()
-  const preloadVets = document.getElementById('vets-slide-preload')
-  if (preloadVets) preloadVets.remove()
-
-  element.style.visibility = 'visible'
-  element.style.opacity = 1
-  element.style.transform = 'translateX(100%)'
-
-  gsap.to(element, {
-    x: '0%',
+  gsap.to(elements, {
     opacity: 1,
-    visibility: 'visible',
-    duration: 0.3,
-    ease: "power2.out",
-    clearProps: 'transform'
+    y: 0,
+    duration: 0.25,
+    stagger: 0.12,
+    ease: "power2.out"
   })
-
-  if (backgroundLayer) {
-    gsap.set(backgroundLayer, { autoAlpha: 1 })
-  }
-
 }
 
 /**
- * Slide out to left animation.
+ * Vets page entrance: show loader, then fade in content after 2s.
  */
-export function slideOutToLeft(element, callback) {
-  const backgroundLayer = ensureBackgroundLayer()
+export function animateVetsEntrance({ loader, content, onComplete } = {}) {
+  const tl = gsap.timeline({ onComplete })
 
-  const timeline = gsap.timeline({
-    onComplete: () => {
-      if (callback) callback()
-    }
-  })
-
-  if (backgroundLayer) {
-    timeline.set(backgroundLayer, { autoAlpha: 1 }, 0)
+  if (content) {
+    tl.set(content, { autoAlpha: 0 })
   }
 
-  timeline.to(element, {
-    x: '-100%',
-    duration: 0.3,
-    ease: "power2.Out"
-  })
+  if (loader) {
+    tl.set(loader, { display: "flex", autoAlpha: 1 })
+    tl.to(loader, { autoAlpha: 1, duration: 0.2 })
+    tl.to(loader, { autoAlpha: 0, duration: 0.3 }, "+=2")
+  } else {
+    tl.to({}, { duration: 2 })
+  }
 
-  return timeline
+  if (content) {
+    tl.to(content, { autoAlpha: 1, duration: 0.4, ease: "power2.out" }, loader ? "-=0.1" : 0)
+  }
+
+  return tl
 }
