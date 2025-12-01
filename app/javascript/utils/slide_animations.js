@@ -107,17 +107,27 @@ export function slideCardTransition(cardContainer, welcomeCard, formCard, foxImg
 /**
  * Chat entrance animation: quick fade/slide for header, messages, and input.
  */
-export function animateChatEntrance(elements) {
-  if (!elements || elements.length === 0) return
+// utils/slide_animations.js
+export function animateChatEntrance({ header, input }, onComplete) {
+  if (!header && !input) return
 
-  gsap.to(elements, {
-    opacity: 1,
-    y: 0,
-    duration: 0.25,
-    stagger: 0.12,
-    ease: "power2.out"
-  })
+  if (header) {
+    gsap.fromTo(header,
+      { opacity: 0, y: -24 },
+      { opacity: 1, y: 0, duration: 1, ease: "power2.out" }
+    )
+  }
+
+  if (input) {
+    gsap.fromTo(input,
+      { opacity: 0, y: 24},
+      { opacity: 1, y: 0, duration: 1, ease: "power2.out", delay: 0.05 }
+    )
+  }
+
+  if (onComplete) gsap.delayedCall(0, onComplete)
 }
+
 
 /**
  * Vets page entrance: show loader, then fade in content after 2s.

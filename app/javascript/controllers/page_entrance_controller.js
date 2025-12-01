@@ -28,20 +28,16 @@ export default class extends Controller {
     this.element.classList.remove("page-entrance-pending")
   }
 
+  // page_entrance_controller.js
   animateChat() {
+    const header = this.element.querySelector(".page-header")
     const input = this.element.querySelector(".chat-input-fixed, .chat-input-form")
 
-    const header = this.element.querySelector(".page-header")
-    const messages = this.element.querySelector(".chat-messages-container")
-
-    const elements = [header, messages, input].filter(Boolean)
-    if (elements.length === 0) {
+    if (!header && !input) {
       this.clearPendingState()
       return
     }
 
-    animateChatEntrance(elements)
-
-    this.clearPendingState()
+    animateChatEntrance({ header, input }, () => this.clearPendingState())
   }
 }
