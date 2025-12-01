@@ -17,6 +17,52 @@
   background: transparent;
 }
 
+// Entrance state for vets page
+.vets-entrance-pending {
+  .vets-loader {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .vets-content {
+    opacity: 0;
+  }
+}
+
+.vets-loader {
+  align-items: center;
+  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.4);
+  display: none;
+  inset: 0;
+  justify-content: center;
+  position: fixed;
+  z-index: $z-overlay + 1;
+  gap: $space-md;
+  color: $white;
+
+  .vets-loader-spinner {
+    width: 34px;
+    height: 34px;
+    border: 3px solid rgba(255, 255, 255, 0.4);
+    border-top-color: $white;
+    border-radius: 50%;
+    animation: vets-spin 0.8s linear infinite;
+  }
+
+  .vets-loader-text {
+    font-size: $font-base;
+    font-weight: $font-weight-semibold;
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.35);
+  }
+}
+
+@keyframes vets-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 // -----------------------------------------------------------------------------
 // Fullscreen map - Full viewport height
 // -----------------------------------------------------------------------------
