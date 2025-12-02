@@ -1,7 +1,8 @@
 class Intake < ApplicationRecord
   # --- Validations ---
   validates :species, presence: true
-  validates :description, presence: true, length: { maximum: 2000 }
+  validates :description, length: { maximum: 2000 }
+  validate :description_has_sufficient_detail
 
   # --- Associations ---
   has_one_attached :photo
@@ -31,5 +32,14 @@ class Intake < ApplicationRecord
     data.dig("error", "message") ||
       data["error"] ||
       data.dig(:error, :message)
+  end
+
+  private
+
+  def description_has_sufficient_detail
+    description_text = description.to_s.strip
+    return if description_text.length >= 10
+
+    errors.add(:description, "Please provide more details.")
   end
 end

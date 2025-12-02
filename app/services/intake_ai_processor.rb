@@ -214,7 +214,7 @@ class IntakeAiProcessor
 
     handle_ai_failure(
       message_id: message_id,
-      fallback_text: "I received a response but couldn't parse it properly. Please try again.",
+      fallback_text: "The information so far isn't enough for me to give safe and specific first-aid guidance. Could you share a bit more about what's going on with the animal? Any extra details will help me guide you better.",
       status_value: STATUS_ERROR,
       payload: {
         error: error.message,

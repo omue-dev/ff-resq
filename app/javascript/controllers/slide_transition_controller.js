@@ -1,6 +1,9 @@
 import { Controller } from "@hotwired/stimulus"
 import { animateWelcomePageEntrance, slideCardTransition } from "utils/slide_animations"
 
+const MIN_DESCRIPTION_LENGTH = 10
+const INSUFFICIENT_DESCRIPTION_MESSAGE = "Please provide more details."
+
 /**
  * SlideTransitionController
  * -------------------------
@@ -88,8 +91,12 @@ export default class extends Controller {
 
     if (descriptionField) {
       descriptionField.addEventListener('input', () => {
-        if (descriptionField.value.trim() !== '') {
+        const trimmedValue = descriptionField.value.trim()
+        if (trimmedValue.length >= MIN_DESCRIPTION_LENGTH) {
           descriptionField.classList.remove('is-invalid')
+          descriptionField.setCustomValidity('')
+        } else {
+          descriptionField.setCustomValidity(INSUFFICIENT_DESCRIPTION_MESSAGE)
         }
       })
     }
@@ -134,16 +141,20 @@ export default class extends Controller {
       speciesField.classList.remove('is-invalid')
     }
 
-    if (!descriptionField || !descriptionField.value || descriptionField.value.trim() === '') {
+    const descriptionValue = descriptionField ? descriptionField.value.trim() : ''
+    if (!descriptionField || descriptionValue.length < MIN_DESCRIPTION_LENGTH) {
       isValid = false
       if (descriptionField) {
         descriptionField.classList.add('is-invalid')
+        descriptionField.setCustomValidity(INSUFFICIENT_DESCRIPTION_MESSAGE)
+        descriptionField.reportValidity()
         if (!firstInvalidField) {
           firstInvalidField = descriptionField
         }
       }
     } else {
       descriptionField.classList.remove('is-invalid')
+      descriptionField.setCustomValidity('')
     }
 
     if (!isValid) {
