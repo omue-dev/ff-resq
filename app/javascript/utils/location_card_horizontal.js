@@ -37,6 +37,8 @@ export function createHorizontalLocationCard(place, onCardClick, onCardHover, ha
   const address = getFormattedAddress(place)
   const distanceText = userLocation ? formatDistance(userLocation, place.location) : null
   const todayHours = getOpeningStatus(place)
+  const phoneNumber = formatPhoneNumber(place.phoneNumber)
+  const phoneHref = buildTelHref(place.phoneNumber)
 
   const categoryLabel = place.categoryLabel || 'Vet'
   const categoryClass = place.category || 'vets'
@@ -56,6 +58,14 @@ export function createHorizontalLocationCard(place, onCardClick, onCardHover, ha
         </div>
         <p class="location-card-category">${categoryLabel}</p>
         <p class="location-card-address">${address}</p>
+        ${phoneNumber ? `
+          <div class="location-card-contact">
+            <a class="phone-icon-button" href="tel:1234567890" aria-label="Call ${place.displayName}" onclick="event.stopPropagation()">
+              <i class="fa-solid fa-phone"></i>
+            </a>
+              <span class="phone-number">${phoneNumber}</span>
+          </div>
+        ` : ''}
         ${distanceText ? `<p class="location-card-distance">Distance: ${distanceText}${isNearest ? ' · Nearest' : ''}</p>` : ''}
         ${todayHours ? `<p class="location-card-today">${todayHours}</p>` : ''}
       </div>
@@ -120,6 +130,17 @@ function formatDistance(origin, destination) {
 function truncateTitle(name, maxLength = 25) {
   if (!name || name.length <= maxLength) return name || ''
   return `${name.slice(0, maxLength)}...`
+}
+
+function buildTelHref(phone) {
+  if (!phone) return '#'
+  const digitsOnly = phone.toString().replace(/[^\d+]/g, '')
+  return `tel:${digitsOnly}`
+}
+
+function formatPhoneNumber(phone) {
+  if (!phone) return null
+  return phone.toString()
 }
 
 /**

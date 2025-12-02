@@ -157,7 +157,8 @@ export const MAPS_CONFIG = {
       "rating",
       "id",
       "types",
-      "regularOpeningHours"
+      "regularOpeningHours",
+      "nationalPhoneNumber"
     ],
 
     /**
@@ -213,7 +214,8 @@ export const MAPS_CONFIG = {
       "rating",
       "id",
       "types",
-      "regularOpeningHours"
+      "regularOpeningHours",
+      "nationalPhoneNumber"
     ],
     radius: 10000,
     maxResultCount: 5,

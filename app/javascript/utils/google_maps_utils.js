@@ -200,6 +200,7 @@ function normalizePlace(place, categoryKey, categoryMeta = {}) {
   const rating = typeof place.rating === 'number' ? place.rating : null
   const types = Array.isArray(place.types) ? place.types : []
   const regularOpeningHours = place.regularOpeningHours || place.regular_opening_hours || null
+  const phoneNumber = place.nationalPhoneNumber || place.formattedPhoneNumber || place.internationalPhoneNumber || place.phoneNumber || null
 
   if (!displayName || !location) return null
 
@@ -212,6 +213,7 @@ function normalizePlace(place, categoryKey, categoryMeta = {}) {
     rating,
     types,
     regularOpeningHours,
+    phoneNumber,
     category: categoryKey,
     categoryLabel: categoryMeta.label,
     categoryColor: categoryMeta.color
