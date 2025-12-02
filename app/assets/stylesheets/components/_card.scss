@@ -54,7 +54,8 @@
   width: 90%;
 
   // Initial state: hidden until animation starts
-  opacity: 1;
+  opacity: 0;
+  visibility: hidden;
   transform: none;
 }
 

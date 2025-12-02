@@ -29,7 +29,7 @@ export function animateWelcomePageEntrance(welcomeCard, birdImg, foxImg) {
   birdImg.style.display = 'block'
   foxImg.style.display = 'block'
 
-  gsap.set(welcomeCard, { scale: 0 })
+  gsap.set(welcomeCard, { scale: 0.9, autoAlpha: 0 })
 
   const timeline = gsap.timeline()
 
@@ -48,7 +48,7 @@ export function animateWelcomePageEntrance(welcomeCard, birdImg, foxImg) {
   // Animate card scaling in
   .to(welcomeCard, {
     scale: 1,
-    opacity: 1,
+    autoAlpha: 1,
     duration: 0.4,
     ease: ANIMATION_CONFIG.CARD_SLIDE.ease
   }, "-=0.4")
