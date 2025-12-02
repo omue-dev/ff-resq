@@ -519,6 +519,47 @@
   letter-spacing: 0.5px;
 }
 
+.location-card-contact {
+  display: flex;
+  align-items: center;
+  gap: $space-xs;
+  margin: $space-xs 0 0 0;
+
+  .phone-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: $white;
+    text-decoration: none;
+    font-weight: $font-weight-semibold;
+    font-size: $font-xs;
+
+    i {
+      color: $green;
+    }
+  }
+
+  .phone-icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: $radius-circle;
+    background: $green;
+    color: $black;
+    text-decoration: none;
+    flex-shrink: 0;
+    box-shadow: $shadow-sm;
+
+    &:hover,
+    &:focus-visible {
+      background: lighten($green, 10%);
+      color: $black;
+    }
+  }
+}
+
 .location-card-address {
   // Typography
   color: $white;
