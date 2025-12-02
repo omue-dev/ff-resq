@@ -140,8 +140,8 @@ export function createAppointmentSection(hasIntake, stopPropagation = false) {
     <button data-action="click->appointment#makeAppointment"
             data-appointment-target="button"
             class="appointment-btn"${onclickAttr}>
-      ${SVG_ICONS.calendar}
-      <span style="padding-left:5px">Make Appointment</span>
+        <i class="fa-solid fa-robot"></i>
+      <span style="padding-left:5px">AI-Appointment</span>
     </button>
     <div class="appointment-status" data-appointment-target="status"></div>
     <div class="appointment-response hidden" data-appointment-target="notes"></div>
@@ -157,7 +157,7 @@ export function createDirectionsButton(directionsUrl) {
   return `
   <div class="card-actions">
         <a href="${directionsUrl}" target="_blank" class="directions-btn" onclick="event.stopPropagation()">
-         ${SVG_ICONS.directions}
-        <span style="padding-left:5px">Get Directions</span></a>
+         <i class="fa-solid fa-road"></i>
+        <span style="padding-left:5px">Navigate</span></a>
   `
 }
