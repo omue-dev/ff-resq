@@ -56,7 +56,7 @@ export function createHorizontalLocationCard(place, onCardClick, onCardHover, ha
         </div>
         <p class="location-card-category">${categoryLabel}</p>
         <p class="location-card-address">${address}</p>
-        ${distanceText ? `<p class="location-card-distance">${distanceText}${isNearest ? ' · Nächstgelegen' : ''}</p>` : ''}
+        ${distanceText ? `<p class="location-card-distance">Distance: ${distanceText}${isNearest ? ' · Nearest' : ''}</p>` : ''}
         ${todayHours ? `<p class="location-card-today">${todayHours}</p>` : ''}
       </div>
       <button class="location-card-expand-btn" type="button" aria-label="Expand card" title="Expand">
@@ -113,7 +113,7 @@ export function createHorizontalLocationCard(place, onCardClick, onCardHover, ha
 
 function formatDistance(origin, destination) {
   const meters = distanceInMeters(origin, destination)
-  const label = formatDistanceLabel(meters, { suffix: " km entfernt" })
+  const label = formatDistanceLabel(meters, { suffix: " km" })
   return label
 }
 

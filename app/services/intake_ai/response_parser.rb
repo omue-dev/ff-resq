@@ -31,7 +31,8 @@ module IntakeAi
     ].freeze
 
     # Default fallback message when parsing fails
-    DEFAULT_FALLBACK_MESSAGE = "I received a response but couldn't parse it properly. Please try again."
+    DEFAULT_FALLBACK_MESSAGE = "The information so far isn't enough for me to give safe and specific first-aid guidance. Could you share a bit more about what's going on with the animal? Any extra details will help me guide you better."
+
 
     # @param raw_response [Hash] The raw API response from GeminiClient
     def initialize(raw_response)

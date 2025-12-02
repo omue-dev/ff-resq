@@ -130,7 +130,7 @@ export function animateChatEntrance({ header, input }, onComplete) {
 
 
 /**
- * Vets page entrance: show loader, then fade in content after 2s.
+ * Vets page entrance: show loader, then fade in content after 1s.
  */
 export function animateVetsEntrance({ loader, content, onComplete } = {}) {
   const tl = gsap.timeline({ onComplete })
@@ -144,7 +144,7 @@ export function animateVetsEntrance({ loader, content, onComplete } = {}) {
     tl.to(loader, { autoAlpha: 1, duration: 0.2 })
     tl.to(loader, { autoAlpha: 0, duration: 0.3 }, "+=2")
   } else {
-    tl.to({}, { duration: 2 })
+    tl.to({}, { duration: 1 })
   }
 
   if (content) {

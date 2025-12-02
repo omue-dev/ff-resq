@@ -69,7 +69,7 @@ export default class extends Controller {
 
     // Show calling state (both dev/prod)
     if (statusElement) {
-      statusElement.textContent = "AI is calling the vet... (wait approx. 15-30 seconds)"
+      statusElement.textContent = "AI is calling the vet... (wait approx. 60 seconds)"
       statusElement.classList.remove('success')
       statusElement.classList.add('calling')
       statusElement.classList.remove('hidden')
@@ -172,6 +172,8 @@ export default class extends Controller {
       } else if (data.status === "cancelled") {
         if (this.currentStatus) {
           this.currentStatus.textContent = "Appointment was cancelled."
+          this.currentStatus.classList.remove('calling')
+          this.currentStatus.classList.remove('hidden')
         }
         this.stopPolling()
         if (this.currentButton) {
@@ -199,6 +201,7 @@ export default class extends Controller {
 
     this.currentStatus.textContent = "✅ Appointment confirmed!"
     this.currentStatus.classList.add('success')
+    this.currentStatus.classList.remove('calling', 'hidden')
 
     this.currentNotes.innerHTML = `
       <p><strong>Vet's Response:</strong></p>
