@@ -37,20 +37,18 @@ export function createHorizontalLocationCard(place, onCardClick, onCardHover, ha
   const address = getFormattedAddress(place)
   const distanceText = userLocation ? formatDistance(userLocation, place.location) : null
   const todayHours = getOpeningStatus(place)
+  const metaLine = buildMetaLine(distanceText, todayHours, isNearest)
   const phoneNumber = formatPhoneNumber(place.phoneNumber)
   const phoneHref = buildTelHref(place.phoneNumber)
 
-  const categoryLabel = place.categoryLabel || 'Vet'
-  const categoryClass = place.category || 'vets'
+  const categoryLabel = place.categoryLabel || 'VETERINARY'
+  const categoryClass = place.category || 'veterinary'
 
   const openingHours = getAllOpeningHours(place)
   const directionsUrl = generateDirectionsUrl(place)
 
   card.innerHTML = `
     <div class="location-card-content">
-      <div class="location-card-icon">
-        <i class="fas fa-briefcase-medical"></i>
-      </div>
       <div class="location-card-info">
         <div class="location-card-header">
           <h3 class="location-card-title" title="${place.displayName}">${titleText}</h3>
@@ -58,16 +56,17 @@ export function createHorizontalLocationCard(place, onCardClick, onCardHover, ha
         </div>
         <p class="location-card-category">${categoryLabel}</p>
         <p class="location-card-address">${address}</p>
+        <div class="location-card-divider"></div>
         ${phoneNumber ? `
           <div class="location-card-contact">
-            <a class="phone-icon-button" href="tel:1234567890" aria-label="Call ${place.displayName}" onclick="event.stopPropagation()">
+            <a class="phone-link" href="${phoneHref}" onclick="event.stopPropagation()">
               <i class="fa-solid fa-phone"></i>
-            </a>
               <span class="phone-number">${phoneNumber}</span>
+            </a>
           </div>
         ` : ''}
-        ${distanceText ? `<p class="location-card-distance">Distance: ${distanceText}${isNearest ? ' · Nearest' : ''}</p>` : ''}
-        ${todayHours ? `<p class="location-card-today">${todayHours}</p>` : ''}
+        <div class="location-card-divider compact"></div>
+        ${metaLine ? `<p class="location-card-meta">${metaLine}</p>` : ''}
       </div>
       <button class="location-card-expand-btn" type="button" aria-label="Expand card" title="Expand">
         <span class="expand-handle" aria-hidden="true"></span>
@@ -130,6 +129,24 @@ function formatDistance(origin, destination) {
 function truncateTitle(name, maxLength = 25) {
   if (!name || name.length <= maxLength) return name || ''
   return `${name.slice(0, maxLength)}...`
+}
+
+function buildMetaLine(distanceText, todayHours, isNearest) {
+  const parts = []
+
+  if (distanceText) {
+    parts.push(`<span class="meta-label">Distance</span> <span class="meta-value">${distanceText}</span>`)
+  }
+
+  if (isNearest) {
+    parts.push(`<span class="meta-pill">Nearest</span>`)
+  }
+
+  if (todayHours) {
+    parts.push(`<span class="meta-label">Today</span> <span class="meta-value">${todayHours}</span>`)
+  }
+
+  return parts.join('<span class="meta-separator">·</span>')
 }
 
 function buildTelHref(phone) {

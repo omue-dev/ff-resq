@@ -178,14 +178,14 @@ export const MAPS_CONFIG = {
       vets: {
         includedTypes: ["veterinary_care"],
         icon: "medical",
-        label: "Vets",
+        label: "VETERINARY",
         color: "$card-border"
       },
       shelters: {
         // Use text query since animal_shelter is not a supported type
         textQuery: "animal shelter",
         icon: "home",
-        label: "Shelters",
+        label: "SHELTER",
         color: "#6dd8b8ff"
       },
       rescue: {
