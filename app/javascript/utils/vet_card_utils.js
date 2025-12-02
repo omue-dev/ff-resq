@@ -28,7 +28,7 @@ export function getOpeningStatus(place) {
     if (todayHours) {
       // Extract just the hours part (remove day name)
       const hours = todayHours.split(': ')[1]
-      return `<strong>Today:</strong> ${hours}`
+      return hours || ''
     }
   }
   return null
