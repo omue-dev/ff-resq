@@ -51,11 +51,11 @@ module AppointmentServiceHelpers
       messages.any?
     end
 
-    # @return [String, nil] Latest AI assessment message
+    # @return [String, nil] First AI assessment message
     def ai_assessment
       @ai_assessment ||= messages
         .where(role: "assistant", pending: false)
-        .last&.content
+        .first&.content
     end
 
     # Builds description from AI's assessment
