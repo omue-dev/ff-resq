@@ -46,7 +46,8 @@
           <%= image_tag message.photo_url, class: "img-thumbnail chat-message-photo" %>
         </div>
       <% end %>
-      <%= simple_format(message.content) %>
+      <% species = message.intake&.species.presence %>
+      <%= simple_format([species, message.content].compact.join(" ")) %>
     </div>
     <div class="message-avatar user-avatar">
       <%= content_tag :i, "", class: "fa-solid fa-circle-user" %>
