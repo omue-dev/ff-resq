@@ -205,7 +205,7 @@ export default class extends Controller {
 
     this.currentNotes.innerHTML = `
       <p><strong>Vet's Response:</strong></p>
-      <p>${data.notes || "Appointment confirmed"}</p>
+      <p>${data.notes || "Appointment confirmed"} €</p>
     `
     this.currentNotes.classList.remove('hidden')
 
