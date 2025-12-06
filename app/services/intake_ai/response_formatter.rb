@@ -38,7 +38,7 @@ module IntakeAi
     #
     # @return [String] HTML-formatted message ready for display
     def format_user_message
-      base_message = extract_user_message
+      base_message = highlight_emergency_hint(extract_user_message)
       handling_text = extract_handling_instructions
 
       return base_message if handling_text.blank?
@@ -65,6 +65,18 @@ module IntakeAi
       return nil if handling.blank? || handling.strip.empty?
 
       handling.strip
+    end
+
+    # Wrap the emergency hint so it can be styled in the chat bubble
+    #
+    # @param message [String] The base message text
+    # @return [String] Message with emergency span injected when present
+    def highlight_emergency_hint(message)
+      return message if message.blank? || message.include?("emergency-hint")
+
+      message.gsub(/(This is an emergency)/i) do |match|
+        %(<span class="emergency-hint">#{match}</span>)
+      end
     end
 
     # Injects formatted handling instructions into the user message
