@@ -71,6 +71,11 @@ class ProcessIntakeWithAiJob < ApplicationJob
   def perform(intake_id, pending_message_id)
     intake = Intake.find(intake_id)
 
+    if AiAssistant.disabled?
+      AiAssistant.handle_disabled!(intake, pending_message_id: pending_message_id)
+      return
+    end
+
     IntakeAiProcessor.new(intake).generate_ai_summary(
       pending_message_id: pending_message_id
     )

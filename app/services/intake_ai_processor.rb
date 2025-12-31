@@ -58,6 +58,7 @@ class IntakeAiProcessor
   # @raise [IntakeAi::Error] Various subtypes for different failure modes
   def generate_ai_summary(pending_message_id: nil)
     log_processing_start(pending_message_id)
+    return AiAssistant.handle_disabled!(intake, pending_message_id: pending_message_id) if AiAssistant.disabled?
 
     ai_response = nil
     response_message = find_or_create_message(pending_message_id)

@@ -10,16 +10,22 @@
       </div>
       <span class="chat-brand-text">AI Assistant</span>
     </div>
-    <%= link_to vets_path(intake_id: @intake&.id),
-      class: vet_button_classes(@result) do %>
-      <div class="medical-icon">
-        <%= content_tag :i, "", class: "fa-solid fa-briefcase-medical" %>
-      </div> Find Vets Nearby
+    <% unless assistant_disabled? %>
+      <%= link_to vets_path(intake_id: @intake&.id),
+        class: vet_button_classes(@result) do %>
+        <div class="medical-icon">
+          <%= content_tag :i, "", class: "fa-solid fa-briefcase-medical" %>
+        </div> Find Vets Nearby
+      <% end %>
     <% end %>
   </div>
 
   <!-- Error alert if AI failed -->
-  <% if @status == "error" %>
+  <% if assistant_disabled? %>
+    <div class="alert alert-info mx-3 mt-3 text-center">
+      The assistant is currently disabled. Please try again later.
+    </div>
+  <% elsif @status == "error" %>
     <div class="alert alert-danger mx-3 mt-3 text-center">
       ⚠️ AI error: <%= @error_message.presence || "An unexpected problem occurred. Please try again later." %>
     </div>
@@ -53,7 +59,13 @@
   </div>
 
   <!-- Fixed Input Area at Bottom -->
-    <% if @intake.present? && @intake.persisted? && !@mock %>
+    <% if assistant_disabled? %>
+      <div class="chat-input-fixed">
+        <div class="alert alert-info text-center mb-0">
+          The assistant is currently disabled.
+        </div>
+      </div>
+    <% elsif @intake.present? && @intake.persisted? && !@mock %>
       <div class="chat-input-fixed">
         <%= form_with url: message_intake_path(@intake), method: :post, local: true, data: { controller: "chat-form", action: "submit->chat-form#submitMessage" }, class: "chat-input-form" do |f| %>
           <div class="input-wrapper">
