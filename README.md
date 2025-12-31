@@ -36,6 +36,7 @@ Final project built during the **Le Wagon Web Developer Bootcamp**. ff-resq is a
 - `CLOUDINARY_URL` – Cloudinary credentials for Active Storage.
 - `GOOGLE_MAPS_API_KEY` – loads Maps JS in `vets#index`.
 - `AI_APPOINTMENT` – set to `true` to show the “AI is calling the vet” experience on the front end.
+- `DISABLE_GEMINI_CHAT` – set to `true` to short-circuit Gemini calls and show a disabled notice in chat (optional `AI_ASSISTANT_DISABLED_MESSAGE` to override the text).
 - Twilio voice:
   - `TWILIO_ACCOUNT_SID`
   - `TWILIO_AUTH_TOKEN`

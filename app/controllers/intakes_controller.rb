@@ -56,6 +56,7 @@ class IntakesController < ApplicationController
     end
 
     # Save user's initial message (photo_url will be updated by background job)
+    assistant_disabled = assistant_disabled?
     user_message = @intake.chat_messages.create!(
       role: "user",
       content: description,
@@ -63,28 +64,33 @@ class IntakesController < ApplicationController
       pending: has_photo  # Mark as pending if waiting for photo upload
     )
 
-    # Pre-create a placeholder AI message so the Stimulus poll controller knows what to refresh.
-    pending_message = @intake.chat_messages.create!(
-      role: "assistant",
-      content: "Analyzing",
-      pending: true
-    )
-
-    # Upload photo to Cloudinary asynchronously if present
-    if has_photo
-      # Read photo data as binary string (ActiveJob can serialize this)
-      photo_data = photo_file.read
-      # CloudinaryUploadJob will trigger AI job after upload completes
-      CloudinaryUploadJob.perform_later(
-        @intake.id,
-        photo_data,
-        photo_file.original_filename,
-        photo_file.content_type,
-        pending_message.id  # Pass the pending message ID so AI can be triggered after upload
-      )
+    if assistant_disabled
+      user_message.update!(pending: false) if user_message.pending?
+      AiAssistant.handle_disabled!(@intake)
     else
-      # No photo - start AI job immediately
-      @intake.generate_ai_summary_async(pending_message_id: pending_message.id)
+      # Pre-create a placeholder AI message so the Stimulus poll controller knows what to refresh.
+      pending_message = @intake.chat_messages.create!(
+        role: "assistant",
+        content: "Analyzing",
+        pending: true
+      )
+
+      # Upload photo to Cloudinary asynchronously if present
+      if has_photo
+        # Read photo data as binary string (ActiveJob can serialize this)
+        photo_data = photo_file.read
+        # CloudinaryUploadJob will trigger AI job after upload completes
+        CloudinaryUploadJob.perform_later(
+          @intake.id,
+          photo_data,
+          photo_file.original_filename,
+          photo_file.content_type,
+          pending_message.id  # Pass the pending message ID so AI can be triggered after upload
+        )
+      else
+        # No photo - start AI job immediately
+        @intake.generate_ai_summary_async(pending_message_id: pending_message.id)
+      end
     end
 
     # Store intake_id in session for vets page
@@ -111,6 +117,7 @@ class IntakesController < ApplicationController
   def create_message
     # Find the existing conversation
     @intake = Intake.find(params[:id])
+    assistant_disabled = assistant_disabled?
 
     # Get message from form
     user_message = message_params[:content]
@@ -120,6 +127,29 @@ class IntakesController < ApplicationController
       role: "user",
       content: user_message
     })
+
+    if assistant_disabled
+      disabled_message = AiAssistant.handle_disabled!(@intake)
+
+      respond_to do |format|
+        format.html { redirect_to chat_intake_path(@intake) }
+        format.json {
+          render json: {
+            user_message_html: render_to_string(
+              partial: "intakes/message",
+              locals: { message: user_chat_message },
+              formats: [:html]
+            ),
+            ai_message_html: render_to_string(
+              partial: "intakes/message",
+              locals: { message: disabled_message },
+              formats: [:html]
+            )
+          }
+        }
+      end
+      return
+    end
 
     # Create AI placeholder
     pending_message = @intake.chat_messages.create!(
@@ -171,6 +201,7 @@ class IntakesController < ApplicationController
     # Pass error + status info to the view
     @status = @intake.status
     @error_message = @intake.parsed_payload.dig("error") rescue nil
+    @assistant_disabled = assistant_disabled?
   end
 
   private
